@@ -33,7 +33,10 @@ class TiledElement(object):
                 print "Please change the name in Tiled and try again."
                 print v
                 raise ValueError
-            setattr(self, k, types[str(k)](v))
+            if v.isdigit():
+                setattr(self, k, types[str(k)](int(v)))
+            else:
+                setattr(self, k, types[str(k)](v))
 
 
 class TiledMap(TiledElement):
@@ -107,6 +110,13 @@ class TiledMap(TiledElement):
                 msg = "Coords: ({0},{1}) in layer {2} has invalid GID: {3}"
                 raise Exception, msg.format(x, y, layer, gid)
 
+    def getTileImageByGID(self, gid):
+        try:
+            return self.images[gid]
+        except (IndexError, ValueError):
+            msg = "Invalid gid"
+
+
 
     def getTileGID(self, x, y, layer):
         """
@@ -116,6 +126,19 @@ class TiledMap(TiledElement):
 
         try:
             return self.tilelayers[int(layer)].data[int(y)][int(x)]
+        except (IndexError, ValueError):
+            msg = "Coords: ({0},{1}) in layer {2} is invalid"
+            raise Exception, msg.format(x, y, layer)
+
+
+    def setTileGID(self, (x, y, layer), gid):
+        """
+        set GID of a tile in this location
+        x and y must be integers and are in tile coordinates, not pixel
+        """
+
+        try:
+            self.tilelayers[int(layer)].data[int(y)][int(x)] = gid
         except (IndexError, ValueError):
             msg = "Coords: ({0},{1}) in layer {2} is invalid"
             raise Exception, msg.format(x, y, layer)
@@ -579,7 +602,6 @@ class TiledObject(TiledElement):
 
     def __repr__(self):
         return "<{0}: \"{1}\">".format(self.__class__.__name__, self.name)
-
 
     def parse(self, node):
         self.set_properties(node)

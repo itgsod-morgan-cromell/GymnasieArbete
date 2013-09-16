@@ -140,7 +140,6 @@ Tiles properties are the exception here, and must be accessed through
     >>> tile["name"]
     'CobbleStone'
 
-
 ===============================================================================
 
 NOTES:

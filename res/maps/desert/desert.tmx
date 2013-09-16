@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="40" height="40" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="Desert" tilewidth="32" tileheight="32" spacing="1" margin="1">
+  <image source="tmw_desert_spacing.png" width="298" height="199"/>
+  <tile id="8">
+   <properties>
+    <property name="type" value="wall"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="senap" value="ost"/>
+    <property name="time" value="10"/>
+   </properties>
+  </tile>
+  <tile id="41">
+   <properties>
+    <property name="type" value="bush"/>
+   </properties>
+  </tile>
+  <tile id="50">
+   <properties>
+    <property name="solid" value="true"/>
+    <property name="type" value="sign"/>
+   </properties>
+  </tile>
+  <tile id="51">
+   <properties>
+    <property name="animation" value="fire.png"/>
+    <property name="delay" value="0.1"/>
+    <property name="frames_x" value="1"/>
+    <property name="frames_y" value="4"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Ground" width="40" height="40">
+  <data encoding="base64" compression="zlib">
+   eJzt1iEKwDAMhtH4nqKrm+3uf7bZqcLE4C974kEg5iMqvao6r7XF7njMZ2DfDLnfqjGBvu/6rvC+BPr06dOn7z8SfrMdjYAGAAAg2w1a/80O
+  </data>
+ </layer>
+ <objectgroup color="#00ff00" draworder="topdown" name="entities" width="40" height="40">
+  <object name="target" x="672" y="704" width="32" height="32">
+   <properties>
+    <property name="spriteOffsetX" value="2"/>
+    <property name="spriteOffsetY" value="57"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup color="#ff0000" draworder="topdown" name="triggers" width="40" height="40">
+  <object name="solid" type="solid" x="584" y="640" width="16" height="24">
+   <properties>
+    <property name="solid" value="true"/>
+   </properties>
+  </object>
+  <object type="teleporter" x="640" y="576" width="32" height="32">
+   <properties>
+    <property name="map" value="level_1"/>
+    <property name="solid" value="false"/>
+    <property name="target" value="player"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="top" width="40" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztzgENAAAIA6BnsX9IY1w3SEACAADw07QDAADAWQu3bwAj
+  </data>
+ </layer>
+</map>
