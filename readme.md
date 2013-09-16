@@ -1,4 +1,4 @@
-# GymnasieArbete 2013-2014
+﻿# GymnasieArbete 2013-2014
 
 Detta gymnasiearbete utförs av:
 
@@ -8,5 +8,11 @@ Detta gymnasiearbete utförs av:
 
 # Frågeställning
 
-Hur enkelt är det att programmera ett avancerat spel i ett högnivå språk, och hur påverkar det användarupplevelsen?
+Vilken version är bäst av python för att programmera spel i? 
+Version av python vi ska testa: 
 
+cPython # Används just nu.
+IronPython
+Jython
+PyPy
+Stackless Python
