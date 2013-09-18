@@ -1,4 +1,4 @@
-
+import game.game
 
 
 class Entity(object):
@@ -6,6 +6,7 @@ class Entity(object):
         self.x = x
         self.y = y
         self.world = world
+        self.timeCreated = game.game.clock.time
 
     def update(self):
         pass

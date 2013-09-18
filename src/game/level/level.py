@@ -138,9 +138,8 @@ class Level(object):
                                 pygame.draw.rect(self.map_object_buffer, pygame.Color(og.color),
                                                 (o.x - camera.x, o.y - camera.y, o.width, o.height), 2)
 
-    def updateEntity(self):
-        for e in game.game.mapdata[self.name]:
-            e.update()
+    def updateEntity(self, e):
+        e.update()
 
     def create_map(self):
         self.map_buffer.fill((50, 33, 37))

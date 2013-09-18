@@ -11,33 +11,35 @@ import level.level
 from profilehooks import profile
 import input_handler
 
+
+pygame.init()
 world = None
 player = None
 mapdata = {}
 screen = None
-input = None
+input = input_handler.Input()
 camera = None
 debug = True
 minimap_scale = 8
 player = None
+clock = gameclock.GameClock(60)
 
 
 class Game(object):
     def __init__(self):
-        global world, player, mapdata, screen, camera, input
+        global world, player, mapdata, screen, camera, clock
         screen_width = 800
         screen_height = 600
-        pygame.init()
+        self.tmap = pygame.threads.tmap
+        self.wq = pygame.threads.WorkerQueue(3)
         screen = pygame.display.set_mode((screen_width, screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF)
         camera = pygame.Rect(0, 0, screen_width, screen_height)
         world = level.level.Level("../res/maps/level_1/level_1.tmx")
-        input = input_handler.Input()
-
-        self.clock = gameclock.GameClock(60)
         self.font = pygame.font.Font('../res/gothic.ttf', 15)
+
         pygame.mixer.init()
         pygame.mixer.music.load("../res/test.ogg")
-        pygame.mixer.music.play()
+        #pygame.mixer.music.play()
 
 
 
@@ -64,15 +66,15 @@ class Game(object):
 
             # Calling the rendering and update methods
 
-            pygame.display.set_caption("FPS: " + str(self.clock.get_fps()) + " UPS: " + str(self.clock.get_ups()))
-            self.dt = self.clock.tick()
-            if self.clock.update_ready:
+            pygame.display.set_caption("FPS: " + str(clock.get_fps()) + " UPS: " + str(clock.get_ups()))
+            self.dt = clock.tick()
+            if clock.update_ready:
                 self.update()
-            if self.clock.frame_ready:
+            if clock.frame_ready:
                 self.render()
 
     def update(self):
-        world.updateEntity()
+        self.tmap(world.updateEntity, mapdata[world.name], worker_queue=self.wq)
         if camera.w < world.map_width:
 
             if camera.x + camera.w > world.map_width - 100:
@@ -115,8 +117,8 @@ class Game(object):
             screen.fill((0,0,0), pygame.Rect(camera.w - 130, 40, 150, 180))
             self.text("--- DEBUG ---", (camera.w - 120, 60))
             self.text("MAP: " + world.name, (camera.w - 120, 80))
-            self.text("FPS: " + str(self.clock.get_fps()), (camera.w - 120, 100))
-            self.text("UPS: " + str(self.clock.get_ups()), (camera.w - 120, 120))
+            self.text("FPS: " + str(clock.get_fps()), (camera.w - 120, 100))
+            self.text("UPS: " + str(clock.get_ups()), (camera.w - 120, 120))
         pygame.display.flip()
 
 

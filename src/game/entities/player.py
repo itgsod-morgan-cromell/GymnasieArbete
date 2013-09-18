@@ -3,7 +3,6 @@ import game.game
 import game.gfx.animate
 from mob import Mob
 
-
 class Player(Mob):
 
     def __init__(self, data):
@@ -15,7 +14,6 @@ class Player(Mob):
         speed = int(data.speed)
         rect = pygame.Rect(0, 0, data.width, data.height)
         super(Player, self).__init__(game.game.world, data.name, x, y, speed, rect)
-
         self.standing = [0] * 4
         self.standing[0] = pygame.image.load('../res/sprites/player/crono_back.gif')
         self.standing[1] = pygame.image.load('../res/sprites/player/crono_front.gif')
