@@ -23,15 +23,17 @@ debug = True
 minimap_scale = 8
 player = None
 clock = gameclock.GameClock(60)
-
+game = None
 
 class Game(object):
     def __init__(self):
-        global world, player, mapdata, screen, camera, clock
+        global world, player, mapdata, screen, camera, clock, game
         screen_width = 800
         screen_height = 600
+
         self.tmap = pygame.threads.tmap
-        self.wq = pygame.threads.WorkerQueue(3)
+        self.wq = pygame.threads.WorkerQueue(0)
+        game = self
         screen = pygame.display.set_mode((screen_width, screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF)
         camera = pygame.Rect(0, 0, screen_width, screen_height)
         world = level.level.Level("../res/maps/level_1/level_1.tmx")
@@ -43,7 +45,7 @@ class Game(object):
 
 
 
-    #@profile
+    @profile
     def run(self):
         while True:
             input.Poll()
@@ -77,8 +79,8 @@ class Game(object):
         self.tmap(world.updateEntity, mapdata[world.name], worker_queue=self.wq)
         if camera.w < world.map_width:
 
-            if camera.x + camera.w > world.map_width - 100:
-                camera.x = world.map_width - camera.w - 100
+            if camera.x + camera.w > world.map_width:
+                camera.x = world.map_width - camera.w
 
             if camera.x < 0:
                 camera.x = 0

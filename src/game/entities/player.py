@@ -2,6 +2,8 @@ import pygame
 import game.game
 import game.gfx.animate
 from mob import Mob
+import random
+
 
 class Player(Mob):
 
@@ -13,7 +15,7 @@ class Player(Mob):
         y = data.y - self.data.spriteOffsetY
         speed = int(data.speed)
         rect = pygame.Rect(0, 0, data.width, data.height)
-        super(Player, self).__init__(game.game.world, data.name, x, y, speed, rect)
+        super(Player, self).__init__(game.game.world, data.type, x, y, speed, rect)
         self.standing = [0] * 4
         self.standing[0] = pygame.image.load('../res/sprites/player/crono_back.gif')
         self.standing[1] = pygame.image.load('../res/sprites/player/crono_front.gif')
@@ -35,6 +37,7 @@ class Player(Mob):
         self.anim_objs['right_run'].makeTransformsPermanent()
 
         self.move_conductor = game.gfx.animate.PygConductor(self.anim_objs)
+
     def update(self):
         self.running = False
         self.speed = 5
@@ -52,7 +55,6 @@ class Player(Mob):
             ya -= 1
         if input.GetControl('DOWN'):
             ya += 1
-
         if xa != 0 or ya != 0:
             self.move(xa, ya)
             self.isMoving = True
@@ -68,20 +70,30 @@ class Player(Mob):
         ya *= self.speed
 
         player_rect = pygame.Rect(self.rect.x + xa, self.rect.y + ya, self.rect.w, self.rect.h)
+        if not game.game.world.mapRect.contains(player_rect):
+            return True
         if game.game.world.collide(player_rect):
             return True
 
-        object = game.game.world.collide_object(player_rect)
+        object = game.game.world.collide_object(self, player_rect)
         if object:
-            self.checkInteraction(object)
+            if self.checkInteraction(object):
+                return True
 
         return False
 
     def checkInteraction(self, object):
         if object.type == 'sign':
             print "This is a sign!"
+            return True
         if object.type == 'teleporter':
+            self.teleport(object)
 
+        if object.type == 'dummy':
+            return True
+
+
+    def teleport(self, object):
             print "teleporting to :" + object.map
             game.game.mapdata[game.game.world.name].remove(self)
             game.game.world = game.level.level.Level('../res/maps/%s/%s.tmx' % (object.map, object.map))
@@ -97,6 +109,7 @@ class Player(Mob):
                 self.x -= target.width/2 + 10
             elif target.spawn_position == "e":
                 self.x += target.width2 + 10
+
 
     def render(self):
         screen = game.game.screen

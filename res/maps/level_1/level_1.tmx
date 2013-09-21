@@ -84,6 +84,11 @@
   <tile id="213" terrain="1,1,1,"/>
   <tile id="214" terrain="1,1,,1"/>
   <tile id="215" terrain="1,1,,1"/>
+  <tile id="234">
+   <properties>
+    <property name="wall" value="a"/>
+   </properties>
+  </tile>
   <tile id="245" terrain="1,,1,1"/>
   <tile id="246" terrain=",1,1,1"/>
   <tile id="247" terrain=",1,1,1"/>
@@ -278,15 +283,195 @@
  </layer>
  <layer name="mountain" width="62" height="31">
   <data encoding="base64" compression="zlib">
-   eJztlGEOATEUhLsOI06CkyA4B4I7EP7hFBzAHexFzI/+aJp9eWy7eHa+ZJLpS5u8SSZ1jhBCCCGE1KX37QU+QLdixty/z7RwbgbNi/feWc+9Rt4NtG1Z7hPynqFLy3Kz56/d30F7Zz+31HOtB31oAB2go/fDRjfNi5RP68EIGkNX6Ob9pNFN8yLl0/67BbSEHlDp/ari3r2Tc9t81P3PrSP1PJ5rZ2tIPY/n2tkaUs/juXa2RtjXFG+NsK8p3hphX1O8JdhxdvzfO26VJ29EcC4=
+   eJztmUEKwjAQRVMPI55EPYmKegoXKuodFN2paw+gB+gddNlL+IWKUpKmMTNTS/Lhw2RoS17zSaDNlFJZoA5NkTssRW4+XVpufQlFbj5F7mp9CUlxm2xSh3lO/7CftzW9yM0jSu5xotQEniZu9zWdewXeNbwh5Oba+yi5j+A9wefA1rtKznXr13Ru15xv4Z1qPrcp59850K13F+7Be/iQ132iOZkkkXNbDgbwEL7Ct7weEc3JJImc2/a7ObyA7/Ajr5ea61LCvV0i5xxnke8zJXJe7NvGEpLIebFvG7vql7WXyHmxbxtzaZZ8zJVzn1pCXDn3qSXElXOfukxUZwMVt0+uXyxlGec4B6m4OTLO+f2Nilsi429RvI+6/0fW6Sc+aCsd
   </data>
  </layer>
  <objectgroup color="#00ff00" draworder="topdown" name="entities" width="62" height="31">
-  <object name="player" type="player" x="1168" y="680" width="28" height="13">
+  <object name="player" type="player" x="1072" y="664" width="28" height="13">
    <properties>
     <property name="speed" value="5"/>
     <property name="spriteOffsetX" value="2"/>
     <property name="spriteOffsetY" value="57"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1168" y="664" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1216" y="688" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1184" y="736" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1264" y="632" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1264" y="752" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1056" y="784" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1200" y="808" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1424" y="552" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1432" y="752" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1328" y="800" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1368" y="800" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1432" y="848" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1536" y="800" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1320" y="736" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1368" y="680" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="1528" y="600" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="840" y="784" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="864" y="864" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="976" y="808" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="760" y="744" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="808" y="688" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="968" y="608" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="748" y="852" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="812" y="900" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="916" y="852" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="700" y="788" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="712" y="640" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="908" y="652" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="816" y="264" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="848" y="264" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="888" y="264" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="920" y="264" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="920" y="232" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="880" y="232" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="840" y="224" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
+   </properties>
+  </object>
+  <object name="dummy" type="dummy" x="808" y="224" width="16" height="16">
+   <properties>
+    <property name="speed" value="2"/>
    </properties>
   </object>
  </objectgroup>

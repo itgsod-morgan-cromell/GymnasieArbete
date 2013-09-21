@@ -3,9 +3,9 @@ from entity import Entity
 
 class Mob(Entity):
 
-    def __init__(self, world, name, x, y, speed, rect):
+    def __init__(self, world, type, x, y, speed, rect):
         super(Mob, self).__init__(world, x, y)
-        self.name = name
+        self.type = type
         self.speed = speed
         self.numSteps = 0
         self.isMoving = False
