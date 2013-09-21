@@ -50,11 +50,11 @@ class PygAnimation(object):
         for frame in frames:
             if len(frame) == 4:
                 spriteSheet = pygame.image.load(frame[0])
-                frameWidth = spriteSheet.get_width() / frame[3]
-                frameHeight = spriteSheet.get_height() / frame[2]
+                frameWidth = spriteSheet.get_width() / frame[2]
+                frameHeight = spriteSheet.get_height() / frame[3]
                 animationSpeed = frame[1]
-                tiles_x = frame[3]
-                tiles_y = frame[2]
+                tiles_x = frame[2]
+                tiles_y = frame[3]
                 frames.pop(frames.index(frame))
                 for y in range(0, tiles_y):
                     for x in range(0, tiles_x):

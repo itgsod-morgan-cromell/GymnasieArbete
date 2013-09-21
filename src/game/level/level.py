@@ -4,6 +4,7 @@ import game.gfx.animate
 import game.entities.player
 import game.entities.dummy
 import os
+import game.gfx.PAdLib.occluder as occluder
 
 
 class Level(object):
@@ -33,6 +34,11 @@ class Level(object):
         sTile = int((rect.y + rect.h) / th) + 1
         wTile = int(rect.x / tw) - 1
         eTile = int((rect.x + rect.w) / tw) + 1
+
+        if eTile > self.tiledmap.width:
+            eTile = self.tiledmap.width
+        if sTile > self.tiledmap.height:
+            sTile = self.tiledmap.height
 
         for layer in xrange(0, len(self.tiledmap.tilelayers)):
             for y in xrange(nTile, sTile):
@@ -67,6 +73,31 @@ class Level(object):
                                 tileRect = pygame.Rect(x*tw + offsetE, y*th + offsetS, tw + offsetW - offsetE, th + offsetN - offsetS)
                                 if rect.colliderect(tileRect):
                                     return True
+
+    def get_solids(self, occluders, rect):
+        tw = self.tiledmap.tilewidth
+        th = self.tiledmap.tileheight
+        nTile = int(rect.y / th) - 1
+        sTile = int((rect.y + rect.h) / th)
+        wTile = int(rect.x / tw) - 1
+        eTile = int((rect.x + rect.w) / tw)
+
+        if eTile > self.tiledmap.width:
+            eTile = self.tiledmap.width
+        if sTile > self.tiledmap.height:
+            sTile = self.tiledmap.height
+
+        for layer in xrange(0, len(self.tiledmap.tilelayers)):
+            for y in xrange(nTile, sTile):
+                for x in xrange(wTile, eTile):
+                    gid = self.tiledmap.getTileGID(x, y, layer)
+                    if gid:
+                        if hasattr(self.tiledmap.tilelayers[layer], "is_walls"):
+                            occluders.append(occluder.Occluder([[x*tw - rect.x, y*th - rect.y], [x*tw - rect.x, y*th+th - rect.y], [x*tw+tw - rect.x, y*th+th - rect.y], [x*tw+tw - rect.x, y*th - rect.y]]))
+        return occluders
+
+
+
 
     def collide_object(self, obj, rect):
         for og in self.tiledmap.objectgroups:

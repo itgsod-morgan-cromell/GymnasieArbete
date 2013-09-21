@@ -16,11 +16,11 @@ class Player(Mob):
         speed = int(data.speed)
         rect = pygame.Rect(0, 0, data.width, data.height)
         super(Player, self).__init__(game.game.world, data.type, x, y, speed, rect)
-        self.standing = [0] * 4
-        self.standing[0] = pygame.image.load('../res/sprites/player/crono_back.gif')
-        self.standing[1] = pygame.image.load('../res/sprites/player/crono_front.gif')
-        self.standing[2] = pygame.image.load('../res/sprites/player/crono_left.gif')
-        self.standing[3] = pygame.transform.flip(self.standing[2], True, False)
+        self.standing = {}
+        self.standing['UP'] = pygame.image.load('../res/sprites/player/crono_back.gif')
+        self.standing['DOWN'] = pygame.image.load('../res/sprites/player/crono_front.gif')
+        self.standing['LEFT'] = pygame.image.load('../res/sprites/player/crono_left.gif')
+        self.standing['RIGHT'] = pygame.transform.flip(self.standing['LEFT'], True, False)
 
         anim_types = 'back_run back_walk front_run front_walk left_run left_walk'.split()
         self.anim_objs = {}
@@ -37,8 +37,22 @@ class Player(Mob):
         self.anim_objs['right_run'].makeTransformsPermanent()
 
         self.move_conductor = game.gfx.animate.PygConductor(self.anim_objs)
+        self.spriteRect = self.anim_objs['right_run'].getRect()
+
+        self.centerX = self.x + self.spriteRect.x + self.spriteRect.w/2
+        self.centerY = self.y + self.spriteRect.y + self.spriteRect.h/2
+        self.time = 30
+        self.targetX = 0
+        self.targetY = 0
 
     def update(self):
+        self.time += 1
+        if self.time >= 30:
+            self.time = 0
+            self.targetX = self.rect.x
+            self.targetY = self.rect.y
+
+
         self.running = False
         self.speed = 5
         xa = 0
@@ -56,6 +70,8 @@ class Player(Mob):
         if input.GetControl('DOWN'):
             ya += 1
         if xa != 0 or ya != 0:
+            for key in self.movingDir:
+                self.movingDir[key] = False
             self.move(xa, ya)
             self.isMoving = True
         else:
@@ -64,6 +80,8 @@ class Player(Mob):
         self.rect.x = self.x + self.data.spriteOffsetX
         self.rect.y = self.y + self.data.spriteOffsetY
         game.game.camera.center = self.rect.center
+        self.centerX = self.rect.center[0]
+        self.centerY = self.rect.center[1] - self.spriteRect.h/2
 
     def hasCollided(self, xa, ya):
         xa *= self.speed
@@ -122,29 +140,32 @@ class Player(Mob):
             self.move_conductor.play()
             if not self.running:
 
-                if self.movingDir == 0:
+                if self.movingDir['UP']:
                     self.anim_objs['back_walk'].blit(screen, (x, y))
-                elif self.movingDir == 1:
+                elif self.movingDir['DOWN']:
                     self.anim_objs['front_walk'].blit(screen, (x, y))
-                elif self.movingDir == 2:
+                elif self.movingDir['LEFT']:
                     self.anim_objs['left_walk'].blit(screen, (x, y))
-                elif self.movingDir == 3:
+                elif self.movingDir['RIGHT']:
                     self.anim_objs['right_walk'].blit(screen, (x, y))
 
             else:
-                if self.movingDir == 0:
+                if self.movingDir['UP']:
                     self.anim_objs['back_run'].blit(screen, (x, y))
-                elif self.movingDir == 1:
+                elif self.movingDir['DOWN']:
                     self.anim_objs['front_run'].blit(screen, (x, y))
-                elif self.movingDir == 2:
+                elif self.movingDir['LEFT']:
                     self.anim_objs['left_run'].blit(screen, (x, y))
-                elif self.movingDir == 3:
+                elif self.movingDir['RIGHT']:
                     self.anim_objs['right_run'].blit(screen, (x, y))
 
 
         else:
             self.move_conductor.stop()
-            screen.blit(self.standing[self.movingDir], (x, y))
+            for key in self.movingDir:
+                if self.movingDir[key]:
+                    screen.blit(self.standing[key], (x, y))
+
 
 
 

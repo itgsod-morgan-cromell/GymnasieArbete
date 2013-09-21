@@ -9,7 +9,7 @@ class Mob(Entity):
         self.speed = speed
         self.numSteps = 0
         self.isMoving = False
-        self.movingDir = 1
+        self.movingDir = {'UP': False, 'DOWN': True, 'LEFT': False, 'RIGHT': False}
         self.rect = rect.copy()
 
     def move(self, xa, ya):
@@ -21,13 +21,13 @@ class Mob(Entity):
 
         self.numSteps += 1
         if ya < 0:
-            self.movingDir = 0 #UP
-        if ya > 0:
-            self.movingDir = 1 #DOWN
-        if xa < 0:
-            self.movingDir = 2 #LEFT
+            self.movingDir['UP'] = True
         if xa > 0:
-            self.movingDir = 3 #RIGHT
+            self.movingDir['RIGHT'] = True
+        if ya > 0:
+            self.movingDir['DOWN'] = True
+        if xa < 0:
+            self.movingDir['LEFT'] = True
 
         if not self.hasCollided(xa, ya):
             self.x += xa * self.speed

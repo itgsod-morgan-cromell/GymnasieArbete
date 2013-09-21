@@ -7,7 +7,7 @@ import pygame
 from pygame.locals import *
 import gameclock
 import level.level
-
+import gfx.shadows
 from profilehooks import profile
 import input_handler
 
@@ -38,7 +38,7 @@ class Game(object):
         camera = pygame.Rect(0, 0, screen_width, screen_height)
         world = level.level.Level("../res/maps/level_1/level_1.tmx")
         self.font = pygame.font.Font('../res/gothic.ttf', 15)
-
+        self.lighting = gfx.shadows.Lighting()
         pygame.mixer.init()
         pygame.mixer.music.load("../res/test.ogg")
         #pygame.mixer.music.play()
@@ -98,6 +98,7 @@ class Game(object):
             camera.y = -(camera.h - world.map_height)/2
 
         world.update()
+        self.lighting.update()
 
 
     def set_resolution(self, width, aspect):
@@ -114,6 +115,7 @@ class Game(object):
         screen.fill((50,33,37))
         world.render_background()
         world.render()
+        self.lighting.draw()
 
         if debug:
             screen.fill((0,0,0), pygame.Rect(camera.w - 130, 40, 150, 180))

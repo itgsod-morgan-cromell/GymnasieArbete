@@ -20,7 +20,8 @@ class Dummy(Mob):
         rect = pygame.Rect(x, y, data.width, data.height)
         super(Dummy, self).__init__(game.game.world, data.type, x, y, speed, rect)
 
-        self.sprite = pygame.image.load('../res/sprites/dummy/dummy.gif')
+        self.sprite = game.gfx.animate.PygAnimation([('../res/sprites/dummy/walk_top.png', 0.3, 4, 1)])
+        self.sprite.play()
         self.time = 29
         self.targetX = game.game.player.x
         self.targetY = game.game.player.y
@@ -31,21 +32,14 @@ class Dummy(Mob):
             return
         xa = 0
         ya = 0
-        if self.targetX > self.x:
+        if game.game.player.targetX > self.x:
             xa += 1
-        if self.targetX < self.x:
+        if game.game.player.targetX < self.x:
             xa -= 1
-        if self.targetY > self.y:
+        if game.game.player.targetY > self.y:
             ya += 1
-        if self.targetY < self.y:
+        if game.game.player.targetY < self.y:
             ya -= 1
-
-        self.time += 1
-        if self.time >= 30:
-            self.time = 0
-            self.targetX = game.game.player.x
-            self.targetY = game.game.player.y
-
 
 
         if xa != 0 or ya != 0:
@@ -93,4 +87,4 @@ class Dummy(Mob):
         x = self.x - game.game.camera.x
         y = self.y - game.game.camera.y
 
-        screen.blit(self.sprite, (x, y))
+        self.sprite.blit(screen, (x, y))
