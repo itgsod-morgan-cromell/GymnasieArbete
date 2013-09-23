@@ -1,7 +1,7 @@
 import pygame
 import game.game
 import game.gfx.animate
-from mob import Mob
+from .mob import Mob
 import random
 
 
@@ -14,6 +14,7 @@ class Player(Mob):
         x = data.x - self.data.spriteOffsetX
         y = data.y - self.data.spriteOffsetY
         speed = int(data.speed)
+        self.moveSpeed = speed
         rect = pygame.Rect(0, 0, data.width, data.height)
         super(Player, self).__init__(game.game.world, data.type, x, y, speed, rect)
         self.standing = {}
@@ -29,6 +30,7 @@ class Player(Mob):
             self.anim_objs[anim_type] = game.gfx.animate.PygAnimation(images_and_duration)
 
         # create the right-facing sprites by copying and flipping the left-facing sprites
+        self.anim_objs['left_walk'] = game.gfx.animate.PygAnimation([('../res/sprites/dummy/walk_top.png', 1, 6, 1)])
         self.anim_objs['right_walk'] = self.anim_objs['left_walk'].getCopy()
         self.anim_objs['right_walk'].flip(True, False)
         self.anim_objs['right_walk'].makeTransformsPermanent()
@@ -54,7 +56,7 @@ class Player(Mob):
 
 
         self.running = False
-        self.speed = 5
+        self.speed = self.moveSpeed
         xa = 0
         ya = 0
         input = game.game.input
@@ -69,6 +71,9 @@ class Player(Mob):
             ya -= 1
         if input.GetControl('DOWN'):
             ya += 1
+
+
+
         if xa != 0 or ya != 0:
             for key in self.movingDir:
                 self.movingDir[key] = False
@@ -102,7 +107,7 @@ class Player(Mob):
 
     def checkInteraction(self, object):
         if object.type == 'sign':
-            print "This is a sign!"
+            print("This is a sign")
             return True
         if object.type == 'teleporter':
             self.teleport(object)
@@ -112,7 +117,7 @@ class Player(Mob):
 
 
     def teleport(self, object):
-            print "teleporting to :" + object.map
+            print("teleporting to :" + object.map)
             game.game.mapdata[game.game.world.name].remove(self)
             game.game.world = game.level.level.Level('../res/maps/%s/%s.tmx' % (object.map, object.map))
             game.game.mapdata[game.game.world.name].append(self)

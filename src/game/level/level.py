@@ -20,6 +20,7 @@ class Level(object):
         self.map_buffer_top = pygame.Surface(game.game.screen.get_size(), pygame.SRCALPHA)
         self.map_object_buffer = pygame.Surface(game.game.screen.get_size(), pygame.SRCALPHA)
         self.map_buffer_top = self.map_buffer_top.convert_alpha()
+        self.animated_tiles = {}
         if self.name not in game.game.mapdata:
             self.entities = []
             self.createEntities()
@@ -110,10 +111,9 @@ class Level(object):
                                 return o
 
         for e in game.game.mapdata[self.name]:
-            if game.game.camera.inflate(64, 64).contains(e.rect):
-                if e != obj:  # To make sure we don't check collision with ourselves.
-                    if rect.colliderect(e.rect):
-                        return e
+            if e != obj:  # To make sure we don't check collision with ourselves.
+                if rect.colliderect(e.rect):
+                    return e
 
     def update(self):
         self.map_buffer_top.fill((255, 255, 255, 0))
@@ -144,6 +144,26 @@ class Level(object):
                                         self.tiledmap.getTileImage((game.game.player.rect.x + game.game.player.rect.w)/tw, (game.game.player.rect.y + game.game.player.rect.h)/th, layer):
                                     self.map_buffer_top.blit(tile, (x*tw - camera.x, y*th - camera.y))
 
+        # Draw all the animated tiles to the map buffer
+        for anim in self.animated_tiles:
+            tile_img = self.animated_tiles[anim][0]
+            tile_x = self.animated_tiles[anim][1]
+            tile_y = self.animated_tiles[anim][2]
+            tile_layer = self.animated_tiles[anim][3]
+            if tile_x < min_x or tile_x > max_x or tile_y < min_y or tile_y > max_y:
+                self.animated_tiles[anim][0].pause()
+            else:
+                self.animated_tiles[anim][0].play()
+                if hasattr(self.tiledmap.tilelayers[tile_layer], "above"):
+                    if tile_y*th > game.game.player.rect.y or \
+                            self.tiledmap.getTileImage(game.game.player.rect.x/tw, game.game.player.rect.y/th, tile_layer) or \
+                            self.tiledmap.getTileImage((game.game.player.rect.x + game.game.player.rect.w)/tw, (game.game.player.rect.y + game.game.player.rect.h)/th, tile_layer):
+                        tile_img.blit(self.map_buffer_top, (tile_x*tw - camera.x, tile_y*th - camera.y))
+                    else:
+                        tile_img.blit(self.map_object_buffer, (tile_x*tw - camera.x, tile_y*th - camera.y))
+                else:
+                    tile_img.blit(self.map_object_buffer, (tile_x*tw - camera.x, tile_y*th - camera.y))
+
         # draw polygon and poly line objects
         if game.game.debug:
             for og in self.tiledmap.objectgroups:
@@ -157,10 +177,11 @@ class Level(object):
                                 pygame.draw.rect(self.map_object_buffer, pygame.Color(og.color),
                                                 (o.x - camera.x, o.y - camera.y, o.width, o.height), 2)
 
-    def updateEntity(self, e):
-        if game.game.camera.inflate(-100, -100).contains(e.rect):
-            e.start = True
-        e.update()
+    def updateEntity(self):
+        for e in game.game.mapdata[self.name]:
+            if game.game.camera.inflate(-100, -100).contains(e.rect):
+                e.start = True
+            e.update()
 
     def create_map(self):
         self.map_buffer.fill((50, 33, 37))
@@ -174,7 +195,25 @@ class Level(object):
                     tile_gid = self.tiledmap.getTileGID(x, y, layer)
                     tile = self.tiledmap.images[tile_gid]
                     if tile:
-                        self.map_buffer.blit(tile, (x*tw, y*th))
+                        gid = (x, y, layer)
+                        tile_properties = self.tiledmap.getTilePropertiesByGID(tile_gid)
+                        if tile_properties:
+                            if 'lightingRadius' in tile_properties:
+                                game.game.lighting.addLight(int(tile_properties['lightingRadius']), x*tw+tw/2, y*th+th/2)
+
+                            if 'animation' in tile_properties:
+                                if gid not in self.animated_tiles:
+                                    self.animated_tiles[gid] = [game.gfx.animate.PygAnimation([('../res/sprites/animated_tiles/%s' % tile_properties['animation'],
+                                                                                                float(tile_properties['delay']),
+                                                                                                int(tile_properties['frames_x']),
+                                                                                                int(tile_properties['frames_y'])
+                                                                                             )]), x, y, layer
+                                                                ]
+                                    self.animated_tiles[gid][0].play()
+                            else:
+                                self.map_buffer.blit(tile, (x*tw, y*th))
+                        else:
+                            self.map_buffer.blit(tile, (x*tw, y*th))
 
     def createEntities(self):
         for og in self.tiledmap.objectgroups:
@@ -186,6 +225,7 @@ class Level(object):
                         self.entities.append(game.game.player)
                     elif o.type == "dummy":
                         self.entities.append(game.entities.dummy.Dummy(o))
+
 
         game.game.mapdata[self.name] = self.entities
 

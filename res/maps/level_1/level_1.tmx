@@ -283,7 +283,7 @@
  </layer>
  <layer name="mountain" width="62" height="31">
   <data encoding="base64" compression="zlib">
-   eJztmdEJwjAURVOHESdRJ1FRp/BDRd1B0T/12wF0AHfQzy7hDRaEkBAlLy+JyYEDL6EtvfTSj7YWQtSZmhsl95tLSz//G+V550XJnRcld1x0PF8/htxtzV7J7QfK3ONKiAmcVr+dl3ruFfKu4Saz3EfkPcFzZrlLz787fgt3Iv3cpp7betCFPbiHh2buE92TCY6e23owgEN4hbdmHhHdkwmOntved3O4gA/4bOal5rg74feAGN7nIeDoubpvW3PA0XN137bmgKPn6r5t7YtZ9dFXz11mDnz13GXmwFfPXWYOqHKn1HEJVe6UOi6hyp1SxyWh/0eG9AVdPRpI
+   eJztmNENgjAURQvDGCYRJkHn8APZQgM7OIAMwA76yRLcxBL86KcvffHek5zkpWnanPSvSwhhIZUNdX94lOn539B7c6FuLtTti8r4fA/dh8Saum1Qdz7UvaNuG3J23+A98HVvHGENBzjGuTG+00N3C0/wCac4n43v9NDdwSt8wXec+8S++Yf/AR66c6BuLpi6L8UuU/c36uZC3VywdzO6AojOt8k=
   </data>
  </layer>
  <layer name="lighting" width="62" height="31">
@@ -392,7 +392,6 @@
     <property name="speed" value="2"/>
    </properties>
   </object>
-  <object x="1096" y="720" width="64" height="56"/>
   <object name="dummy" type="dummy" x="912" y="504" width="32" height="32">
    <properties>
     <property name="speed" value="2"/>

@@ -1,4 +1,4 @@
-from mob import Mob
+from .mob import Mob
 import game.game
 import pygame
 from random import randint
@@ -20,25 +20,27 @@ class Dummy(Mob):
         rect = pygame.Rect(x, y, data.width, data.height)
         super(Dummy, self).__init__(game.game.world, data.type, x, y, speed, rect)
 
-        self.sprite = game.gfx.animate.PygAnimation([('../res/sprites/dummy/walk_top.png', 0.3, 4, 1)])
+        self.sprite = game.gfx.animate.PygAnimation('../res/sprites/dummy/test.xml')
         self.sprite.play()
         self.time = 29
-        self.targetX = game.game.player.x
-        self.targetY = game.game.player.y
         self.start = False
+        self.thinking = False
 
     def update(self):
         if not self.start:
             return
+
+        targetX = game.game.player.targetX
+        targetY = game.game.player.targetY
         xa = 0
         ya = 0
-        if game.game.player.targetX > self.x:
+        if targetX > self.x:
             xa += 1
-        if game.game.player.targetX < self.x:
+        if targetX < self.x:
             xa -= 1
-        if game.game.player.targetY > self.y:
+        if targetY > self.y:
             ya += 1
-        if game.game.player.targetY < self.y:
+        elif targetY < self.y:
             ya -= 1
 
 
@@ -51,6 +53,7 @@ class Dummy(Mob):
         self.rect.x = self.x + self.data.spriteOffsetX
         self.rect.y = self.y + self.data.spriteOffsetY
 
+        self.oldPos = (self.x, self.y)
     def hasCollided(self, xa, ya):
         xa *= self.speed
         ya *= self.speed
@@ -70,20 +73,24 @@ class Dummy(Mob):
         object = game.game.world.collide_object(self, dummy_rect)
         if object:
             if self.checkInteraction(object):
-                self.xa = randint(0, 3) - 1
-                self.ya = randint(0, 3) - 1
                 return True
 
+        self.thinking = False
         return False
 
     def checkInteraction(self, object):
-        if object.type == 'player' or object.type == 'dummy':
+        if object.type == 'dummy':
+            self.thinking = True
             return True
+
+        if object.type == 'player':
+            if self in game.game.mapdata[game.game.world.name]:
+                game.game.mapdata[game.game.world.name].remove(self)
 
     def render(self):
         screen = game.game.screen
 
-        screen.fill((0,255,0), pygame.Rect(self.targetX - game.game.camera.x, self.targetY - game.game.camera.y, 16, 16))
+
         x = self.x - game.game.camera.x
         y = self.y - game.game.camera.y
 

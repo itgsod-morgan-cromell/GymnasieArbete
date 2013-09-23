@@ -5,11 +5,11 @@ import os
 
 import pygame
 from pygame.locals import *
-import gameclock
-import level.level
-import gfx.shadows
-from profilehooks import profile
-import input_handler
+from . import gameclock
+from .level import level
+from .gfx import shadows
+#from profilehooks import profile
+from . import input_handler
 
 
 pygame.init()
@@ -24,28 +24,26 @@ minimap_scale = 8
 player = None
 clock = gameclock.GameClock(60)
 game = None
+lighting = None
+
 
 class Game(object):
     def __init__(self):
-        global world, player, mapdata, screen, camera, clock, game
+        global world, player, mapdata, screen, camera, clock, game, lighting
         screen_width = 800
         screen_height = 600
-
-        self.tmap = pygame.threads.tmap
-        self.wq = pygame.threads.WorkerQueue(0)
         game = self
         screen = pygame.display.set_mode((screen_width, screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF)
         camera = pygame.Rect(0, 0, screen_width, screen_height)
-        world = level.level.Level("../res/maps/level_1/level_1.tmx")
+        lighting = shadows.Lighting()
+        world = level.Level("../res/maps/level_1/level_1.tmx")
         self.font = pygame.font.Font('../res/gothic.ttf', 15)
-        self.lighting = gfx.shadows.Lighting()
+
         pygame.mixer.init()
         pygame.mixer.music.load("../res/test.ogg")
         #pygame.mixer.music.play()
 
-
-
-    @profile
+#    @profile
     def run(self):
         while True:
             input.Poll()
@@ -61,7 +59,7 @@ class Game(object):
                 else:
                     debug = True
             if input.GetControl('RELOAD'):
-                world = level.level.Level(world.current_path)
+                world = level.Level(world.current_path)
 
 
 
@@ -76,7 +74,7 @@ class Game(object):
                 self.render()
 
     def update(self):
-        self.tmap(world.updateEntity, mapdata[world.name], worker_queue=self.wq)
+        world.updateEntity()
         if camera.w < world.map_width:
 
             if camera.x + camera.w > world.map_width:
@@ -98,7 +96,7 @@ class Game(object):
             camera.y = -(camera.h - world.map_height)/2
 
         world.update()
-        self.lighting.update()
+       # lighting.update()
 
 
     def set_resolution(self, width, aspect):
@@ -115,7 +113,7 @@ class Game(object):
         screen.fill((50,33,37))
         world.render_background()
         world.render()
-        self.lighting.draw()
+      #  lighting.render()
 
         if debug:
             screen.fill((0,0,0), pygame.Rect(camera.w - 130, 40, 150, 180))
@@ -123,6 +121,7 @@ class Game(object):
             self.text("MAP: " + world.name, (camera.w - 120, 80))
             self.text("FPS: " + str(clock.get_fps()), (camera.w - 120, 100))
             self.text("UPS: " + str(clock.get_ups()), (camera.w - 120, 120))
+
         pygame.display.flip()
 
 

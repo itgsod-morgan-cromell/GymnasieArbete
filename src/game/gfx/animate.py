@@ -15,7 +15,8 @@
 
 # TODO: Feature idea: if the same image file is specified, re-use the Surface object. (Make this optional though.)
 
-import pygame, time
+import pygame, time, os
+from xml.dom import minidom
 
 # setting up constants
 PLAYING = 'playing'
@@ -64,6 +65,34 @@ class PygAnimation(object):
                         sprite = spriteSheet.subsurface(frameRect)
                         frame = (sprite, animationSpeed)
                         frames.insert(x * (y + 1), frame)
+
+        if isinstance(frames, str):
+            if os.path.splitext(frames)[1] == '.xml':
+                basedir = (os.path.dirname(frames))
+                animdoc = minidom.parse(frames).getElementsByTagName('SpriteMapping')[0]
+                frames = []
+                src = basedir + "/" + animdoc.getElementsByTagName('Texture')[0].attributes['Path'].value
+                spriteSheet = pygame.image.load(src)
+                sprites = []
+                for sprite in animdoc.getElementsByTagName('Sprites')[0].getElementsByTagName('Sprite'):
+                    spriteData = sprite.getElementsByTagName('Coordinates')[0]
+                    x = spriteData.getElementsByTagName('X')[0].childNodes[0].data
+                    y = spriteData.getElementsByTagName('Y')[0].childNodes[0].data
+                    width = spriteData.getElementsByTagName('Width')[0].childNodes[0].data
+                    height = spriteData.getElementsByTagName('Height')[0].childNodes[0].data
+                    rect = pygame.Rect(int(x), int(y), int(width), int(height))
+                    sprites.append(spriteSheet.subsurface(rect))
+
+                animFrames = animdoc.getElementsByTagName('Animations')[0]
+                fps = int(animFrames.getElementsByTagName('Animation')[0].attributes['FrameRate'].value)
+                animFrames = animFrames.getElementsByTagName('Frames')[0].getElementsByTagName('Frame')
+                for frame in animFrames:
+                    id = int(frame.attributes['SpriteId'].value)
+
+                    duration = float(frame.attributes['Duration'].value.replace(',', '.')) * 60/fps
+                    frames.append((sprites[id], duration))
+
+
 
 
 

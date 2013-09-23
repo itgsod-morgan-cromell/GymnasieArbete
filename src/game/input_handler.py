@@ -100,12 +100,6 @@ class Input():
         self.gesturex = 0
         self.gesturey = 0
 
-        with open('../res/test.json', "wb") as fp:
-            json.dump(self.controlMap, fp)
-
-        with open('../res/test.json') as fp:
-            test = json.load(fp)
-            self.controlMap = test
 
     #update the input states
     #your game engine should call this every frame
