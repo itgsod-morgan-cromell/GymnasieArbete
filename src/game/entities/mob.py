@@ -9,8 +9,8 @@ Here we handle stuff as the move function and things like that.
 
 class Mob(Entity):
 
-    def __init__(self, world, type, x, y, speed, rect):
-        super(Mob, self).__init__(world, x, y)
+    def __init__(self, type, x, y, speed, rect):
+        super(Mob, self).__init__(x, y)
         self.type = type
         self.speed = speed
         self.numSteps = 0
