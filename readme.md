@@ -3,16 +3,19 @@
 Detta gymnasiearbete utförs av:
 
 * Morgan Cromell
-* Rasmus Ahlbäck
-* Viktor Lund
+
 
 # Frågeställning
 
 Vilken version är bäst av python för att programmera spel i? 
 Version av python vi ska testa: 
 
-cPython # Används just nu.
-IronPython
-Jython
-PyPy
-Stackless Python
+* cPython
+* IronPython
+* Jython
+* PyPy
+* Stackless Python
+
+# Dokumentation
+
+För full documentation läs Wikin och kommentarer och dictionary i koden. Observera dock att dokumentationen i koden är skriven på engelska.

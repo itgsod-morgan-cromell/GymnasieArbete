@@ -3,7 +3,7 @@ from xml.etree import ElementTree
 from collections import defaultdict
 from utils import decode_gid, types, parse_properties, read_points
 from constants import *
-
+import pygame
 
 
 """
@@ -596,6 +596,7 @@ class TiledObject(TiledElement):
         self.width = 0
         self.height = 0
         self.gid = 0
+        self.rect = None
 
         self.parse(node)
 
@@ -635,5 +636,7 @@ class TiledObject(TiledElement):
                 if y > y2: y2 = y
             self.width = abs(x1) + abs(x2)
             self.height = abs(y1) + abs(y2)
+
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
 

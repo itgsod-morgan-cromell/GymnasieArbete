@@ -6,6 +6,19 @@ import game.entities.dummy
 import os
 import game.gfx.PAdLib.occluder as occluder
 
+'''
+The level class is using data from a tmx file and parsed with the pytmx module.
+
+=============== VARS =====================
+map_buffer* Here we store diffirent buffers for diffirent types of tiles. one buffer for the background layers, and one for the objects such as animated tiles
+we also have a top buffer that is used to render  tiles over the entities.
+
+game.game.mapdata[self.name] : This is used for storing all the entities object. We store all the objects in a dictionary so we can call all the object for a specific map.
+This enables us to switch map back and forth and only update/render the objects that is on the current map.
+
+
+'''
+
 
 class Level(object):
     def __init__(self, filename):
@@ -18,8 +31,9 @@ class Level(object):
         self.mapRect = pygame.Rect(0, 0, self.map_width, self.map_height)
         self.map_buffer = pygame.Surface((self.map_width, self.map_height))
         self.map_buffer_top = pygame.Surface(game.game.screen.get_size(), pygame.SRCALPHA)
-        self.map_object_buffer = pygame.Surface(game.game.screen.get_size(), pygame.SRCALPHA)
         self.map_buffer_top = self.map_buffer_top.convert_alpha()
+        self.map_object_buffer = pygame.Surface(game.game.screen.get_size(), pygame.SRCALPHA)
+
         self.animated_tiles = {}
         if self.name not in game.game.mapdata:
             self.entities = []
@@ -29,6 +43,10 @@ class Level(object):
         self.create_map()
 
     def collide(self, rect):
+        '''
+        Checks collision between a rect object and a tile with specific properties.
+        '''
+
         tw = self.tiledmap.tilewidth
         th = self.tiledmap.tileheight
         nTile = int(rect.y / th) - 1
@@ -41,9 +59,9 @@ class Level(object):
         if sTile > self.tiledmap.height:
             sTile = self.tiledmap.height
 
-        for layer in xrange(0, len(self.tiledmap.tilelayers)):
-            for y in xrange(nTile, sTile):
-                for x in xrange(wTile, eTile):
+        for layer in range(0, len(self.tiledmap.tilelayers)):
+            for y in range(nTile, sTile):
+                for x in range(wTile, eTile):
 
                     gid = self.tiledmap.getTileGID(x, y, layer)
 
@@ -76,6 +94,10 @@ class Level(object):
                                     return True
 
     def get_solids(self, occluders, rect):
+        '''
+        Get all the tiles with the 'wall' property.
+        '''
+
         tw = self.tiledmap.tilewidth
         th = self.tiledmap.tileheight
         nTile = int(rect.y / th) - 1
@@ -88,9 +110,9 @@ class Level(object):
         if sTile > self.tiledmap.height:
             sTile = self.tiledmap.height
 
-        for layer in xrange(0, len(self.tiledmap.tilelayers)):
-            for y in xrange(nTile, sTile):
-                for x in xrange(wTile, eTile):
+        for layer in range(0, len(self.tiledmap.tilelayers)):
+            for y in range(nTile, sTile):
+                for x in range(wTile, eTile):
                     gid = self.tiledmap.getTileGID(x, y, layer)
                     if gid:
                         if hasattr(self.tiledmap.tilelayers[layer], "is_walls"):
@@ -101,14 +123,14 @@ class Level(object):
 
 
     def collide_object(self, obj, rect):
+        '''
+        Checks collison between a rect object and other close by map triggers and also checks collision with other entities.
+        '''
         for og in self.tiledmap.objectgroups:
             if og.name == "triggers":
                 for o in og:
-                    if o.x > game.game.camera.x and o.x + o.width < game.game.camera.x + game.game.camera.w:
-                        if o.y > game.game.camera.y and o.y + o.height < game.game.camera.y + game.game.camera.h:
-                            object_rect = pygame.Rect(o.x, o.y, o.width, o.height)
-                            if rect.colliderect(object_rect):
-                                return o
+                    if rect.colliderect(o.rect):
+                        return o
 
         for e in game.game.mapdata[self.name]:
             if e != obj:  # To make sure we don't check collision with ourselves.
@@ -132,7 +154,7 @@ class Level(object):
         if max_y > self.tiledmap.height: max_y = self.tiledmap.height
 
         # Draw top tiles
-        for layer in xrange(0, len(self.tiledmap.tilelayers)):
+        for layer in range(0, len(self.tiledmap.tilelayers)):
             if hasattr(self.tiledmap.tilelayers[layer], "above"):
                 for y in xrange(min_y, max_y):
                     for x in xrange(min_x, max_x):
@@ -215,6 +237,11 @@ class Level(object):
                         else:
                             self.map_buffer.blit(tile, (x*tw, y*th))
 
+
+    '''
+    Create entities based on types specified in the tiledmap and adds them to the list of entities.
+    '''
+    # @TODO: Make it so that instead of using if statements we check the entities folder and make it so that the type corresponds to a class name.
     def createEntities(self):
         for og in self.tiledmap.objectgroups:
             if og.name == "entities":

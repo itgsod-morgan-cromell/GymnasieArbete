@@ -1,25 +1,33 @@
+'''
 
-import sys
-import os
+This is the main game class where everything is happening. From here we call to all other functions that the game needs.
+
+'''
 
 
 import pygame
 from pygame.locals import *
 from . import gameclock
 from .level import level
-from .gfx import shadows
-#from profilehooks import profile
+from .gfx import shadows, particles
+from profilehooks import profile
 from . import input_handler
 
 
 pygame.init()
+
+'''
+These are the global variables that we use among the other classes.
+
+'''
+
 world = None
 player = None
 mapdata = {}
 screen = None
 input = input_handler.Input()
 camera = None
-debug = True
+debug = False # Dev testing feature. Press X to enter debug mode.
 minimap_scale = 8
 player = None
 clock = gameclock.GameClock(60)
@@ -30,8 +38,8 @@ lighting = None
 class Game(object):
     def __init__(self):
         global world, player, mapdata, screen, camera, clock, game, lighting
-        screen_width = 800
-        screen_height = 600
+        screen_width = 1280
+        screen_height = 720
         game = self
         screen = pygame.display.set_mode((screen_width, screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF)
         camera = pygame.Rect(0, 0, screen_width, screen_height)
@@ -42,8 +50,6 @@ class Game(object):
         pygame.mixer.init()
         pygame.mixer.music.load("../res/test.ogg")
         #pygame.mixer.music.play()
-
-#    @profile
     def run(self):
         while True:
             input.Poll()
@@ -53,11 +59,7 @@ class Game(object):
                 return
 
             if input.GetControl('DEBUG'):
-
-                if debug:
-                    debug = False
-                else:
-                    debug = True
+                debug = not debug
             if input.GetControl('RELOAD'):
                 world = level.Level(world.current_path)
 
@@ -67,13 +69,19 @@ class Game(object):
             # Calling the rendering and update methods
 
             pygame.display.set_caption("FPS: " + str(clock.get_fps()) + " UPS: " + str(clock.get_ups()))
-            self.dt = clock.tick()
+            dt = clock.tick()
             if clock.update_ready:
-                self.update()
+                self.update(dt)
             if clock.frame_ready:
                 self.render()
 
-    def update(self):
+    def update(self, dt):
+        '''
+        Main update loop. This is where we call every object that needs to update. Most of the objects are found in the world object where the entities
+        are being loaded and updated.
+        We also readjust the camera here to make sure it does not step out of map bounds.
+        '''
+
         world.updateEntity()
         if camera.w < world.map_width:
 
@@ -105,16 +113,14 @@ class Game(object):
 
     def render(self):
         """
-        The render method first draws everything on the buffer.
-        After the buffer is completed we draw what is on the buffer to the screen with the help of screen.display.flip().
-        This results in a flicker-free animations and much nicer rendering.
+        The main render methods tell the world to draw every visible entity to the buffer surface.
+        We then draw the buffered surface to the screen.
 
         """
         screen.fill((50,33,37))
         world.render_background()
         world.render()
       #  lighting.render()
-
         if debug:
             screen.fill((0,0,0), pygame.Rect(camera.w - 130, 40, 150, 180))
             self.text("--- DEBUG ---", (camera.w - 120, 60))
@@ -122,7 +128,7 @@ class Game(object):
             self.text("FPS: " + str(clock.get_fps()), (camera.w - 120, 100))
             self.text("UPS: " + str(clock.get_ups()), (camera.w - 120, 120))
 
-        pygame.display.flip()
+        pygame.display.update(pygame.Rect(0,0, camera.w, camera.h))
 
 
     def text(self, input, pos):

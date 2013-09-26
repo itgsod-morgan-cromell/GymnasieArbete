@@ -4,6 +4,14 @@ import game.gfx.animate
 from .mob import Mob
 import random
 
+'''
+The player class is a child of the mob class and is currently just a simple animated sprite moving around via inputs.
+
+The code should be pretty self explanatory.
+'''
+
+# TODO: Fix the animations to use the new xml format for more cleanup.
+# TODO: Hook in the projectile system.
 
 class Player(Mob):
 
@@ -48,6 +56,8 @@ class Player(Mob):
         self.targetY = 0
 
     def update(self):
+
+        # Set the path that the dummy AI should walk towards. We have a bit of delay here so the AI is more human.
         self.time += 1
         if self.time >= 30:
             self.time = 0
@@ -116,6 +126,11 @@ class Player(Mob):
             return True
 
 
+        '''
+        This will move the player to another map by initializing the new map and move out the player entity from the old enitity list
+        into the new one.
+        '''
+
     def teleport(self, object):
             print("teleporting to :" + object.map)
             game.game.mapdata[game.game.world.name].remove(self)
@@ -131,7 +146,7 @@ class Player(Mob):
             elif target.spawn_position == "w":
                 self.x -= target.width/2 + 10
             elif target.spawn_position == "e":
-                self.x += target.width2 + 10
+                self.x += target.width/2 + 10
 
 
     def render(self):
@@ -141,6 +156,8 @@ class Player(Mob):
         if game.game.debug:
             screen.fill((255, 0, 0), pygame.Rect(x + self.data.spriteOffsetX, y + self.data.spriteOffsetY, self.rect.w, self.rect.h))
 
+
+            # TODO: This code is so messy. Clean it up and add a standardized 8-directional animation system that the mob class could use.
         if self.isMoving:
             self.move_conductor.play()
             if not self.running:

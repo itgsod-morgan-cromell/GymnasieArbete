@@ -3,6 +3,9 @@ import game.game
 import pygame
 from random import randint
 
+'''
+This is a simple straight up 'follow player' AI that i am using as a prototype. See player and the parent class for more info.
+'''
 
 class Dummy(Mob):
 
@@ -29,7 +32,7 @@ class Dummy(Mob):
     def update(self):
         if not self.start:
             return
-
+        self.dirty = 0
         targetX = game.game.player.targetX
         targetY = game.game.player.targetY
         xa = 0
@@ -64,10 +67,6 @@ class Dummy(Mob):
             self.ya = randint(0, 3) - 1
             return True
         if game.game.world.collide(dummy_rect):
-            self.xa = 0
-            self.ya = 0
-            self.xa = randint(0, 3) - 1
-            self.ya = randint(0, 3) - 1
             return True
 
         object = game.game.world.collide_object(self, dummy_rect)
