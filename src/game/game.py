@@ -38,11 +38,14 @@ lighting = None
 class Game(object):
     def __init__(self):
         global world, player, mapdata, screen, camera, clock, game, lighting
-        screen_width = 1280
-        screen_height = 720
+        self.screen_width = 1024
+        self.screen_height = 576
+        game_width = 1024
+        game_height = 576
         game = self
-        screen = pygame.display.set_mode((screen_width, screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF)
-        camera = pygame.Rect(0, 0, screen_width, screen_height)
+        screen = pygame.Surface((game_width, game_height))
+        self.window = pygame.display.set_mode((self.screen_width, self.screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF)
+        camera = pygame.Rect(0, 0, game_width, game_height)
         lighting = shadows.Lighting()
         world = level.Level("../res/maps/level_1/level_1.tmx")
         self.font = pygame.font.Font('../res/gothic.ttf', 15)
@@ -128,7 +131,13 @@ class Game(object):
             self.text("FPS: " + str(clock.get_fps()), (camera.w - 120, 100))
             self.text("UPS: " + str(clock.get_ups()), (camera.w - 120, 120))
 
-        pygame.display.update(pygame.Rect(0,0, camera.w, camera.h))
+        if self.screen_width == camera.w:
+            self.window.blit(screen, (0,0))
+        else:
+            surf = pygame.transform.scale(screen, (self.screen_width, self.screen_height))
+            self.window.blit(surf, (0,0))
+
+        pygame.display.update(pygame.Rect(0,0, self.screen_width, self.screen_height))
 
 
     def text(self, input, pos):

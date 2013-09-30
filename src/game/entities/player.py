@@ -38,16 +38,13 @@ class Player(Mob):
             self.anim_objs[anim_type] = game.gfx.animate.PygAnimation(images_and_duration)
 
         # create the right-facing sprites by copying and flipping the left-facing sprites
-        self.anim_objs['left_walk'] = game.gfx.animate.PygAnimation([('../res/sprites/dummy/walk_top.png', 1, 6, 1)])
-        self.anim_objs['right_walk'] = self.anim_objs['left_walk'].getCopy()
-        self.anim_objs['right_walk'].flip(True, False)
-        self.anim_objs['right_walk'].makeTransformsPermanent()
+        self.anim_objs['left_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_left.xml')
+        self.anim_objs['front_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_front.xml')
+        self.anim_objs['right_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_front.xml')
         self.anim_objs['right_run'] = self.anim_objs['left_run'].getCopy()
-        self.anim_objs['right_run'].flip(True, False)
-        self.anim_objs['right_run'].makeTransformsPermanent()
 
         self.move_conductor = game.gfx.animate.PygConductor(self.anim_objs)
-        self.spriteRect = self.anim_objs['right_run'].getRect()
+
 
         self.centerX = self.x + self.spriteRect.x + self.spriteRect.w/2
         self.centerY = self.y + self.spriteRect.y + self.spriteRect.h/2
