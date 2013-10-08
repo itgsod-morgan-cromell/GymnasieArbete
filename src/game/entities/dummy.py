@@ -21,7 +21,7 @@ class Dummy(Mob):
         y = data.y - self.data.spriteOffsetY
         speed = int(data.speed)
         rect = pygame.Rect(x, y, data.width, data.height)
-        super(Dummy, self).__init__(game.game.world, data.type, x, y, speed, rect)
+        super(Dummy, self).__init__(data.type, x, y, speed, rect)
 
         self.sprite = game.gfx.animate.PygAnimation('../res/sprites/dummy/test.xml')
         self.sprite.play()

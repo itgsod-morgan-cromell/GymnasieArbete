@@ -24,24 +24,24 @@ class Player(Mob):
         speed = int(data.speed)
         self.moveSpeed = speed
         rect = pygame.Rect(0, 0, data.width, data.height)
-        super(Player, self).__init__(game.game.world, data.type, x, y, speed, rect)
-        self.standing = {}
-        self.standing['UP'] = pygame.image.load('../res/sprites/player/crono_back.gif')
-        self.standing['DOWN'] = pygame.image.load('../res/sprites/player/crono_front.gif')
-        self.standing['LEFT'] = pygame.image.load('../res/sprites/player/crono_left.gif')
-        self.standing['RIGHT'] = pygame.transform.flip(self.standing['LEFT'], True, False)
+        super(Player, self).__init__(data.type, x, y, speed, rect)
 
-        anim_types = 'back_run back_walk front_run front_walk left_run left_walk'.split()
         self.anim_objs = {}
-        for anim_type in anim_types:
-            images_and_duration = [('../res/sprites/player/crono_%s.%s.gif' % (anim_type, str(num).rjust(3, '0')), 0.1) for num in range(6)]
-            self.anim_objs[anim_type] = game.gfx.animate.PygAnimation(images_and_duration)
-
         # create the right-facing sprites by copying and flipping the left-facing sprites
         self.anim_objs['left_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_left.xml')
         self.anim_objs['front_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_front.xml')
-        self.anim_objs['right_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_front.xml')
-        self.anim_objs['right_run'] = self.anim_objs['left_run'].getCopy()
+        self.anim_objs['front_left_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_front_left.xml')
+        self.anim_objs['front_right_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_front_right.xml')
+        self.anim_objs['right_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_right.xml')
+        self.anim_objs['back_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_back.xml')
+        self.anim_objs['back_right_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_back_right.xml')
+        self.anim_objs['back_left_walk'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_back_left.xml')
+
+        self.anim_objs['front_fire'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_front_fire.xml')
+
+        self.anim_objs['standing'] = game.gfx.animate.PygAnimation('../res/sprites/player/test_standing.xml')
+
+        self.spriteRect = self.anim_objs['left_walk'].getRect()
 
         self.move_conductor = game.gfx.animate.PygConductor(self.anim_objs)
 
@@ -81,6 +81,8 @@ class Player(Mob):
 
 
 
+
+
         if xa != 0 or ya != 0:
             for key in self.movingDir:
                 self.movingDir[key] = False
@@ -88,6 +90,12 @@ class Player(Mob):
             self.isMoving = True
         else:
             self.isMoving = False
+
+        if input.GetControl('FIRE'):
+            self.fire = True
+            self.isMoving = True
+        else:
+            self.fire = False
 
         self.rect.x = self.x + self.data.spriteOffsetX
         self.rect.y = self.y + self.data.spriteOffsetY
@@ -157,33 +165,53 @@ class Player(Mob):
             # TODO: This code is so messy. Clean it up and add a standardized 8-directional animation system that the mob class could use.
         if self.isMoving:
             self.move_conductor.play()
-            if not self.running:
+
+            if self.fire:
+                self.anim_objs['front_fire'].blit(screen, (x, y))
+            else:
 
                 if self.movingDir['UP']:
-                    self.anim_objs['back_walk'].blit(screen, (x, y))
+                    if self.movingDir['LEFT']:
+                        self.anim_objs['back_left_walk'].blit(screen, (x, y))
+                    elif self.movingDir['RIGHT']:
+                        self.anim_objs['back_right_walk'].blit(screen, (x, y))
+                    else:
+                        self.anim_objs['back_walk'].blit(screen, (x, y))
                 elif self.movingDir['DOWN']:
-                    self.anim_objs['front_walk'].blit(screen, (x, y))
+                    if self.movingDir['LEFT']:
+                        self.anim_objs['front_left_walk'].blit(screen, (x, y))
+                    elif self.movingDir['RIGHT']:
+                        self.anim_objs['front_right_walk'].blit(screen, (x, y))
+                    else:
+                        self.anim_objs['front_walk'].blit(screen, (x, y))
                 elif self.movingDir['LEFT']:
                     self.anim_objs['left_walk'].blit(screen, (x, y))
                 elif self.movingDir['RIGHT']:
                     self.anim_objs['right_walk'].blit(screen, (x, y))
 
-            else:
-                if self.movingDir['UP']:
-                    self.anim_objs['back_run'].blit(screen, (x, y))
-                elif self.movingDir['DOWN']:
-                    self.anim_objs['front_run'].blit(screen, (x, y))
-                elif self.movingDir['LEFT']:
-                    self.anim_objs['left_run'].blit(screen, (x, y))
-                elif self.movingDir['RIGHT']:
-                    self.anim_objs['right_run'].blit(screen, (x, y))
 
 
         else:
             self.move_conductor.stop()
-            for key in self.movingDir:
-                if self.movingDir[key]:
-                    screen.blit(self.standing[key], (x, y))
+            if self.movingDir['UP']:
+                if self.movingDir['LEFT']:
+                    screen.blit(self.anim_objs['standing'].getFrame(7), (x, y))
+                elif self.movingDir['RIGHT']:
+                    screen.blit(self.anim_objs['standing'].getFrame(1), (x, y))
+                else:
+                    screen.blit(self.anim_objs['standing'].getFrame(0), (x, y))
+            elif self.movingDir['DOWN']:
+                if self.movingDir['LEFT']:
+                    screen.blit(self.anim_objs['standing'].getFrame(5), (x, y))
+                elif self.movingDir['RIGHT']:
+                    screen.blit(self.anim_objs['standing'].getFrame(3), (x, y))
+                else:
+                    screen.blit(self.anim_objs['standing'].getFrame(4), (x, y))
+            elif self.movingDir['LEFT']:
+                screen.blit(self.anim_objs['standing'].getFrame(6), (x, y))
+            elif self.movingDir['RIGHT']:
+                screen.blit(self.anim_objs['standing'].getFrame(2), (x, y))
+
 
 
 

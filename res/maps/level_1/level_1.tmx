@@ -295,11 +295,11 @@
   </data>
  </layer>
  <objectgroup color="#00ff00" draworder="topdown" name="entities" width="62" height="31">
-  <object name="player" type="player" x="144" y="192" width="28" height="13">
+  <object name="player" type="player" x="144" y="192" width="32" height="32">
    <properties>
     <property name="speed" value="5"/>
-    <property name="spriteOffsetX" value="2"/>
-    <property name="spriteOffsetY" value="57"/>
+    <property name="spriteOffsetX" value="0"/>
+    <property name="spriteOffsetY" value="30"/>
    </properties>
   </object>
   <object name="dummy" type="dummy" x="624" y="288" width="32" height="32">

@@ -74,6 +74,9 @@ class Input():
                 ['keystate', (K_LSHIFT, )],
                 ['buttonstate', (0, 2)]
             ],
+            'FIRE': [
+                ['keystate', (K_SPACE, )]
+            ],
             'LEFT': [
                 ['keystate', (K_LEFT, )],
                 ['stickstate', (0, 0, -1, .5)]
