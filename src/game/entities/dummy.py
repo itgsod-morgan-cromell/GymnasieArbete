@@ -84,10 +84,9 @@ class Dummy(Mob):
 
         if object.type == 'player':
             if self in game.game.mapdata[game.game.world.name]:
-                game.game.mapdata[game.game.world.name].remove(self)
+                self.remove()
 
-    def render(self):
-        screen = game.game.screen
+    def render(self, screen):
 
 
         x = self.x - game.game.camera.x

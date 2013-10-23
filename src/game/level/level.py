@@ -205,6 +205,9 @@ class Level(object):
                 e.start = True
             e.update()
 
+    def addEntity(self, entity):
+        game.game.mapdata[self.name].append(entity)
+
     def create_map(self):
         self.map_buffer.fill((50, 33, 37))
         tw = self.tiledmap.tilewidth
@@ -272,7 +275,7 @@ class Level(object):
     def render(self):
         for e in game.game.mapdata[self.name]:
             if game.game.camera.inflate(100, 100).contains(e.rect):
-                e.render()
+                e.render(game.game.screen)
         game.game.screen.blit(self.map_buffer_top, (0, 0))
 
 

@@ -8,9 +8,13 @@ class Entity(object):
         self.x = x
         self.y = y
         self.timeCreated = game.game.clock.time
-
+        self.removed = False
     def update(self):
         pass
 
-    def render(self):
+    def render(self, screen):
         pass
+
+    def remove(self):
+        self.removed = True
+        game.game.mapdata[game.game.world.name].remove(self)

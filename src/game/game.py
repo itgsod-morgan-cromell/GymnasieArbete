@@ -56,6 +56,7 @@ class Game(object):
     def run(self):
         while True:
             input.Poll()
+
             global debug, world
             if input.GetControl('QUIT'):
                 pygame.quit()
