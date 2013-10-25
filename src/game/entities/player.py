@@ -55,9 +55,11 @@ class Player(Mob):
         self.time = 30
         self.targetX = 0
         self.targetY = 0
+        self.fireTime = 0
+        self.fireRate = 0
 
     def update(self):
-
+        self.fireTime += 1
         # Set the path that the dummy AI should walk towards. We have a bit of delay here so the AI is more human.
         self.time += 1
         if self.time >= 30:
@@ -90,15 +92,14 @@ class Player(Mob):
         if input.GetControl('FIRE'):
             self.fire = True
             self.isMoving = True
-            x = self.x
-            y = self.y
+            x = self.rect.x + self.rect.w/2
+            y = self.rect.y
 
             for key in self.movingDir:
                 if self.movingDir[key]:
                     projDir = self.projectileAngles[key]
 
             #projDir = math.atan2(pygame.mouse.get_pos()[1] - self.y, pygame.mouse.get_pos()[0] - self.x)/math.pi*180
-            print projDir
             projDir *= math.pi/180
 
             self.shoot(x, y, projDir)
@@ -161,9 +162,13 @@ class Player(Mob):
             self.x += target.width / 2 + 10
 
     def shoot(self, x, y, projDir):
-        p = BasicBullet(x, y, projDir)
-        self.projectiles.append(p)
-        game.game.world.addEntity(p)
+        if self.fireTime > self.fireRate:
+            p = BasicBullet(x, y, projDir)
+            self.projectiles.append(p)
+            game.game.world.addEntity(p)
+            self.fireRate = p.rateOfFire
+            self.fireTime = 0
+
 
 
     def render(self, screen):

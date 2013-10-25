@@ -48,7 +48,7 @@ class Dummy(Mob):
 
 
         if xa != 0 or ya != 0:
-            self.move(xa, ya)
+           # self.move(xa, ya)
             self.isMoving = True
         else:
             self.isMoving = False

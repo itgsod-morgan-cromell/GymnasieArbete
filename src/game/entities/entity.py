@@ -17,4 +17,5 @@ class Entity(object):
 
     def remove(self):
         self.removed = True
+        print self.type
         game.game.mapdata[game.game.world.name].remove(self)
