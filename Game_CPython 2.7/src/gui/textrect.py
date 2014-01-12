@@ -32,7 +32,7 @@ def render_textrect(string, maxsize, rect, text_color, background_color=None, ju
     """
 
     import pygame
-    font = pygame.font.Font('res/other/font.ttf', maxsize)
+    font = pygame.font.Font('res/other/visitor2.ttf', maxsize)
     final_lines = []
     string = str(string)
     requested_lines = string.splitlines()

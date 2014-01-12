@@ -14,7 +14,7 @@ class PowerUp(object):
             image_amount = 'small'
         else:
             image_amount = 'tiny'
-        self.font = pygame.font.SysFont('arial', 10)
+        self.font = pygame.font.Font('res/other/visitor2.ttf', 20)
         self.image = pygame.image.load('res/items/other/{0}_{1}.gif'.format(self.name.lower(), image_amount))
         self.x = 0
         self.y = 0
@@ -29,7 +29,7 @@ class PowerUp(object):
     def draw(self, screen, offset):
         screen.blit(self.image, (self.x*32 - offset.x, self.y*32 - offset.y))
 
-        screen.blit(self.font.render(str(self.amount), 0, (192, 192, 192), (0, 0, 0)), (self.x*32 - offset.x + 12, self.y*32 - offset.y + 16))
+        screen.blit(self.font.render(str(self.amount), 0, (192, 192, 192)), (self.x*32 - offset.x + 12, self.y*32 - offset.y + 16))
 
 
 class Item(object):

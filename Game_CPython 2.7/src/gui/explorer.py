@@ -6,14 +6,14 @@ from src.gui.textrect import *
 class Field(object):
     def __init__(self, rect, data, color=(255, 255, 255)):
         if type(data) == str:
-            self.image = render_textrect(data, 27, rect, color)
+            self.image = render_textrect(data, 50, rect, color)
         else:
             self.image = data
         self.rect = rect
 
     def change_text(self, text, color=(255, 255, 255)):
 
-        self.image = render_textrect(text, 27, self.rect, color)
+        self.image = render_textrect(text, 50, self.rect, color)
 
 
 class Explorer(Gui):

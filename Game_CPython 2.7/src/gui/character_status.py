@@ -92,7 +92,7 @@ class StatsUi(Gui):
 
     def get_stat(self, stat, rect, alignment=0, color=(255, 255, 255)):
         if stat in self.stats:
-            text = render_textrect(self.stats[stat], 27, rect, color, None, alignment)
+            text = render_textrect(self.stats[stat], 50, rect, color, None, alignment)
             return text
         else:
             print "No such type exists."
