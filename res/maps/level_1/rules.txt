@@ -1,4 +1,0 @@
-../mapData/rule_background.tmx
-../mapData/rule_background_2.tmx
-../mapData/rule_background_3.tmx
-../mapData/rule_props.tmx

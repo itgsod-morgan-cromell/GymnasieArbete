@@ -18,4 +18,4 @@ Version av python vi ska testa:
 
 # Dokumentation
 
-För full documentation läs Wikin och kommentarer och dictionary i koden. Observera dock att dokumentationen i koden är skriven på engelska.
+För full documentation läs Wikin och kommentarerna i koden. Observera dock att kommentarerna i koden är skriven på engelska.
