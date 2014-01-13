@@ -42,10 +42,13 @@ class GuiHandler(object):
                     else:
                         self.mouse_col = (255, 0, 255)
                         self.mouse = tile
-                    for entity in world.map.entities:
-                        if entity.x == mouse_grid_x and entity.y == mouse_grid_y:
+                    for item in world.map.items:
+                        if item.x == mouse_grid_x and item.y == mouse_grid_y:
                             self.mouse_col = (0, 0, 255)
-                            self.mouse = entity
+                            self.mouse = item
+                    if world.player.x == mouse_grid_x and world.player.y == mouse_grid_y:
+                            self.mouse_col = (0, 0, 255)
+                            self.mouse = world.player
         else:
             mouse_rect = pygame.Rect((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), (2, 2))
             for gui in self.guis:

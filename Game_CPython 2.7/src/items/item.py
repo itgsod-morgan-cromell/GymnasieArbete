@@ -20,7 +20,7 @@ class PowerUp(object):
         self.y = 0
 
     def pickup(self, world):
-        world.map.entities.remove(self)
+        world.map.items.remove(self)
         if type(world.player.stats[self.name]) == list:
             world.player.stats[self.name][0] += self.amount
         else:
@@ -56,7 +56,7 @@ class Item(object):
             self.x = world.player.x
             self.y = world.player.y
             if not self.stackable:
-                world.map.entities.append(self)
+                world.map.items.append(self)
                 if self in world.player.inventory:
                     world.player.inventory.remove(self)
                 elif self == world.player.weapon:
@@ -67,12 +67,12 @@ class Item(object):
                     world.player.trinket = None
             else:
                 world.player.inventory.remove(self)
-                for item in world.map.entities:
+                for item in world.map.items:
                     if item.x == world.player.x and item.y == world.player.y:
                         if item.name == self.name:
                             item.stats['AMOUNT'] += self.stats['AMOUNT']
                             return
-                world.map.entities.append(Item(self.name, self.category, self.image, self.stats, self.extra))
+                world.map.items.append(Item(self.name, self.category, self.image, self.stats, self.extra))
 
 
 
@@ -92,13 +92,13 @@ class Item(object):
         if self.stackable:
             for item in world.plater.inventory:
                 if item.name == self.name:
-                    world.map.entities.remove(self)
+                    world.map.items.remove(self)
                     item.stats['AMOUNT'] += self.stats['AMOUNT']
                     return
 
         if len(world.player.inventory) < 9:
                 world.player.inventory.append(self)
-                world.map.entities.remove(self)
+                world.map.items.remove(self)
 
     def interacting(self, world, offset):
         mouse_x = pygame.mouse.get_pos()[0]

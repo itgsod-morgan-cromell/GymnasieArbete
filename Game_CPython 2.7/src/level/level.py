@@ -4,11 +4,12 @@ from src.level.generator.map_loader import Map
 
 class Level(object):
     def __init__(self, floor, up=None, down=None):
-        self.entities = []
+        self.monsters = []
+        self.items = []
         self.up = up
         self.floor = floor
         self.down = down
-        self.dungeon = Dungeon((45, 25), "Neverland", 50, (4, 4), (12, 12), (32, 32))
+        self.dungeon = Dungeon((45, 25), "None", 50, (4, 4), (12, 12), (32, 32))
 
         self.dungeon.generate_dungeon()
         self.map = Map()
@@ -26,3 +27,9 @@ class Level(object):
             self.dungeon.grid[self.up_stair[1]][self.up_stair[0]] = 1
             self.spawn = self.up_stair
             self.map.load_dungeon(self.dungeon)
+
+    def get_item(self, x, y):
+        for item in self.items:
+            if item:
+                if item.x == x and item.y == y:
+                    return item
