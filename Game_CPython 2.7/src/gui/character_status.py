@@ -5,14 +5,15 @@ from src.gui.textrect import *
 
 
 class StatsUi(Gui):
-    def __init__(self, player):
+    def __init__(self, world):
+        self.world = world
         width = 250
         height = 330
         image = pygame.Surface((width, height))
         image.fill((127, 127, 127), pygame.Rect((0, 0), (3, height)))
         Gui.__init__(self, 'character', (710, 0), image, True)
-        self.stats = player.stats
-        self.icon = player.icon
+        self.stats = world.player.stats
+        self.icon = world.player.icon
         self.stats_rect = pygame.Rect((15, 45), (220, 124))
         self.inventory_rect = pygame.Rect((15, self.stats_rect.y + self.stats_rect.h + 15), (220, 145))
         self.slots = [Slot(self.stats_rect.x+12, self.stats_rect.y+80), Slot(self.stats_rect.x+56, self.stats_rect.y+80), Slot(self.stats_rect.x+100, self.stats_rect.y+80)]

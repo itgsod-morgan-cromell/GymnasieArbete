@@ -6,13 +6,10 @@ from src.gui.minimap import MiniMap
 
 class GuiHandler(object):
     def __init__(self, world):
-        self.guis = []
-        player_stats = StatsUi(world.player)
-        self.guis.append(player_stats)
-        minimap = MiniMap(world)
-        self.guis.append(minimap)
-        explorer = Explorer(world)
-        self.guis.append(explorer)
+        self.player_stats = StatsUi(world)
+        self.minimap = MiniMap(world)
+        self.explorer = Explorer(world)
+
         self.mouse_col = (0, 255, 0)
         self.mouse = None
         self.mouse_grid_x = 0
@@ -20,12 +17,9 @@ class GuiHandler(object):
 
     def update(self, world, offset, mouse, events):
         self.mouse_col = (255, 0, 0)
-        for gui in self.guis:
-            if gui.active:
-                if gui.type == 'explorer':
-                    gui.update(world, self.mouse)
-                else:
-                    gui.update(world)
+        self.player_stats.update(world)
+        self.minimap.update(world)
+        self.explorer.update(world, self.mouse)
         self.mouse = None
         self.mouse_grid_x = mouse[0]
         self.mouse_grid_y = mouse[1]
@@ -51,17 +45,15 @@ class GuiHandler(object):
                             self.mouse = world.player
         else:
             mouse_rect = pygame.Rect((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), (2, 2))
-            for gui in self.guis:
-                if gui.type == 'character':
-                    mouse_rect.x -= gui.x
-                    mouse_rect.y -= gui.y
-                    colliding_slots = []
-                    for slot in gui.slots:
-                        if mouse_rect.colliderect(slot.rect):
-                            colliding_slots.append(slot.containts)
-                    for slot in gui.inventory_slots:
-                        if mouse_rect.colliderect(slot.rect):
-                            colliding_slots.append(slot.containts)
+            mouse_rect.x -= self.player_stats.x
+            mouse_rect.y -= self.player_stats.y
+            colliding_slots = []
+            for slot in self.player_stats.slots:
+                if mouse_rect.colliderect(slot.rect):
+                    colliding_slots.append(slot.containts)
+            for slot in self.player_stats.inventory_slots:
+                if mouse_rect.colliderect(slot.rect):
+                    colliding_slots.append(slot.containts)
 
                     if colliding_slots:
                         self.mouse = colliding_slots[0]
@@ -72,10 +64,10 @@ class GuiHandler(object):
                                         colliding_slots[0].interacting(world, offset)
                                         colliding_slots[0].drop(world)
 
-    def draw(self, screen, offset):
-        for gui in self.guis:
-            if gui.active:
-                gui.draw(screen)
+    def draw(self, screen):
+        self.player_stats.draw(screen)
+        self.minimap.draw(screen)
+        self.explorer.draw(screen)
         mouse_grid_x = self.mouse_grid_x*32
         mouse_grid_y = self.mouse_grid_y*32
         if mouse_grid_x < 700:
