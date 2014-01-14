@@ -1,4 +1,5 @@
 import pygame
+from src.gui.menu import Menu
 from src.level.world import World
 from src.main.gameclock import GameClock
 from src.gui.guihandler import GuiHandler
@@ -21,13 +22,20 @@ class Game(object):
         self.world_screen = pygame.Surface((self.WIDTH - 250, self.HEIGHT))
         self.clock = GameClock(60)
         self.camera = pygame.Rect(0, 0, self.WIDTH - 250, self.HEIGHT)
+        self.events = None
+        self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
+
+    def new_game(self):
         self.world = World()
         self.events = pygame.event.get()
         self.world.update(self.events, self.camera, (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32))
         self.ui = GuiHandler(self.world)
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> a046b4b7d17fc244be9e33d0b4b5401a855c0c1f
     def run(self):
         """
         Handles the looping of the main with a clock that follows a set amount of ticks per second.
@@ -37,23 +45,33 @@ class Game(object):
             pygame.display.set_caption("FPS: {0},  UPS: {1}".format(self.clock.get_fps(), self.clock.get_ups()))
             dt = self.clock.tick()
             if self.clock.update_ready:
-                self.update(dt)
+                self.events = pygame.event.get()
+                for event in self.events:
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                if self.menu.active:
+                    self.menu.update(self)
+                else:
+                    self.update()
 
             if self.clock.frame_ready:
-                self.draw(dt)
+                if self.menu.active:
+                    self.menu.draw(self.screen)
+                else:
+                    self.draw()
+                pygame.display.flip()
 
-    def update(self, dt):
+    def update(self):
         '''
         Main update loop.
         '''
 
-        self.events = pygame.event.get()
-
-        keys = pygame.key.get_pressed()
         for event in self.events:
-            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
-                pygame.quit()
-                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.menu.active = not self.menu.active
+
         mouse = (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32)
         self.world.update(self.events, self.camera, mouse)
         self.camera.centerx = int(self.world.player.x)*32 + 3
@@ -69,14 +87,11 @@ class Game(object):
 
         self.ui.update(self.world, self.camera, mouse, self.events)
 
-
-
-    def draw(self, dt):
+    def draw(self):
         '''
         Main draw loop.
         '''
         self.screen.fill((0, 0, 0))
         self.world.draw(self.world_screen, self.camera)
         self.screen.blit(self.world_screen, (0, 0))
-        self.ui.draw(self.screen, self.camera)
-        pygame.display.flip()
+        self.ui.draw(self.screen)

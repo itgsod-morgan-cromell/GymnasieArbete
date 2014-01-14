@@ -3,36 +3,31 @@ import pygame
 from src.entities.entity import Entity
 import random
 from src.items.item import *
-from src.level.generator.map_loader import Tile
 
 
 class Chest(Entity):
-    def __init__(self, tile, world, level):
-        Entity.__init__(self, 'Chest', (tile.x, tile.y), world)
-        self.level = level
+    def __init__(self, pos, world):
+        Entity.__init__(self, 'chest', pos, world)
+        self.type = 'chest'
+        self.level = self.world.map.floor
         self.used = False
-        self.prev = tile
-        closed_img = self.prev.image
-        closed_img.blit(pygame.image.load('res/items/other/chest_closed.png'), (0, 0))
+        closed_img = pygame.image.load('res/items/other/chest_closed.png')
         self.image = closed_img
 
     def open(self):
         if not self.used:
             self.used = True
-            open_img = self.prev.image
-            open_img.blit(pygame.image.load('res/items/other/chest_open.png'), (0, 0))
+            open_img = pygame.image.load('res/items/other/chest_open.png')
             self.image = open_img
 
     def loot(self):
         if self.used:
             item = self.generate_loot()
-            x = self.x/self.prev.w
-            y = self.y/self.prev.h
-            item.x = x
-            item.y = y
-            self.world.map.entities.append(item)
-            self.world.map.map.tiles[y][x] = Tile(self.x, self.y, self.prev.w, self.prev.h, 1)
-            self.world.map.dungeon.grid[y][x] = 1
+            item.x = self.x
+            item.y = self.y
+            self.world.map.items.append(item)
+            self.world.map.items.remove(self)
+            self.world.map.dungeon.grid[self.y][self.x] = 1
 
     def generate_loot(self):
         types = ['POWERUP', 'WEAPON']
@@ -58,3 +53,6 @@ class Chest(Entity):
 
             return PowerUp(random.choice(['GOLD', 'HP']),
                            random.randint(10, 100) * self.level)
+
+    def draw(self, screen, offset):
+        screen.blit(self.image, (self.x*32 - offset.x, self.y*32 - offset.y))

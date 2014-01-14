@@ -1,7 +1,6 @@
 
 import pygame
 from src.entities.entity import Entity
-from src.items.item import Item
 from src.level.generator.astar import *
 
 
@@ -108,36 +107,34 @@ class Player(Entity):
             ya = -1
         # Check collision from the grid.
         tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
+        item = self.world.map.get_item(self.x + xa, self.y + ya)
+        if item:
 
-        for entity in self.world.map.entities:
-            if entity != self:
-                if entity.x == self.x + xa and entity.y == self.y + ya:
-                    if entity.x == self.path[-1][0] and entity.y == self.path[-1][1]:
-                        if entity.type == 'item' or entity.type == 'powerup':
-                            entity.pickup(self.world)
+            if not self.path or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
+                if item.type == 'item' or item.type == 'powerup':
+                    item.pickup(self.world)
+                elif item.type == 'chest':
+                    item.loot()
+                    item.open()
+                    xa = 0
+                    ya = 0
 
-        if hasattr(tile, 'id'):
-            if tile.id == 2 or tile.id == 3 or tile.id == 4 or tile.id == 5 or tile.id == 6 or tile.id == 7:
-                xa = 0
-                ya = 0
-            if tile.id == 8:
-                self.world.move_up(self)
-                self.path = None
-                self.x, self.y = self.world.map.down_stair
+        if tile.id == 2 or tile.id == 3 or tile.id == 4 or tile.id == 5 or tile.id == 6 or tile.id == 7:
+            xa = 0
+            ya = 0
+        if tile.id == 8:
+            self.world.move_up(self)
+            self.path = None
+            self.x, self.y = self.world.map.down_stair
 
-            elif tile.id == 9:
-                self.world.move_down(self)
-                self.path = None
-                self.x, self.y = self.world.map.up_stair
-
-            else:
-                self.x += xa
-                self.y += ya
+        elif tile.id == 9:
+            self.world.move_down(self)
+            self.path = None
+            self.x, self.y = self.world.map.up_stair
 
         else:
-            if tile.name == 'Chest':
-                tile.loot()
-                tile.open()
+            self.x += xa
+            self.y += ya
 
     def calculate_stats(self):
         if self.stats['EXP'][0] >= self.stats['EXP'][1]:
