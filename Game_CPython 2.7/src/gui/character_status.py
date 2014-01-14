@@ -11,15 +11,11 @@ class StatsUi(Gui):
         height = 330
         image = pygame.Surface((width, height))
         image.fill((127, 127, 127), pygame.Rect((0, 0), (3, height)))
-<<<<<<< HEAD
+
         Gui.__init__(self, 'character', (player.playable_width, 0), image, True)
         self.stats = copy.copy(player.stats)
         self.icon = player.icon
-=======
-        Gui.__init__(self, 'character', (710, 0), image, True)
-        self.stats = world.player.stats
-        self.icon = world.player.icon
->>>>>>> a046b4b7d17fc244be9e33d0b4b5401a855c0c1f
+
         self.stats_rect = pygame.Rect((15, 45), (220, 124))
         self.inventory_rect = pygame.Rect((15, self.stats_rect.y + self.stats_rect.h + 15), (220, 145))
         self.slots = [Slot(self.stats_rect.x+12, self.stats_rect.y+80), Slot(self.stats_rect.x+56, self.stats_rect.y+80), Slot(self.stats_rect.x+100, self.stats_rect.y+80)]

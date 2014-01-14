@@ -16,12 +16,7 @@ class MiniMap(Gui):
         self.map.load_dungeon(world.map.dungeon)
         self.myfont = pygame.font.Font('res/other/font.ttf', 27)
 
-<<<<<<< HEAD
-
         Gui.__init__(self, 'minimap', (world.player.playable_width, 330), image, True)
-=======
-        Gui.__init__(self, 'minimap', (710, 330), image, True)
->>>>>>> a046b4b7d17fc244be9e33d0b4b5401a855c0c1f
 
     def update(self, world):
         self.world = world

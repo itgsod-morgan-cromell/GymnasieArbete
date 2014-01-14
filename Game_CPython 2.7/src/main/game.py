@@ -31,11 +31,6 @@ class Game(object):
         self.world.update(self.events, self.camera, (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32))
         self.ui = GuiHandler(self.world)
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> a046b4b7d17fc244be9e33d0b4b5401a855c0c1f
     def run(self):
         """
         Handles the looping of the main with a clock that follows a set amount of ticks per second.
