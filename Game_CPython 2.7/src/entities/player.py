@@ -5,14 +5,18 @@ from src.level.generator.astar import *
 
 
 class Player(Entity):
-    def __init__(self, pos, world):
-        Entity.__init__(self, 'Fredrik, the brave', pos, world)
-        self.images = [pygame.image.load('res/player/m/ranger/back.png'),
-                       pygame.image.load('res/player/m/ranger/right.png'),
-                       pygame.image.load('res/player/m/ranger/front.png'),
-                       pygame.image.load('res/player/m/ranger/left.png')]
+    def __init__(self, pos, world, gender, _class, name):
+        self._class = _class
+        self.gender = gender
+        Entity.__init__(self, name, pos, world)
+        self.spritesheet = pygame.image.load('res/player/{0}/{1}.png'.format(gender, _class))
+        self.images = []
+        for i in range(0, 4):
+            rect = pygame.Rect((i*32, 0), (32, 32))
+
+            self.images.append(self.spritesheet.subsurface(rect))
         self.dir = 0
-        self.icon = pygame.image.load('res/player/m/ranger/icon.png')
+        self.icon = self.spritesheet.subsurface(pygame.Rect((4*32, 0), (32, 32)))
         self.move_ticker = 0
         self.inventory = []
         self.weapon = None
@@ -94,23 +98,23 @@ class Player(Entity):
 
     def move(self, xa, ya):
         if xa > 0:
-            self.dir = 1
+            self.dir = 0
             xa = 1
         elif xa < 0:
-            self.dir = 3
+            self.dir = 2
             xa = -1
         elif ya > 0:
-            self.dir = 2
+            self.dir = 1
             ya = 1
         elif ya < 0:
-            self.dir = 0
+            self.dir = 3
             ya = -1
         # Check collision from the grid.
         tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
         item = self.world.map.get_item(self.x + xa, self.y + ya)
         if item:
 
-            if not self.path or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
+            if not self.path or not self.follow_p or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
                 if item.type == 'item' or item.type == 'powerup':
                     item.pickup(self.world)
                 elif item.type == 'chest':
@@ -252,9 +256,12 @@ class Player(Entity):
             if hasattr(self.world.map.map.tiles[y][x], 'id'):
                 self.world.map.map.tiles[y][x].id = self.world.map.dungeon.grid[y][x]
                 self.world.map.map.tiles[y][x].load_image()
-            self.move(x - self.x, y - self.y)
             if self.path:
                 self.path.remove(self.path[0])
+            if not self.path:
+                self.path_delay = self.max_path_delay
+                self.follow_p = False
+            self.move(x - self.x, y - self.y)
             if not self.path:
                 self.path_delay = self.max_path_delay
                 self.follow_p = False

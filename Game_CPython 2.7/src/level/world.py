@@ -6,11 +6,11 @@ import random
 
 
 class World(object):
-    def __init__(self):
+    def __init__(self, player):
         self.generate_floor()
         self.map.setup()
         self.spawn_objects()
-        self.player = Player(self.map.spawn, self)
+        self.player = Player(self.map.spawn, self, player['gender'], player['class'], 'Test')
 
     def generate_floor(self):
         self.map = Level(1)

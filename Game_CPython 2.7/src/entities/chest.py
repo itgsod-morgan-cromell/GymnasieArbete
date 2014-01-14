@@ -30,7 +30,7 @@ class Chest(Entity):
             self.world.map.dungeon.grid[self.y][self.x] = 1
 
     def generate_loot(self):
-        types = ['POWERUP', 'WEAPON']
+        types = ['WEAPON']
         type = random.choice(types)
 
         if type == 'WEAPON':

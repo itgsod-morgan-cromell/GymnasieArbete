@@ -55,16 +55,16 @@ class GuiHandler(object):
                 if mouse_rect.colliderect(slot.rect):
                     colliding_slots.append(slot.containts)
 
-                    if colliding_slots:
-                        self.mouse = colliding_slots[0]
-                        if hasattr(colliding_slots[0], 'type'):
-                            if colliding_slots[0].type == 'item':
-                                for event in events:
-                                    if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                                        colliding_slots[0].interacting(world, offset)
-                                        colliding_slots[0].drop(world)
+            if colliding_slots:
+                self.mouse = colliding_slots[0]
+                if hasattr(colliding_slots[0], 'type'):
+                    if colliding_slots[0].type == 'item':
+                        for event in events:
+                            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                                colliding_slots[0].interacting(world, offset)
+                                colliding_slots[0].drop(world)
 
-    def draw(self, screen):
+    def draw(self, screen, offset):
         self.player_stats.draw(screen)
         self.minimap.draw(screen)
         self.explorer.draw(screen)

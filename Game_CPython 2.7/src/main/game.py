@@ -16,7 +16,7 @@ class Game(object):
     def __init__(self):
         pygame.init()
         self.WIDTH = 30 * 32
-        self.HEIGHT = 22 * 32
+        self.HEIGHT = 20 * 32
         self.SCALE = 1
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.world_screen = pygame.Surface((self.WIDTH - 250, self.HEIGHT))
@@ -25,8 +25,8 @@ class Game(object):
         self.events = None
         self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
 
-    def new_game(self):
-        self.world = World()
+    def new_game(self, player):
+        self.world = World(player)
         self.events = pygame.event.get()
         self.world.update(self.events, self.camera, (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32))
         self.ui = GuiHandler(self.world)
@@ -89,4 +89,4 @@ class Game(object):
         self.screen.fill((0, 0, 0))
         self.world.draw(self.world_screen, self.camera)
         self.screen.blit(self.world_screen, (0, 0))
-        self.ui.draw(self.screen)
+        self.ui.draw(self.screen, self.camera)
