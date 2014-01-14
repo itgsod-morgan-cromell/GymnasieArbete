@@ -31,12 +31,12 @@ class Chest(Entity):
             item.x = x
             item.y = y
             self.world.map.entities.append(item)
-            self.world.map.map.tiles[y][x] = Tile(self.x, self.y, self.prev.w, self.prev.h, self.prev.id)
+            self.world.map.map.tiles[y][x] = Tile(self.x, self.y, self.prev.w, self.prev.h, 1)
+            self.world.map.dungeon.grid[y][x] = 1
 
     def generate_loot(self):
         types = ['POWERUP', 'WEAPON']
         type = random.choice(types)
-        print type
 
         if type == 'WEAPON':
             rarities = ['common', 'uncommon', 'rare', 'epic']

@@ -5,6 +5,7 @@ from src.gui.textrect import *
 
 class Field(object):
     def __init__(self, rect, data, color=(255, 255, 255)):
+        self.data  = data
         if type(data) == str:
             self.image = render_textrect(data, 50, rect, color)
         else:
@@ -12,7 +13,7 @@ class Field(object):
         self.rect = rect
 
     def change_text(self, text, color=(255, 255, 255)):
-
+        self.data = text
         self.image = render_textrect(text, 50, self.rect, color)
 
 
@@ -28,22 +29,26 @@ class Explorer(Gui):
         self.subinfo = Field(pygame.Rect((15 + 16, 10 + 70), (150, 44)), "+ 10")
         self.myfont = pygame.font.Font('res/other/font.ttf', 27)
 
-        Gui.__init__(self, 'explorer', (710, 330 + 150 - 3), image, True)
+        Gui.__init__(self, 'explorer', (world.player.playable_width, 330 + 150 - 3), image, True)
 
     def update(self, world, data):
         if data:
             if hasattr(data, 'icon'):
-                self.icon.image = data.icon
+                if self.icon.image != data.icon:
+                    self.icon.image = data.icon
             elif hasattr(data, 'image'):
-                self.icon.image = data.image
+                if self.icon.image != data.image:
+                    self.icon.image = data.image
             if hasattr(data, 'name'):
-                self.info.change_text(data.name)
+                if self.info.data != data.name:
+                    self.info.change_text(data.name)
             if data.type == 'item':
                 stats = ''
                 for key, value in data.stats.iteritems():
                     sign = '+' if value > 0 else ''
                     stats += '\n{0}: {1}{2}'.format(key, sign, value)
-                    self.subinfo.change_text(stats)
+                    if self.subinfo.data != stats:
+                        self.subinfo.change_text(stats)
                 if 'rarity' in data.extra:
                     if data.extra['rarity'] == 'epic':
                         self.info.change_text(data.name, (163, 53, 238))

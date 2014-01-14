@@ -1,11 +1,13 @@
+
 import pygame
 from src.entities.entity import Entity
 from src.items.item import Item
 from src.level.generator.astar import *
 
+
 class Player(Entity):
     def __init__(self, pos, world):
-        Entity.__init__(self, 'Draughtbane, Secret of Honor', pos, world)
+        Entity.__init__(self, 'Fredrik, the brave', pos, world)
         self.images = [pygame.image.load('res/player/m/ranger/back.png'),
                        pygame.image.load('res/player/m/ranger/right.png'),
                        pygame.image.load('res/player/m/ranger/front.png'),
@@ -17,7 +19,9 @@ class Player(Entity):
         self.weapon = None
         self.armor = None
         self.trinket = None
+        self.max_path_delay = 4
         self.astar = Pathfinder()
+        self.playable_width = 0
 
         self.stats = {'STATUS': ' ',
                            'HP': [50, 100],
@@ -37,6 +41,7 @@ class Player(Entity):
         self.follow_p = False
 
     def update(self, events, offset, mouse):
+        self.playable_width = offset.w
         xa = 0
         ya = 0
         if self.path:
@@ -64,7 +69,7 @@ class Player(Entity):
 
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pressed()[0] and self.path and mouse[0]*32 < 700:
+                if pygame.mouse.get_pressed()[0] and self.path and mouse[0]*32 < self.playable_width:
                     self.follow_p = True
 
             elif event.type == pygame.KEYDOWN:
@@ -149,12 +154,12 @@ class Player(Entity):
         for row in range(0, len(self.world.map.map.tiles)):
             for tile in range(0, len(self.world.map.map.tiles[row])):
                 if hasattr(self.world.map.map.tiles[row][tile], 'id'):
-                    if self.world.map.map.tiles[row][tile].id == 15:
+                    if self.world.map.map.tiles[row][tile].id in [15, 16]:
                         self.world.map.map.tiles[row][tile].id = self.world.map.dungeon.grid[row][tile]
                         self.world.map.map.tiles[row][tile].dirs = [2, 2]
                         self.world.map.map.tiles[row][tile].load_image()
 
-        if mouse[0]*32 < 700:
+        if mouse[0]*32 < self.playable_width:
 
             if len(self.world.map.map.tiles) - 1 >= self.mouse_grid_y:
                 if len(self.world.map.map.tiles[self.mouse_grid_y]) - 1 >= self.mouse_grid_x:
@@ -204,19 +209,19 @@ class Player(Entity):
                                 p = 0
                                 if current_node.parent:
                                     p = current_node.parent
-                                if current_node.dir:
-                                    dir = current_node.dir
+                                if current_node:
+                                    c = current_node
 
                                 self.world.map.map.tiles[path[i][1]][path[i][0]].dirs[1] = 9
                                 if p:
                                     tile.dirs[0] = p.dir
-                                    tile.dirs[1] = dir
-                                    if dir:
-                                        tile.dirs[1] = dir
+                                    tile.dirs[1] = c.dir
+                                    if c.dir:
+                                        tile.dirs[1] = c.dir
                                     else:
                                         tile.dirs[1] = p.dir
-                                elif dir:
-                                    tile.dirs[0] = dir
+                                elif c.dir:
+                                    tile.dirs[0] = c.dir
 
                                 if len(path) == 1:
                                     if not p:
@@ -228,8 +233,10 @@ class Player(Entity):
                                         elif p.dir == 5:
                                             tile.dirs[0] = 7
                                             tile.dirs[1] = 7
-
-                                tile.id = 15
+                                if c == path[-1]:
+                                    tile.id = 16
+                                else:
+                                    tile.id = 15
                                 tile.load_image()
                                 self.world.map.map.tiles[path[i][1]][path[i][0]] = tile
 
@@ -238,11 +245,11 @@ class Player(Entity):
             self.path_delay = 0
             return
         if len(self.path) == 0:
-                self.path_delay = 5
+                self.path_delay = self.max_path_delay
                 self.calculate_path(mouse)
                 return
         if self.path_delay == 0:
-            self.path_delay = 5
+            self.path_delay = self.max_path_delay
             x = self.path[0][0]
             y = self.path[0][1]
             if hasattr(self.world.map.map.tiles[y][x], 'id'):
@@ -252,7 +259,7 @@ class Player(Entity):
             if self.path:
                 self.path.remove(self.path[0])
             if not self.path:
-                self.path_delay = 5
+                self.path_delay = self.max_path_delay
                 self.follow_p = False
                 self.calculate_path(mouse)
 

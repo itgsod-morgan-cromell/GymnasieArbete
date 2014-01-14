@@ -307,7 +307,6 @@ class Pathfinder:
         if map[end_pos[1]][end_pos[0]] in unwalkable_tile_ids:
             if map[end_pos[1]][end_pos[0]] in [7, 8, 9, 10]:
                 if len(self.path) == 1:
-                    print self.path
                     return self.path
                 else:
                     if self.path:

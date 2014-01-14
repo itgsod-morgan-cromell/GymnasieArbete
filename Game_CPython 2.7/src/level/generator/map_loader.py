@@ -95,7 +95,8 @@ class Tile:
                 f2 = pygame.image.load('res/other/footsteps/current/0.png')
                 f2 = self.rot_center(f2, self.dirs[1] * -45)
                 self.image.blit(f2, (0, 0))
-            #pygame.draw.circle(self.image, (255, 255, 255), (self.w/2, self.h/2), 3)
+        elif self.id == 16:
+            pygame.draw.circle(self.image, (255, 0, 0), (self.w/2, self.h/2), 3)
 
     def rot_center(self, image, angle):
         """rotate an image while keeping its center and size"""

@@ -3,6 +3,7 @@ from src.level.world import World
 from src.main.gameclock import GameClock
 from src.gui.guihandler import GuiHandler
 import sys
+from src.profilehooks import profile
 
 
 class Game(object):
@@ -13,16 +14,20 @@ class Game(object):
 
     def __init__(self):
         pygame.init()
-        self.WIDTH = 960
-        self.HEIGHT = 640
+        self.WIDTH = 30 * 32
+        self.HEIGHT = 22 * 32
         self.SCALE = 1
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.world_screen = pygame.Surface((self.WIDTH - 250, self.HEIGHT))
         self.clock = GameClock(60)
         self.camera = pygame.Rect(0, 0, self.WIDTH - 250, self.HEIGHT)
         self.world = World()
+        self.events = pygame.event.get()
+        self.world.update(self.events, self.camera, (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32))
         self.ui = GuiHandler(self.world)
-        self.events = None
+
+
+
     def run(self):
         """
         Handles the looping of the main with a clock that follows a set amount of ticks per second.
@@ -51,8 +56,8 @@ class Game(object):
                 sys.exit()
         mouse = (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32)
         self.world.update(self.events, self.camera, mouse)
-        self.camera.centerx = self.world.player.x*32 + 3
-        self.camera.centery = self.world.player.y*32
+        self.camera.centerx = int(self.world.player.x)*32 + 3
+        self.camera.centery = int(self.world.player.y)*32
         if self.camera.x < 0:
             self.camera.x = 0
         if self.camera.x + self.camera.w > self.world.map.dungeon.width:

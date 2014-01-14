@@ -71,7 +71,8 @@ def render_textrect(string, maxsize, rect, text_color, background_color=None, ju
 
     accumulated_height = 0
     for line in final_lines:
-        if accumulated_height + font.size(line)[1] >= rect.height:
+        height = font.size(line)[1]
+        if accumulated_height + height >= rect.height:
             return render_textrect(string, maxsize - 1, rect, text_color, background_color, justification)
             #raise TextRectException, "Once word-wrapped, the text string was too tall to fit in the rect."
         if line is not "":
@@ -84,7 +85,7 @@ def render_textrect(string, maxsize, rect, text_color, background_color=None, ju
                 surface.blit(tempsurface, (rect.width - tempsurface.get_width(), accumulated_height))
             else:
                 raise TextRectException, "Invalid justification argument: " + str(justification)
-            accumulated_height += font.size(line)[1]
+            accumulated_height += height
 
     return surface
 

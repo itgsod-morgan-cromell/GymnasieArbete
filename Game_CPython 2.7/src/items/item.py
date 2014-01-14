@@ -24,6 +24,7 @@ class PowerUp(object):
         if type(world.player.stats[self.name]) == list:
             world.player.stats[self.name][0] += self.amount
         else:
+
             world.player.stats[self.name] += self.amount
 
     def draw(self, screen, offset):
@@ -52,7 +53,7 @@ class Item(object):
     def drop(self, world):
         self.unequip(world.player)
         tile = world.map.map.tiles[world.player.y][world.player.x]
-        if tile.id == 1 or tile.id == 11:
+        if tile:
             self.x = world.player.x
             self.y = world.player.y
             if not self.stackable:

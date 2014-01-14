@@ -31,7 +31,7 @@ class GuiHandler(object):
         self.mouse_grid_y = mouse[1]
         mouse_grid_x = self.mouse_grid_x + offset.x/32
         mouse_grid_y = self.mouse_grid_y + offset.y/32
-        if self.mouse_grid_x*32 < 700:
+        if self.mouse_grid_x*32 < offset.w:
             if len(world.map.map.tiles) - 1 >= mouse_grid_y:
                 if len(world.map.map.tiles[mouse_grid_y]) - 1 >= mouse_grid_x:
                     tile = world.map.map.tiles[mouse_grid_y][mouse_grid_x]
@@ -75,6 +75,6 @@ class GuiHandler(object):
                 gui.draw(screen)
         mouse_grid_x = self.mouse_grid_x*32
         mouse_grid_y = self.mouse_grid_y*32
-        if mouse_grid_x < 700:
+        if mouse_grid_x < offset.w:
 
             pygame.draw.rect(screen, self.mouse_col, pygame.Rect((mouse_grid_x, mouse_grid_y), (32, 32)), 2)

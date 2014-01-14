@@ -2,7 +2,7 @@ from src.gui.gui import Gui
 import pygame
 from src.gui.slot import Slot
 from src.gui.textrect import *
-
+import copy
 
 class StatsUi(Gui):
     def __init__(self, player):
@@ -10,16 +10,17 @@ class StatsUi(Gui):
         height = 330
         image = pygame.Surface((width, height))
         image.fill((127, 127, 127), pygame.Rect((0, 0), (3, height)))
-        Gui.__init__(self, 'character', (710, 0), image, True)
-        self.stats = player.stats
+        Gui.__init__(self, 'character', (player.playable_width, 0), image, True)
+        self.stats = copy.copy(player.stats)
         self.icon = player.icon
         self.stats_rect = pygame.Rect((15, 45), (220, 124))
         self.inventory_rect = pygame.Rect((15, self.stats_rect.y + self.stats_rect.h + 15), (220, 145))
         self.slots = [Slot(self.stats_rect.x+12, self.stats_rect.y+80), Slot(self.stats_rect.x+56, self.stats_rect.y+80), Slot(self.stats_rect.x+100, self.stats_rect.y+80)]
         self.inventory_slots = [None] * 10
+        self.stats_font = {}
+        self.update_stats()
 
     def update(self, world):
-        self.stats = world.player.stats
         self.world = world
         self.slots[0].containts = self.world.player.weapon
         self.slots[1].containts = self.world.player.armor
@@ -42,17 +43,33 @@ class StatsUi(Gui):
             x += self.inventory_rect.x
             y += self.inventory_rect.y
             self.inventory_slots[i] = Slot(x, y, item)
+            for key in world.player.stats.keys():
+                if not key in self.stats or self.stats[key] != world.player.stats[key]:
+                    self.stats = copy.copy(world.player.stats)
+                    self.update_stats()
+
+
+    def update_stats(self):
+        if self.stats['STATUS']:
+            self.stats_font['STATUS'] = self.get_stat('STATUS', pygame.Rect((0, 0), (213, 28)), 1, (186, 186, 186))
+        text_rect = pygame.Rect((0, 0), (44, 30))
+        self.stats_font['LVL'] = self.get_stat('LVL', text_rect, 0, (247, 226, 107))
+        self.stats_font['DMG'] = self.get_stat('DMG', text_rect, 2, (0, 200, 0))
+        self.stats_font['MAG'] = self.get_stat('MAG', text_rect, 2, (0, 200, 0))
+        self.stats_font['DEF'] = self.get_stat('DEF', text_rect, 2, (0, 200, 0))
+        self.stats_font['GOLD'] = self.get_stat('GOLD', pygame.Rect((0, 0), (100, 30)), 2, (186, 186, 186))
 
     def draw(self, screen):
         self.draw_status()
         self.draw_stats()
         self.draw_inventory()
+
         screen.blit(self.image, (self.x, self.y))
 
     def draw_status(self):
         self.image.blit(pygame.image.load('res/gui/status.png'), (15, 5))
-        if self.world.player.stats['STATUS']:
-            self.image.blit(self.get_stat('STATUS', pygame.Rect((0, 0), (213, 28)), 1, (186, 186, 186)), (15 + 8, 5 + 7))
+        if self.stats['STATUS']:
+            self.image.blit(self.stats_font['STATUS'], (15, 15))
 
     def draw_stats(self):
 
@@ -69,11 +86,10 @@ class StatsUi(Gui):
         ###########################
 
         ### Draw numeric stats ####
-        text_rect = pygame.Rect((0, 0), (44, 30))
-        self.image.blit(self.get_stat('LVL', text_rect, 0, (247, 226, 107)), (self.stats_rect.x + 53, self.stats_rect.y+51))
-        self.image.blit(self.get_stat('DMG', text_rect, 2, (0, 200, 0)), (self.stats_rect.x+137, self.stats_rect.y+20))
-        self.image.blit(self.get_stat('MAG', text_rect, 2, (0, 200, 0)), (self.stats_rect.x+137, self.stats_rect.y+51))
-        self.image.blit(self.get_stat('DEF', text_rect, 2, (0, 200, 0)), (self.stats_rect.x+137, self.stats_rect.y+83))
+        self.image.blit(self.stats_font['LVL'], (self.stats_rect.x + 53, self.stats_rect.y+51))
+        self.image.blit(self.stats_font['DMG'], (self.stats_rect.x+137, self.stats_rect.y+20))
+        self.image.blit(self.stats_font['MAG'], (self.stats_rect.x+137, self.stats_rect.y+51))
+        self.image.blit(self.stats_font['DEF'], (self.stats_rect.x+137, self.stats_rect.y+83))
         ###########################
 
         ### Draw items in slots ###
@@ -88,7 +104,7 @@ class StatsUi(Gui):
             if slot:
                 if slot.containts:
                     self.image.blit(slot.containts.image, (slot.x, slot.y))
-        self.image.blit(self.get_stat('GOLD', pygame.Rect((0, 0), (100, 30)), 2, (186, 186, 186)), (self.inventory_rect.x+115, self.inventory_rect.y+10))
+        self.image.blit(self.stats_font['GOLD'], (self.inventory_rect.x+115, self.inventory_rect.y+10))
 
     def get_stat(self, stat, rect, alignment=0, color=(255, 255, 255)):
         if stat in self.stats:
