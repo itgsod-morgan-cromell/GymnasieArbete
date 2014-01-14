@@ -18,6 +18,7 @@ class PowerUp(object):
         self.image = pygame.image.load('res/items/other/{0}_{1}.gif'.format(self.name.lower(), image_amount))
         self.x = 0
         self.y = 0
+        self.options = {'LMouse': 'pickup'}
 
     def pickup(self, world):
         world.map.items.remove(self)
@@ -46,11 +47,13 @@ class Item(object):
             self.stackable = False
 
         self.equipped = False
+        self.options = {'LMouse': 'pickup'}
         self.image = pygame.image.load(image)
         self.x = 0
         self.y = 0
 
     def drop(self, world):
+        self.options = {'LMouse': 'pickup'}
         self.unequip(world.player)
         tile = world.map.map.tiles[world.player.y][world.player.x]
         if tile:
@@ -90,6 +93,7 @@ class Item(object):
             self.equipped = False
 
     def pickup(self, world):
+        self.options = {'LMouse': 'drop'}
         if self.stackable:
             for item in world.plater.inventory:
                 if item.name == self.name:

@@ -1,4 +1,4 @@
-###########################################
+"""
 ### Dungeon Generator --- map_loader.py ###
 ###########################################
 ####### Breiny Games (c) 2011 #############
@@ -8,12 +8,11 @@
 ## the data representing a randomly      ##
 ## generated dungeon generated from the  ##
 ## map_generator.py module.              ##
-###########################################
+"""
 
 
 import pygame
 import random
-
 
 
 class MinimapTile:
@@ -107,14 +106,13 @@ class Tile:
         rot_image = rot_image.subsurface(rot_rect).copy()
         return rot_image
 
-class Map:
 
+class Map:
 
     def __init__(self):
 
         self.dungeon = None
         self.tiles = []
-
 
     def load_dungeon(self, dungeon):
 
@@ -143,4 +141,7 @@ class Map:
 
         for row in self.tiles:
             for tile in row:
-                surface.blit(tile.image, (tile.x -offset.x, tile.y -offset.y))
+                x = tile.x -offset.x
+                y = tile.y -offset.y
+                if -1 < x < offset.w and -1 < y < offset.h or tile.w is 4:
+                    surface.blit(tile.image, (x, y))

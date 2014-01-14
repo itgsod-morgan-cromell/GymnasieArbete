@@ -1,11 +1,12 @@
 import pygame
 from src.gui.gui import Gui
 from src.level.generator.map_loader import Map
+import copy
 
 
 class MiniMap(Gui):
     def __init__(self, world):
-        self.world = world
+        self.world = copy.copy(world)
         width = 250
         height = 150
         image = pygame.Surface((width, height))

@@ -72,7 +72,7 @@ class Player(Entity):
 
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pressed()[0] and self.path and mouse[0]*32 < self.playable_width:
+                if pygame.mouse.get_pressed()[0] and self.path and mouse[0]*32 < self.playable_width - 16:
                     self.follow_p = True
 
             elif event.type == pygame.KEYDOWN:
@@ -160,7 +160,7 @@ class Player(Entity):
                         self.world.map.map.tiles[row][tile].dirs = [2, 2]
                         self.world.map.map.tiles[row][tile].load_image()
 
-        if mouse[0]*32 < self.playable_width:
+        if mouse[0]*32 < self.playable_width - 16:
 
             if len(self.world.map.map.tiles) - 1 >= self.mouse_grid_y:
                 if len(self.world.map.map.tiles[self.mouse_grid_y]) - 1 >= self.mouse_grid_x:

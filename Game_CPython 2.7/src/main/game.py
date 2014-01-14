@@ -20,7 +20,7 @@ class Game(object):
         self.SCALE = 1
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.world_screen = pygame.Surface((self.WIDTH - 250, self.HEIGHT))
-        self.clock = GameClock(60)
+        self.clock = GameClock(40)
         self.camera = pygame.Rect(0, 0, self.WIDTH - 250, self.HEIGHT)
         self.events = None
         self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
@@ -45,6 +45,10 @@ class Game(object):
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            if not self.menu.main:
+                                self.menu.active = not self.menu.active
                 if self.menu.active:
                     self.menu.update(self)
                 else:
@@ -61,11 +65,6 @@ class Game(object):
         '''
         Main update loop.
         '''
-
-        for event in self.events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.menu.active = not self.menu.active
 
         mouse = (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32)
         self.world.update(self.events, self.camera, mouse)
