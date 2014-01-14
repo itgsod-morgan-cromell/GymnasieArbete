@@ -4,6 +4,7 @@ from src.gui.slot import Slot
 from src.gui.textrect import *
 import copy
 
+
 class StatsUi(Gui):
     def __init__(self, world):
         self.world = world
