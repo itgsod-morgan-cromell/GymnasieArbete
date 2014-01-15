@@ -1,15 +1,16 @@
 
 import pygame
+from src.entities.classdata import ClassData
 from src.entities.entity import Entity
 from src.level.generator.astar import *
 
 
 class Player(Entity):
-    def __init__(self, pos, world, gender, _class, name):
-        self._class = _class
-        self.gender = gender
+    def __init__(self, pos, world, _class, name):
+        self.lvl = 1
+        self.classdata = ClassData(_class)
         Entity.__init__(self, name, pos, world)
-        self.spritesheet = pygame.image.load('res/player/{0}/{1}.png'.format(gender, _class))
+        self.spritesheet = pygame.image.load('res/player/{0}.png'.format(_class))
         self.images = []
         for i in range(0, 4):
             rect = pygame.Rect((i*32, 0), (32, 32))
@@ -26,15 +27,13 @@ class Player(Entity):
         self.astar = Pathfinder()
         self.playable_width = 0
 
-        self.stats = {'STATUS': ' ',
-                           'HP': [50, 100],
-                           'MP': [70, 100],
-                           'EXP': [0, 100],
-                           'LVL': 1,
-                           'DMG': 6,
-                           'DEF': 9,
-                           'MAG': 12,
-                           'GOLD': 128}
+        self.stats = self.classdata.stats
+        self.hp = self.stats['HP']
+        self.mp = self.stats['MP']
+        self.gold = 0
+        self.exp = 0
+
+
 
 
         self.mouse_grid_x = 0
@@ -141,15 +140,14 @@ class Player(Entity):
             self.y += ya
 
     def calculate_stats(self):
-        if self.stats['EXP'][0] >= self.stats['EXP'][1]:
-            self.stats['LVL'] += 1
-            self.stats['EXP'][0] = 0
-            self.stats['EXP'][1] = 100 * self.stats['LVL']
+        if self.exp >= self.stats['EXP']:
+            self.lvl += 1
+            self.exp = 0
 
-        if self.stats['HP'][0] > self.stats['HP'][1]:
-            self.stats['HP'][0] = self.stats['HP'][1]
-        if self.stats['MP'][0] > self.stats['MP'][1]:
-            self.stats['MP'][0] = self.stats['MP'][1]
+        if self.hp > self.stats['HP']:
+            self.hp = self.stats['HP']
+        if self.mp > self.stats['MP']:
+            self.mp = self.stats['MP']
 
     def calculate_path(self, mouse):
         for row in range(0, len(self.world.map.map.tiles)):

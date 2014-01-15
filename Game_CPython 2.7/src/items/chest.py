@@ -1,14 +1,16 @@
 import glob
 import pygame
-from src.entities.entity import Entity
 import random
 from src.items.item import *
 
 
-class Chest(Entity):
+class Chest(object):
     def __init__(self, pos, world):
-        Entity.__init__(self, 'chest', pos, world)
+        self.name = 'chest'
         self.type = 'chest'
+        self.x = pos[0]
+        self.y = pos[1]
+        self.world = world
         self.level = self.world.map.floor
         self.used = False
         closed_img = pygame.image.load('res/items/other/chest_closed.png')

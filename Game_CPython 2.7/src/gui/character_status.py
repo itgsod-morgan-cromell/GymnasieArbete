@@ -52,16 +52,14 @@ class StatsUi(Gui):
                     self.stats = copy.copy(world.player.stats)
                     self.update_stats()
 
-
     def update_stats(self):
-        if self.stats['STATUS']:
-            self.stats_font['STATUS'] = self.get_stat('STATUS', pygame.Rect((0, 0), (213, 28)), 1, (186, 186, 186))
+
         text_rect = pygame.Rect((0, 0), (44, 30))
-        self.stats_font['LVL'] = self.get_stat('LVL', text_rect, 0, (247, 226, 107))
-        self.stats_font['DMG'] = self.get_stat('DMG', text_rect, 2, (0, 200, 0))
-        self.stats_font['MAG'] = self.get_stat('MAG', text_rect, 2, (0, 200, 0))
-        self.stats_font['DEF'] = self.get_stat('DEF', text_rect, 2, (0, 200, 0))
-        self.stats_font['GOLD'] = self.get_stat('GOLD', pygame.Rect((0, 0), (100, 30)), 2, (186, 186, 186))
+        self.stats_font['LVL'] = self.get_stat(self.world.player.lvl, text_rect, 0, (247, 226, 107))
+        self.stats_font['DMG'] = self.get_stat('STR', text_rect, 2, (0, 200, 0))
+        self.stats_font['MAG'] = self.get_stat('WIS', text_rect, 2, (0, 200, 0))
+        self.stats_font['DEF'] = self.get_stat('CON', text_rect, 2, (0, 200, 0))
+        self.stats_font['GOLD'] = self.get_stat(self.world.player.gold, pygame.Rect((0, 0), (100, 30)), 2, (186, 186, 186))
 
     def draw(self, screen):
         self.draw_status()
@@ -72,8 +70,7 @@ class StatsUi(Gui):
 
     def draw_status(self):
         self.image.blit(pygame.image.load('res/gui/status.png'), (15, 5))
-        if self.stats['STATUS']:
-            self.image.blit(self.stats_font['STATUS'], (15, 15))
+
 
     def draw_stats(self):
 
@@ -81,10 +78,10 @@ class StatsUi(Gui):
         self.image.blit(self.icon, (self.stats_rect.x + 12, self.stats_rect.y + 12))
 
         ### Draw bar stats ########
-        hp_in_width = float(self.stats['HP'][0])/float(self.stats['HP'][1])
+        hp_in_width = float(self.world.player.hp)/float(self.stats['HP'])
         hp_in_width *= 84
         self.image.fill((206, 0, 31), pygame.Rect((self.stats_rect.x+51, self.stats_rect.y+16), (hp_in_width, 8)))
-        mp_in_width = float(self.stats['MP'][0])/float(self.stats['MP'][1])
+        mp_in_width = float(self.world.player.mp)/float(self.stats['MP'])
         mp_in_width *= 84
         self.image.fill((62, 59, 255), pygame.Rect((self.stats_rect.x+51, self.stats_rect.y+32), (mp_in_width, 8)))
         ###########################
@@ -111,8 +108,12 @@ class StatsUi(Gui):
         self.image.blit(self.stats_font['GOLD'], (self.inventory_rect.x+115, self.inventory_rect.y+10))
 
     def get_stat(self, stat, rect, alignment=0, color=(255, 255, 255)):
+
         if stat in self.stats:
             text = render_textrect(self.stats[stat], 50, rect, color, None, alignment)
+            return text
+        elif type(stat) == int:
+            text = render_textrect(str(stat), 50, rect, color, None, alignment)
             return text
         else:
             print "No such type exists."
