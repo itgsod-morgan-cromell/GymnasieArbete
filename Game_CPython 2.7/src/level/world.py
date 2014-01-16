@@ -27,21 +27,23 @@ class World(object):
                         self.map.map.tiles[row][tile].id = 1
                         self.map.dungeon.grid[row][tile] = 1
 
-    def move_up(self, entity):
+    def move_up(self):
         if self.map.up:
             self.map = self.map.up
         else:
             self.map.up = Level(self.map.floor - 1, None, self.map)
             self.map = self.map.up
             self.spawn_objects()
+            self.player.x, self.player.y = self.map.up_stair
 
-    def move_down(self, entity):
+    def move_down(self):
         if self.map.down:
             self.map = self.map.down
         else:
             self.map.down = Level(self.map.floor + 1, self.map)
             self.map = self.map.down
             self.spawn_objects()
+            self.player.x, self.player.y = self.map.down_stair
 
     def update(self, input, offset, mouse):
         self.player.update(input, offset, mouse)
@@ -49,10 +51,12 @@ class World(object):
             monster.update()
 
     def draw(self, screen, offset):
-        self.map.map.draw(screen, offset)
+        self.map.map.draw(screen, offset, self.map.explored_tiles)
         for item in self.map.items:
-            item.draw(screen, offset)
+            explored = self.map.explored_tiles[item.y][item.x]
+            item.draw(screen, offset, explored)
         for monster in self.map.monsters:
-            monster.draw(screen, offset)
+            if self.map.explored_tiles[monster.y][monster.x] >= 0:
+                monster.draw(screen, offset)
         self.player.draw(screen, offset)
 

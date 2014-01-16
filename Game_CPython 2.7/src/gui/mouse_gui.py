@@ -11,10 +11,14 @@ class MouseGui(Gui):
         image = pygame.Surface((200, 100), pygame.SRCALPHA, 32)
         #image.convert_alpha()
         self.options = {}
+        self.show_window = False
         Gui.__init__(self, 'character', (0, 0), image, True)
 
     def update_data(self, data):
         self.options = {}
+        self.active = True
+        if self.data != data:
+            self.show_window = False
         self.data = data
         self.image = pygame.Surface((200, 100), pygame.SRCALPHA, 32)
         #self.image.convert_alpha()
@@ -30,17 +34,26 @@ class MouseGui(Gui):
     def update(self, world, events):
         self.world = world
         if not self.active:
+            self.show_window = False
             return
         self.x = pygame.mouse.get_pos()[0]
         self.y = pygame.mouse.get_pos()[1] - self.image.get_bounding_rect().h
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:  # Left click.
-                    if 'LMouse' in self.options:
-                        if hasattr(self.data, self.options['LMouse']):
-                            getattr(self.data, self.options['LMouse'])(self.world)
+                    if self.show_window:
+                        if 'LMouse' in self.options:
+                            if hasattr(self.data, self.options['LMouse']):
+                                getattr(self.data, self.options['LMouse'])(self.world)
+                    self.show_window = not self.show_window
+                elif pygame.mouse.get_pressed()[2]:  # Right click.
+                    if self.show_window:
+                        if 'RMouse' in self.options:
+                            if hasattr(self.data, self.options['RMouse']):
+                                getattr(self.data, self.options['RMouse'])(self.world)
 
     def draw(self, screen):
         if not self.active:
             return
-        screen.blit(self.image, (self.x, self.y))
+        if self.show_window:
+            screen.blit(self.image, (self.x, self.y))
