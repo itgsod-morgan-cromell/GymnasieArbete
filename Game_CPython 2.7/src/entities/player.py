@@ -33,7 +33,7 @@ class Player(Entity):
         self.gold = 0
         self.exp = 0
         #Radius is measured in tiles and not in pixels.
-        self.radius = 9
+        self.radius = 19
 
 
 
@@ -185,6 +185,7 @@ class Player(Entity):
                         self.options = {'LMouse': 'travel'}
                     else:
                         self.options = {}
+                        print "no path"
 
     def travel(self, world=None):
         if self.path:

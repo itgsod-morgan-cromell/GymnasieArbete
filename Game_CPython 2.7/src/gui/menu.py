@@ -74,11 +74,6 @@ class Menu(Gui):
                                 game.__init__()
                             elif self.title_text == 'Select class':
                                 self.choices_to_send['class'] = item.data
-                                #game.new_game(self.choices_to_send)
-                                #self.choices_to_send = {}
-                                #self.change_options(['back to menu', 'Save game', 'Quit'])
-                                #self.active = False
-                                #self.main = False
                                 self.change_options([' '])
                                 self.change_title("Enter your character's name")
 
@@ -92,7 +87,13 @@ class Menu(Gui):
                     if event.key == pygame.K_BACKSPACE:
                         self.current_string = self.current_string[0:-1]
                     elif event.key == pygame.K_RETURN:
-                        print "ewew"
+                        game.new_game(self.choices_to_send)
+                        self.change_title(' ')
+                        self.choices_to_send['name'] = ' '.join(self.current_string)
+                        self.choices_to_send = {}
+                        self.change_options(['back to menu', 'Save game', 'Quit'])
+                        self.active = False
+                        self.main = False
                     elif 64 < event.key < 91 or 96 < event.key < 123 or event.key == 32:
                         if len(self.current_string) < 14:
                             self.current_string.append(chr(event.key))

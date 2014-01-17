@@ -15,21 +15,21 @@ class MouseGui(Gui):
         Gui.__init__(self, 'character', (0, 0), image, True)
 
     def update_data(self, data):
+        if self.data != data:
+            self.active = True
+            self.show_window = False
+            #self.image.convert_alpha()
+        self.data = data
         self.options = {}
-        self.active = True
         self.image = pygame.Surface((200, 100), pygame.SRCALPHA, 32)
-        #self.image.convert_alpha()
-        if self.data is not data:
-            self.show_window = True
-            self.data = copy.copy(data)
-            if hasattr(data, 'options'):
-                i = 0
-                for option, action in data.options.items():
-                    string = "{0}: {1}".format(option, action)
-                    rect = pygame.Rect((0, 15 * i), (len(string) * 7, 15))
-                    i += 1
-                    self.options[option] = action
-                    self.image.blit(render_textrect(string, 15, rect, (128, 128, 128), (0, 0, 0)), (rect.x, rect.y))
+        if hasattr(data, 'options'):
+            i = 0
+            for option, action in data.options.items():
+                string = "{0}: {1}".format(option, action)
+                rect = pygame.Rect((0, 15 * i), (len(string) * 7, 15))
+                i += 1
+                self.options[option] = action
+                self.image.blit(render_textrect(string, 15, rect, (128, 128, 128), (0, 0, 0)), (rect.x, rect.y))
 
     def update(self, world, events):
         self.world = world
