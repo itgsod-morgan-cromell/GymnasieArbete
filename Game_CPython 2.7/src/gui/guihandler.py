@@ -18,6 +18,7 @@ class GuiHandler(object):
         self.mouse_img = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.mouse_img.convert_alpha()
 
+
     def update(self, world, offset, mouse, events):
         self.mouse_col = (255, 0, 0)
         self.player_stats.update(world)
@@ -30,19 +31,25 @@ class GuiHandler(object):
         mouse_grid_x = self.mouse_grid_x + offset.x/32
         mouse_grid_y = self.mouse_grid_y + offset.y/32
         if self.mouse_grid_x*32 < offset.w - 16:
-            for item in world.map.items:
-                if item.x == mouse_grid_x and item.y == mouse_grid_y:
+            item = world.map.get_item(mouse_grid_x, mouse_grid_y)
+
+            if world.player.x == mouse_grid_x and world.player.y == mouse_grid_y:
                     self.mouse_col = (0, 0, 255)
-                    self.mouse = item
-                    self.mouse_gui.update_data(item)
-                    self.mouse_gui.active = True
-                elif world.player.x == mouse_grid_x and world.player.y == mouse_grid_y:
-                        self.mouse_col = (0, 0, 255)
-                        self.mouse = world.player
-                        self.mouse_gui.update_data(world.player)
-                        self.mouse_gui.active = True
+                    self.mouse = world.player
+                    self.mouse_gui.update_data(world.player)
+
+            elif item:
+                self.mouse_col = (0, 0, 255)
+                self.mouse = item
+                self.mouse_gui.update_data(item)
+
+            elif world.map.dungeon.grid[mouse_grid_y][mouse_grid_x]:
+                self.mouse_gui.update_data(world.player)
+                if world.player.path:
+                    self.mouse_gui.options = {'LMouse': 'travel'}
                 else:
-                    self.mouse_gui.active = False
+                    self.mouse_gui.options = {}
+                self.mouse_col = (0, 255, 0)
 
         else:
             mouse_rect = pygame.Rect((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), (2, 2))
@@ -59,15 +66,15 @@ class GuiHandler(object):
             if colliding_slots:
                 self.mouse = colliding_slots[0]
                 self.mouse_gui.update_data(colliding_slots[0])
-                self.mouse_gui.active = True
             else:
+                self.mouse = None
                 self.mouse_gui.active = False
 
     def draw(self, screen, offset):
         self.player_stats.draw(screen)
         self.minimap.draw(screen)
         self.explorer.draw(screen)
-        self.mouse_gui.draw(screen)
+
         mouse_grid_x = self.mouse_grid_x*32
         mouse_grid_y = self.mouse_grid_y*32
         if mouse_grid_x < offset.w - 16:
@@ -77,3 +84,4 @@ class GuiHandler(object):
             pygame.draw.lines(self.mouse_img, self.mouse_col, False, [(24, 30), (30, 30), (30, 24)], 2) #bottom right
             pygame.draw.lines(self.mouse_img, self.mouse_col, False, [(0, 24), (0, 30), (8, 30)], 2) #bottom left
             screen.blit(self.mouse_img, (mouse_grid_x, mouse_grid_y))
+        self.mouse_gui.draw(screen)

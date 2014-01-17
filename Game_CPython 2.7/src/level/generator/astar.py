@@ -304,15 +304,8 @@ class Pathfinder:
             if abs(start_pos[0] - end_pos[0]) in [0, 1] and abs(start_pos[1] - end_pos[1]) in [0, 1]:
                 self.path.append((end_pos[0], end_pos[1]))
 
-        if map[end_pos[1]][end_pos[0]] in unwalkable_tile_ids:
-            if map[end_pos[1]][end_pos[0]] in [7, 8, 9, 10]:
-                if len(self.path) == 1:
-                    return self.path
-                else:
-                    if self.path:
-                        self.path.pop()
-            else:
-                return []
+        if map[end_pos[1]][end_pos[0]] in [0, 2, 3, 4, 5, 6]:
+                return None
 
         return self.path
                     

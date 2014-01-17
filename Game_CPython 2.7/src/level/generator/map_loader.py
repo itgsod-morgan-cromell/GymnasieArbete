@@ -54,7 +54,7 @@ class Tile:
         self.rect = pygame.Rect(self.x, self.y,
                                 self.w, self.h)
 
-        self.image = pygame.surface.Surface((self.w, self.h))
+        self.image = pygame.surface.Surface((self.w, self.h), pygame.SRCALPHA, 32)
         
         self.id = tile_id
         self.load_image()
@@ -113,6 +113,8 @@ class Map:
 
         self.dungeon = None
         self.tiles = []
+        self.shadow_tile = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
+        self.shadow_tile.fill((0, 0, 0, 200))
 
     def load_dungeon(self, dungeon):
 
@@ -137,11 +139,20 @@ class Map:
             self.tiles.append(row)
 
 
-    def draw(self, surface, offset):
+    def draw(self, surface, offset, explored_tiles=None):
 
         for row in self.tiles:
             for tile in row:
                 x = tile.x -offset.x
                 y = tile.y -offset.y
                 if -1 < x < offset.w and -1 < y < offset.h or tile.w is 4:
-                    surface.blit(tile.image, (x, y))
+                    if explored_tiles:
+                        if explored_tiles[tile.y/32][tile.x/32] == 0:
+                            surface.blit(tile.image, (x, y))
+                            surface.blit(self.shadow_tile, (x, y))
+                        elif explored_tiles[tile.y/32][tile.x/32] == 1:
+                            surface.blit(tile.image, (x, y))
+                        else:
+                            pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, 32, 32))
+                    else:
+                        surface.blit(tile.image, (x, y))

@@ -1,14 +1,16 @@
 
 import pygame
+from src.entities.classdata import ClassData
 from src.entities.entity import Entity
 from src.level.generator.astar import *
 
 
 class Player(Entity):
     def __init__(self, pos, world, _class, name):
-        self._class = _class
+        self.lvl = 1
+        self.classdata = ClassData(_class)
         Entity.__init__(self, name, pos, world)
-        self.spritesheet = pygame.image.load('res/player/male/{0}.png'.format(_class))
+        self.spritesheet = pygame.image.load('res/player/{0}.png'.format(_class))
         self.images = []
         for i in range(0, 4):
             rect = pygame.Rect((i*32, 0), (32, 32))
@@ -24,16 +26,15 @@ class Player(Entity):
         self.max_path_delay = 4
         self.astar = Pathfinder()
         self.playable_width = 0
+        self.KEYBOARD = False
+        self.stats = self.classdata.stats
+        self.hp = self.stats['HP']
+        self.mp = self.stats['MP']
+        self.gold = 0
+        self.exp = 0
+        #Radius is measured in tiles and not in pixels.
+        self.radius = 9
 
-        self.stats = {'STATUS': ' ',
-                           'HP': [50, 100],
-                           'MP': [70, 100],
-                           'EXP': [0, 100],
-                           'LVL': 1,
-                           'DMG': 6,
-                           'DEF': 9,
-                           'MAG': 12,
-                           'GOLD': 128}
 
 
         self.mouse_grid_x = 0
@@ -41,6 +42,7 @@ class Player(Entity):
         self.path = None
         self.path_delay = 0
         self.follow_p = False
+        self.move(0, 0)
 
     def update(self, events, offset, mouse):
         self.playable_width = offset.w
@@ -49,7 +51,7 @@ class Player(Entity):
         if self.path:
             if self.follow_p:
                 self.follow_p = True
-                self.follow_path(mouse)
+                self.travel()
                 return
         self.follow_p = False
         self.path_delay = 0
@@ -70,11 +72,7 @@ class Player(Entity):
 
 
         for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pressed()[0] and self.path and mouse[0]*32 < self.playable_width - 16:
-                    self.follow_p = True
-
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     xa = -1
                 if event.key == pygame.K_RIGHT:
@@ -111,44 +109,42 @@ class Player(Entity):
         # Check collision from the grid.
         tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
         item = self.world.map.get_item(self.x + xa, self.y + ya)
-        if item:
+        if item and self.KEYBOARD:
 
             if not self.path or not self.follow_p or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
                 if item.type == 'item' or item.type == 'powerup':
                     item.pickup(self.world)
                 elif item.type == 'chest':
-                    item.loot()
-                    item.open()
+                    item.loot(self.world)
+                    item.open(self.world)
                     xa = 0
                     ya = 0
 
         if tile.id == 2 or tile.id == 3 or tile.id == 4 or tile.id == 5 or tile.id == 6 or tile.id == 7:
             xa = 0
             ya = 0
-        if tile.id == 8:
+        if tile.id == 8 and self.KEYBOARD:
             self.world.move_up(self)
             self.path = None
-            self.x, self.y = self.world.map.down_stair
 
-        elif tile.id == 9:
+        elif tile.id == 9 and self.KEYBOARD:
             self.world.move_down(self)
             self.path = None
-            self.x, self.y = self.world.map.up_stair
 
         else:
             self.x += xa
             self.y += ya
+            self.world.map.fog_of_war(self.x, self.y, self.radius)
 
     def calculate_stats(self):
-        if self.stats['EXP'][0] >= self.stats['EXP'][1]:
-            self.stats['LVL'] += 1
-            self.stats['EXP'][0] = 0
-            self.stats['EXP'][1] = 100 * self.stats['LVL']
+        if self.exp >= self.stats['EXP']:
+            self.lvl += 1
+            self.exp = 0
 
-        if self.stats['HP'][0] > self.stats['HP'][1]:
-            self.stats['HP'][0] = self.stats['HP'][1]
-        if self.stats['MP'][0] > self.stats['MP'][1]:
-            self.stats['MP'][0] = self.stats['MP'][1]
+        if self.hp > self.stats['HP']:
+            self.hp = self.stats['HP']
+        if self.mp > self.stats['MP']:
+            self.mp = self.stats['MP']
 
     def calculate_path(self, mouse):
         for row in range(0, len(self.world.map.map.tiles)):
@@ -166,7 +162,7 @@ class Player(Entity):
 
                     start = (self.x, self.y)
                     end = (self.mouse_grid_x, self.mouse_grid_y)
-                    blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                    blocked_tiles = [0, 2, 3, 4, 5, 6, 10]
                     self.path = None
                     start_dir = 0
                     if self.mouse_grid_x is not self.x:
@@ -183,70 +179,22 @@ class Player(Entity):
                     elif self.mouse_grid_y < self.y:
                         start_dir = 0
 
-
                     path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
                     if path:
-
                         self.path = path
-                        tile = self.world.map.map.tiles[path[-1][1]][path[-1][0]]
-                        if hasattr(tile, 'id'):
-                            if tile.id == 1 or tile.id == 11:
-                                tile.id = 15
-                                tile.load_image()
-                        for i in range(0, len(path)):
-                            tile = self.world.map.map.tiles[path[i][1]][path[i][0]]
-                            if hasattr(tile, 'id'):
-                                tile.id = self.world.map.dungeon.grid[path[i][1]][path[i][0]]
-                                tile.dirs = [2, 2]
-                                tile.load_image()
-                                if len(path) > i + 1:
-                                    current_node = self.astar.nodes[path[i + 1][1]][path[i + 1][0]]
-                                    last = False
-                                else:
-                                    current_node = self.astar.nodes[path[i][1]][path[i][0]]
-                                    last = True
-                                dir = 0
-                                p = 0
-                                if current_node.parent:
-                                    p = current_node.parent
-                                if current_node:
-                                    c = current_node
+                        self.options = {'LMouse': 'travel'}
+                    else:
+                        self.options = {}
 
-                                self.world.map.map.tiles[path[i][1]][path[i][0]].dirs[1] = 9
-                                if p:
-                                    tile.dirs[0] = p.dir
-                                    tile.dirs[1] = c.dir
-                                    if c.dir:
-                                        tile.dirs[1] = c.dir
-                                    else:
-                                        tile.dirs[1] = p.dir
-                                elif c.dir:
-                                    tile.dirs[0] = c.dir
-
-                                if len(path) == 1:
-                                    if not p:
-                                        tile.dirs[1] = 2
-                                    else:
-                                        if p.dir == 7:
-                                            tile.dirs[0] = 5
-                                            tile.dirs[1] = 5
-                                        elif p.dir == 5:
-                                            tile.dirs[0] = 7
-                                            tile.dirs[1] = 7
-                                if c == path[-1]:
-                                    tile.id = 16
-                                else:
-                                    tile.id = 15
-                                tile.load_image()
-                                self.world.map.map.tiles[path[i][1]][path[i][0]] = tile
-
-    def follow_path(self, mouse):
+    def travel(self, world=None):
+        if self.path:
+            self.draw_path()
+            self.follow_p = True
         if not self.path:
             self.path_delay = 0
             return
         if len(self.path) == 0:
                 self.path_delay = self.max_path_delay
-                self.calculate_path(mouse)
                 return
         if self.path_delay == 0:
             self.path_delay = self.max_path_delay
@@ -264,10 +212,62 @@ class Player(Entity):
             if not self.path:
                 self.path_delay = self.max_path_delay
                 self.follow_p = False
-                self.calculate_path(mouse)
 
         else:
             self.path_delay -= 1
+
+    def draw_path(self):
+        tile = self.world.map.map.tiles[self.path[-1][1]][self.path[-1][0]]
+        if hasattr(tile, 'id'):
+            if tile.id == 1 or tile.id == 11:
+                tile.id = 15
+                tile.load_image()
+        for i in range(0, len(self.path)):
+            tile = self.world.map.map.tiles[self.path[i][1]][self.path[i][0]]
+            if hasattr(tile, 'id'):
+                tile.id = self.world.map.dungeon.grid[self.path[i][1]][self.path[i][0]]
+                tile.dirs = [2, 2]
+                tile.load_image()
+                if len(self.path) > i + 1:
+                    current_node = self.astar.nodes[self.path[i + 1][1]][self.path[i + 1][0]]
+                    last = False
+                else:
+                    current_node = self.astar.nodes[self.path[i][1]][self.path[i][0]]
+                    last = True
+                dir = 0
+                p = 0
+                if current_node.parent:
+                    p = current_node.parent
+                if current_node:
+                    c = current_node
+
+                self.world.map.map.tiles[self.path[i][1]][self.path[i][0]].dirs[1] = 9
+                if p:
+                    tile.dirs[0] = p.dir
+                    tile.dirs[1] = c.dir
+                    if c.dir:
+                        tile.dirs[1] = c.dir
+                    else:
+                        tile.dirs[1] = p.dir
+                elif c.dir:
+                    tile.dirs[0] = c.dir
+
+                if len(self.path) == 1:
+                    if not p:
+                        tile.dirs[1] = 2
+                    else:
+                        if p.dir == 7:
+                            tile.dirs[0] = 5
+                            tile.dirs[1] = 5
+                        elif p.dir == 5:
+                            tile.dirs[0] = 7
+                            tile.dirs[1] = 7
+                if c == self.path[-1]:
+                    tile.id = 16
+                else:
+                    tile.id = 15
+                tile.load_image()
+                self.world.map.map.tiles[self.path[i][1]][self.path[i][0]] = tile
 
     def draw(self, screen, offset):
         screen.blit(self.images[self.dir], (self.x*32-offset.x, self.y*32-offset.y))

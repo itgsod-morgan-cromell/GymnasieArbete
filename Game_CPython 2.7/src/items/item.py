@@ -51,6 +51,8 @@ class Item(object):
         self.image = pygame.image.load(image)
         self.x = 0
         self.y = 0
+        self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
+        self.shadow.fill((0, 0, 0, 200))
 
     def drop(self, world):
         self.options = {'LMouse': 'pickup'}
@@ -109,6 +111,8 @@ class Item(object):
         mouse_x = pygame.mouse.get_pos()[0]
         mouse_y = pygame.mouse.get_pos()[1]
 
-
-    def draw(self, screen, offset):
-        screen.blit(self.image, (self.x*32 - offset.x, self.y*32 - offset.y))
+    def draw(self, screen, offset, explored=1):
+        if explored >= 0:
+            screen.blit(self.image, (self.x*32 - offset.x, self.y*32 - offset.y))
+        if explored == 0:
+            screen.blit(self.shadow, (self.x*32 - offset.x, self.y*32 - offset.y))
