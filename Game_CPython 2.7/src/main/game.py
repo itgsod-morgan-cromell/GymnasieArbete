@@ -50,7 +50,7 @@ class Game(object):
                             if not self.menu.main:
                                 self.menu.active = not self.menu.active
                 if self.menu.active:
-                    self.menu.update(self)
+                    self.menu.update(self, self.events)
                 else:
                     self.update()
 

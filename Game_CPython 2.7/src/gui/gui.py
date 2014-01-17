@@ -12,8 +12,5 @@ class Gui(object):
     def activate(self):
         self.active = not self.active
 
-    def update(self, world):
-        self.world = world
-
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))

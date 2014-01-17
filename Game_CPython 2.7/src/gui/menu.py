@@ -2,6 +2,7 @@ import sys
 from src.gui.gui import Gui
 import pygame
 from src.gui.textrect import render_textrect
+import copy
 
 
 class MenuItem(object):
@@ -29,6 +30,9 @@ class Menu(Gui):
         self.logo_rect = pygame.Rect((0, 0), (250, 50))
         self.title = render_textrect(' ', 30, self.logo_rect, (255, 255, 0), None, 1)
         self.title_text = ' '
+        self.current_string = []
+        self.textbox = pygame.Surface((200, 30))
+        pygame.draw.rect(self.textbox, (128, 128, 128), self.textbox.get_rect(), 2)
         self.logo = render_textrect('Dungeon of Doom (Alpha)', 30, self.logo_rect, (255, 255, 0), None, 1)
         Gui.__init__(self, 'menu', (self.rect.x, self.rect.y), image, True)
         self.choices_to_send = {}
@@ -47,7 +51,7 @@ class Menu(Gui):
             rect = pygame.Rect((0, 0 + (30 * key)), (self.width, 30))
             self.items.append(MenuItem(rect, option))
 
-    def update(self, game):
+    def update(self, game, events):
         for item in self.items:
             if item.rect.collidepoint(pygame.mouse.get_pos()[0] - self.x, pygame.mouse.get_pos()[1] - self.y) and item.data in self.options:
                 item.active = True
@@ -57,8 +61,8 @@ class Menu(Gui):
                             if item.data == 'New Game':
                                 self.prev_title = self.title
                                 self.prev_options = self.options
-                                self.change_title('Select gender')
-                                self.change_options(['Male', 'Female', 'Back'])
+                                self.change_title('Select class')
+                                self.change_options(['Warrior', 'Mage', 'Ranger'])
                             elif item.data == 'Quit':
                                 pygame.quit()
                                 sys.exit()
@@ -68,24 +72,38 @@ class Menu(Gui):
                                 self.change_options(self.prev_options)
                             elif item.data is 'back to menu':
                                 game.__init__()
-                            elif self.title_text == 'Select gender':
-                                self.choices_to_send['gender'] = item.data
-                                self.prev_title = self.title
-                                self.prev_options = self.options
-                                self.change_title('Select class')
-                                self.change_options(['Warrior', 'Mage', 'Ranger'])
                             elif self.title_text == 'Select class':
                                 self.choices_to_send['class'] = item.data
-                                game.new_game(self.choices_to_send)
-                                self.choices_to_send = {}
-                                self.change_options(['back to menu', 'Save game', 'Quit'])
-                                self.active = False
-                                self.main = False
+                                #game.new_game(self.choices_to_send)
+                                #self.choices_to_send = {}
+                                #self.change_options(['back to menu', 'Save game', 'Quit'])
+                                #self.active = False
+                                #self.main = False
+                                self.change_options([' '])
+                                self.change_title("Enter your character's name")
+
+            else:
+                item.active = False
+
+        if self.title_text is "Enter your character's name":
+            oldstring = copy.copy(self.current_string)
+            for event in events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        self.current_string = self.current_string[0:-1]
+                    elif event.key == pygame.K_RETURN:
+                        print "ewew"
+                    elif 64 < event.key < 91 or 96 < event.key < 123 or event.key == 32:
+                        if len(self.current_string) < 14:
+                            self.current_string.append(chr(event.key))
+            #print self.current_string
+            if oldstring is not self.current_string:
+                rect = pygame.Rect((0, 0), (self.textbox.get_rect().w - 3, self.textbox.get_rect().h - 2))
+                self.textbox.blit(render_textrect(''.join(self.current_string), 30, rect, (255, 255, 255), (0, 0, 0)), (2, 1))
 
                             #self.active = False
                             #self.main = False
-            else:
-                item.active = False
+
 
     def draw(self, screen):
         self.image.fill((0, 0, 0))
@@ -101,3 +119,5 @@ class Menu(Gui):
             else:
                 self.image.blit(item.image, (item.rect.x, item.rect.y))
         screen.blit(self.image, (self.x, self.y))
+        if self.title_text == "Enter your character's name":
+            screen.blit(self.textbox, (self.middle[0] - self.textbox.get_rect().w/2, self.middle[1] - self.textbox.get_rect().h/2))

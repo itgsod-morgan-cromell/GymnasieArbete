@@ -5,11 +5,10 @@ from src.level.generator.astar import *
 
 
 class Player(Entity):
-    def __init__(self, pos, world, gender, _class, name):
+    def __init__(self, pos, world, _class, name):
         self._class = _class
-        self.gender = gender
         Entity.__init__(self, name, pos, world)
-        self.spritesheet = pygame.image.load('res/player/{0}/{1}.png'.format(gender, _class))
+        self.spritesheet = pygame.image.load('res/player/male/{0}.png'.format(_class))
         self.images = []
         for i in range(0, 4):
             rect = pygame.Rect((i*32, 0), (32, 32))
