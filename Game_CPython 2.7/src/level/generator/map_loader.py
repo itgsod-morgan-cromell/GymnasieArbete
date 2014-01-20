@@ -119,7 +119,7 @@ class Map:
         self.shadow_tile = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.shadow_tile.fill((0, 0, 0, 200))
 
-    def load_dungeon(self, dungeon):
+    def load_dungeon(self, dungeon, minimap=False):
 
         self.dungeon = dungeon
         self.tiles = []
@@ -127,7 +127,7 @@ class Map:
         for y in range(0, self.dungeon.grid_size[1]):
             row = []
             for x in range(0, self.dungeon.grid_size[0]):
-                if dungeon.tile_w == 4:
+                if minimap:
                     row.append(MinimapTile(x * dungeon.tile_w,
                                            y * dungeon.tile_h,
                                            dungeon.tile_w,

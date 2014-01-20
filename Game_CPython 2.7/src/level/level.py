@@ -1,6 +1,7 @@
 from src.level.generator.map_generator import Dungeon
 from src.level.generator.map_loader import Map
 import copy
+import random
 
 
 class Level(object):
@@ -10,7 +11,7 @@ class Level(object):
         self.up = up
         self.floor = floor
         self.down = down
-        self.dungeon = Dungeon((45, 25), "None", 50, (4, 4), (12, 12), (32, 32))
+        self.dungeon = Dungeon((random.randint(100, 300), random.randint(100, 300)), "None", 100, (5, 5), (32, 32), (32, 32))
 
         self.dungeon.generate_dungeon()
         self.explored_tiles = copy.deepcopy(self.dungeon.grid)

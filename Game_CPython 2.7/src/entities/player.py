@@ -36,7 +36,7 @@ class Player(Entity):
         self.radius = 19
 
 
-
+        
         self.mouse_grid_x = 0
         self.mouse_grid_y = 0
         self.path = None
