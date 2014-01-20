@@ -13,6 +13,7 @@
 
 import pygame
 import random
+from src.util.pyganim import *
 
 
 class MinimapTile:
@@ -55,7 +56,7 @@ class Tile:
                                 self.w, self.h)
 
         self.image = pygame.surface.Surface((self.w, self.h), pygame.SRCALPHA, 32)
-        
+        self.anim = None
         self.id = tile_id
         self.load_image()
 
@@ -69,19 +70,21 @@ class Tile:
         if self.id == 0:
             self.image.fill((0, 0, 0))
         elif self.id == 1 or self.id == 11:
-            self.load_tile_image('floors', 'wood_floor')
+            self.load_tile_image('floor', 'cobble_blood', (1, 12))
+            self.anim = PygAnimation([('res/tiles/wall/torches/torch1.png', 0.2), ('res/tiles/wall/torches/torch2.png', 0.2), ('res/tiles/wall/torches/torch3.png', 0.2)])
+            self.anim.play()
         elif self.id == 2 or self.id == 3 or self.id == 4 or self.id == 5 or self.id == 6:
-            self.load_tile_image('walls', 'stone_wall')
+            self.load_tile_image('wall', 'brick_dark', (0, 3))
         elif self.id == 7:
             self.image.fill((255, 0, 0))
         elif self.id == 8:
-            self.load_tile_image('floors', 'wood_floor')
+            self.load_tile_image('floor', 'cobble_blood', (1, 12))
             self.load_tile_image('gateways', 'stone_stair_up')
         elif self.id == 9:
-            self.load_tile_image('floors', 'wood_floor')
+            self.load_tile_image('floor', 'cobble_blood', (1, 12))
             self.load_tile_image('gateways', 'stone_stair_down')
         elif self.id == 10:
-            self.load_tile_image('floors', 'wood_floor')
+            self.load_tile_image('floor', 'cobble_blood', (1, 12))
         elif self.id == 12:
             self.load_tile_image('gateways', 'door_closed')
         elif self.id == 15:
@@ -145,14 +148,15 @@ class Map:
             for tile in row:
                 x = tile.x -offset.x
                 y = tile.y -offset.y
+                tile_img = tile.image
                 if -1 < x < offset.w and -1 < y < offset.h or tile.w is 4:
                     if explored_tiles:
                         if explored_tiles[tile.y/32][tile.x/32] == 0:
-                            surface.blit(tile.image, (x, y))
+                            surface.blit(tile_img, (x, y))
                             surface.blit(self.shadow_tile, (x, y))
                         elif explored_tiles[tile.y/32][tile.x/32] == 1:
-                            surface.blit(tile.image, (x, y))
+                            surface.blit(tile_img, (x, y))
                         else:
                             pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, 32, 32))
                     else:
-                        surface.blit(tile.image, (x, y))
+                        surface.blit(tile_img, (x, y))

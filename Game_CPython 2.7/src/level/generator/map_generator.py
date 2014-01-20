@@ -364,9 +364,9 @@ class Dungeon:
         elif direction == "EAST":
             self.grid[branching_pos[1]][branching_pos[0]+1] = 1
         elif direction == "SOUTH":
-            self.grid[branching_pos[1]+1][branching_pos[0]] = 12
+            self.grid[branching_pos[1]+1][branching_pos[0]] = 1
         elif direction == "WEST":
-            self.grid[branching_pos[1]][branching_pos[0]-1] = 12
+            self.grid[branching_pos[1]][branching_pos[0]-1] = 1
 
 
     def set_staircases(self):
