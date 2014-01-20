@@ -15,13 +15,14 @@ class Game(object):
 
     def __init__(self):
         pygame.init()
-        self.WIDTH = 30 * 32
-        self.HEIGHT = 20 * 32
+        self.WIDTH = 32 * 32
+        self.HEIGHT = 24 * 32
+        self.MENU_WIDTH = 250
         self.SCALE = 1
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
-        self.world_screen = pygame.Surface((self.WIDTH - 250, self.HEIGHT))
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL | pygame.RESIZABLE)
+        self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT))
         self.clock = GameClock(40)
-        self.camera = pygame.Rect(0, 0, self.WIDTH - 250, self.HEIGHT)
+        self.camera = pygame.Rect(0, 0, self.WIDTH - self.MENU_WIDTH, self.HEIGHT)
         self.events = None
         self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
 
@@ -49,6 +50,14 @@ class Game(object):
                         if event.key == pygame.K_ESCAPE:
                             if not self.menu.main:
                                 self.menu.active = not self.menu.active
+                    elif event.type == pygame.VIDEORESIZE:
+                        self.WIDTH, self.HEIGHT = event.dict['size']
+                        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL | pygame.RESIZABLE)
+                        self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT))
+                        self.clock = GameClock(40)
+                        self.camera = pygame.Rect(0, 0, self.WIDTH - self.MENU_WIDTH, self.HEIGHT)
+                        self.ui = GuiHandler(self.world)
+
                 if self.menu.active:
                     self.menu.update(self, self.events)
                 else:
@@ -60,7 +69,7 @@ class Game(object):
                 else:
                     self.draw()
                 pygame.display.flip()
-
+                
     def update(self):
         '''
         Main update loop.

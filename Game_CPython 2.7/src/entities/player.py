@@ -33,10 +33,10 @@ class Player(Entity):
         self.gold = 0
         self.exp = 0
         #Radius is measured in tiles and not in pixels.
-        self.radius = 19
+        self.radius = 9
 
 
-        
+
         self.mouse_grid_x = 0
         self.mouse_grid_y = 0
         self.path = None
@@ -81,14 +81,14 @@ class Player(Entity):
                     ya = -1
                 if event.key == pygame.K_DOWN:
                     ya = 1
-
-        if self.mouse_grid_x != mouse[0] + offset.x/32 or self.mouse_grid_y != mouse[1] + offset.y/32:
-            self.mouse_grid_x = mouse[0] + offset.x/32
-            self.mouse_grid_y = mouse[1] + offset.y/32
-            self.calculate_path(mouse)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pygame.mouse.get_pressed()[0]:
+                    self.mouse_grid_x = mouse[0] + offset.x/32
+                    self.mouse_grid_y = mouse[1] + offset.y/32
+                    self.calculate_path(mouse)
 
         if xa != 0 or ya != 0:
-            self.calculate_path(mouse)
+            #self.calculate_path(mouse)
             self.move(xa, ya)
 
         self.calculate_stats()
@@ -109,14 +109,13 @@ class Player(Entity):
         # Check collision from the grid.
         tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
         item = self.world.map.get_item(self.x + xa, self.y + ya)
-        if item and self.KEYBOARD:
+        if item:
 
             if not self.path or not self.follow_p or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
                 if item.type == 'item' or item.type == 'powerup':
-                    item.pickup(self.world)
+                    xa = 0
+                    ya = 0
                 elif item.type == 'chest':
-                    item.loot(self.world)
-                    item.open(self.world)
                     xa = 0
                     ya = 0
 
@@ -153,7 +152,6 @@ class Player(Entity):
                     if self.world.map.map.tiles[row][tile].id in [15, 16]:
                         self.world.map.map.tiles[row][tile].id = self.world.map.dungeon.grid[row][tile]
                         self.world.map.map.tiles[row][tile].dirs = [2, 2]
-                        self.world.map.map.tiles[row][tile].load_image()
 
         if mouse[0]*32 < self.playable_width - 16:
 
@@ -162,7 +160,7 @@ class Player(Entity):
 
                     start = (self.x, self.y)
                     end = (self.mouse_grid_x, self.mouse_grid_y)
-                    blocked_tiles = [0, 2, 3, 4, 5, 6, 10]
+                    blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 10]
                     self.path = None
                     start_dir = 0
                     if self.mouse_grid_x is not self.x:
@@ -185,7 +183,6 @@ class Player(Entity):
                         self.options = {'LMouse': 'travel'}
                     else:
                         self.options = {}
-                        print "no path"
 
     def travel(self, world=None):
         if self.path:
@@ -203,7 +200,6 @@ class Player(Entity):
             y = self.path[0][1]
             if hasattr(self.world.map.map.tiles[y][x], 'id'):
                 self.world.map.map.tiles[y][x].id = self.world.map.dungeon.grid[y][x]
-                self.world.map.map.tiles[y][x].load_image()
             if self.path:
                 self.path.remove(self.path[0])
             if not self.path:
@@ -218,17 +214,13 @@ class Player(Entity):
             self.path_delay -= 1
 
     def draw_path(self):
-        tile = self.world.map.map.tiles[self.path[-1][1]][self.path[-1][0]]
-        if hasattr(tile, 'id'):
-            if tile.id == 1 or tile.id == 11:
-                tile.id = 15
-                tile.load_image()
+
         for i in range(0, len(self.path)):
             tile = self.world.map.map.tiles[self.path[i][1]][self.path[i][0]]
             if hasattr(tile, 'id'):
                 tile.id = self.world.map.dungeon.grid[self.path[i][1]][self.path[i][0]]
                 tile.dirs = [2, 2]
-                tile.load_image()
+
                 if len(self.path) > i + 1:
                     current_node = self.astar.nodes[self.path[i + 1][1]][self.path[i + 1][0]]
                     last = False

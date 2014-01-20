@@ -11,7 +11,7 @@ class Level(object):
         self.up = up
         self.floor = floor
         self.down = down
-        self.dungeon = Dungeon((random.randint(100, 300), random.randint(100, 300)), "None", 100, (5, 5), (32, 32), (32, 32))
+        self.dungeon = Dungeon((random.randint(50, 200), random.randint(50, 200)), "None", 100, (5, 5), (32, 32), (32, 32))
 
         self.dungeon.generate_dungeon()
         self.explored_tiles = copy.deepcopy(self.dungeon.grid)
@@ -51,14 +51,30 @@ class Level(object):
         end_points.append((x0, y0 - radius))
         end_points.append((x0 + radius, y0))
         end_points.append((x0 - radius, y0))
+        end_points.append((x0 - 7, y0 + 3))
+        end_points.append((x0 + 7, y0 + 3))
+        end_points.append((x0 - 7, y0 - 3))
+        end_points.append((x0 + 7, y0 - 3))
+        end_points.append((x0 - 3, y0 - 7))
+        end_points.append((x0 + 3, y0 - 7))
+        end_points.append((x0 - 7, y0 - 6))
+        end_points.append((x0 - 7, y0 + 6))
+        end_points.append((x0 + 7, y0 - 6))
+        end_points.append((x0 + 7, y0 + 6))
+
+        end_points.append((x0 - 6, y0 - 7))
+        end_points.append((x0 + 6, y0 - 7))
+        end_points.append((x0 - 6, y0 + 7))
+        end_points.append((x0 + 6, y0 + 7))
+
 
         while x < y:
             if f >= 0:
                 y -= 1
-                ddf_y += 2
+                ddf_y += 1
                 f += ddf_y
             x += 1
-            ddf_x += 2
+            ddf_x += 1
             f += ddf_x
             end_points.append((x0 + x, y0 + y))
             end_points.append((x0 - x, y0 + y))
@@ -86,8 +102,10 @@ class Level(object):
 
         for line in lines:
             for pos in line:
-                if self.dungeon.grid[pos[1]][pos[0]] in [0, 2, 3, 4, 5, 6]:
-                    self.explored_tiles[pos[1]][pos[0]] = 1
+                x = pos[0]
+                y = pos[1]
+                if self.dungeon.grid[y][x] in [0, 2, 3, 4, 5, 6]:
+                    self.explored_tiles[y][x] = 1
                     break
                 else:
                     self.explored_tiles[pos[1]][pos[0]] = 1

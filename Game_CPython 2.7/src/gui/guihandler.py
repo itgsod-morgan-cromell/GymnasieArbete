@@ -22,7 +22,7 @@ class GuiHandler(object):
     def update(self, world, offset, mouse, events):
         self.mouse_col = (255, 0, 0)
         self.player_stats.update(world)
-        self.minimap.update(world)
+       # self.minimap.update(world)
         self.explorer.update(world, self.mouse)
         self.mouse_gui.update(world, events)
         self.mouse = None
@@ -43,13 +43,15 @@ class GuiHandler(object):
                 self.mouse = item
                 self.mouse_gui.update_data(item)
 
-            elif world.map.dungeon.grid[mouse_grid_y][mouse_grid_x]:
+            elif world.map.dungeon.grid[mouse_grid_y][mouse_grid_x] in [1]:
                 self.mouse_gui.update_data(world.player)
                 if world.player.path:
                     self.mouse_gui.options = {'LMouse': 'travel'}
                 else:
                     self.mouse_gui.options = {}
                 self.mouse_col = (0, 255, 0)
+            else:
+                    self.mouse_gui.options = {}
 
         else:
             mouse_rect = pygame.Rect((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), (2, 2))
@@ -72,7 +74,7 @@ class GuiHandler(object):
 
     def draw(self, screen, offset):
         self.player_stats.draw(screen)
-        self.minimap.draw(screen)
+       # self.minimap.draw(screen)
         self.explorer.draw(screen)
 
         mouse_grid_x = self.mouse_grid_x*32

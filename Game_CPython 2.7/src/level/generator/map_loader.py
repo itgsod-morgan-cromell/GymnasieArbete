@@ -56,6 +56,7 @@ class Tile:
                                 self.w, self.h)
 
         self.image = pygame.surface.Surface((self.w, self.h), pygame.SRCALPHA, 32)
+
         self.anim = None
         self.id = tile_id
         self.load_image()
@@ -67,12 +68,11 @@ class Tile:
             self.image.blit(pygame.image.load('res/tiles/{0}/{1}.png'.format(type, name)), (0, 0))
 
     def load_image(self):
+        self.feet = None
         if self.id == 0:
             self.image.fill((0, 0, 0))
         elif self.id == 1 or self.id == 11:
             self.load_tile_image('floor', 'cobble_blood', (1, 12))
-            self.anim = PygAnimation([('res/tiles/wall/torches/torch1.png', 0.2), ('res/tiles/wall/torches/torch2.png', 0.2), ('res/tiles/wall/torches/torch3.png', 0.2)])
-            self.anim.play()
         elif self.id == 2 or self.id == 3 or self.id == 4 or self.id == 5 or self.id == 6:
             self.load_tile_image('wall', 'brick_dark', (0, 3))
         elif self.id == 7:
@@ -88,17 +88,16 @@ class Tile:
         elif self.id == 12:
             self.load_tile_image('gateways', 'door_closed')
         elif self.id == 15:
+            self.feet = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
             # If its a pathfinding tile, draw out footsteps based on the directions of the feet.
             if self.dirs[0] != 9:
                 f = pygame.image.load('res/other/footsteps/parent/0.png')
                 f = self.rot_center(f, self.dirs[0] * -45)
-                self.image.blit(f, (0, 0))
+                self.feet.blit(f, (0, 0))
             if self.dirs[1] != 9:
                 f2 = pygame.image.load('res/other/footsteps/current/0.png')
                 f2 = self.rot_center(f2, self.dirs[1] * -45)
-                self.image.blit(f2, (0, 0))
-        elif self.id == 16:
-            pygame.draw.circle(self.image, (255, 0, 0), (self.w/2, self.h/2), 3)
+                self.feet.blit(f2, (0, 0))
 
     def rot_center(self, image, angle):
         """rotate an image while keeping its center and size"""
@@ -122,6 +121,7 @@ class Map:
     def load_dungeon(self, dungeon, minimap=False):
 
         self.dungeon = dungeon
+        self.minimap = minimap
         self.tiles = []
 
         for y in range(0, self.dungeon.grid_size[1]):
@@ -149,14 +149,26 @@ class Map:
                 x = tile.x -offset.x
                 y = tile.y -offset.y
                 tile_img = tile.image
-                if -1 < x < offset.w and -1 < y < offset.h or tile.w is 4:
-                    if explored_tiles:
-                        if explored_tiles[tile.y/32][tile.x/32] == 0:
-                            surface.blit(tile_img, (x, y))
-                            surface.blit(self.shadow_tile, (x, y))
-                        elif explored_tiles[tile.y/32][tile.x/32] == 1:
-                            surface.blit(tile_img, (x, y))
+                if not self.minimap:
+                    if -1 < x < offset.w and -1 < y < offset.h:
+                        if explored_tiles:
+                            if explored_tiles[tile.y/32][tile.x/32] == 0:
+                                surface.blit(tile_img, (x, y))
+                                surface.blit(self.shadow_tile, (x, y))
+                            elif explored_tiles[tile.y/32][tile.x/32] == 1:
+                                surface.blit(tile_img, (x, y))
+                            else:
+                                pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, 32, 32))
                         else:
-                            pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, 32, 32))
-                    else:
-                        surface.blit(tile_img, (x, y))
+                            surface.blit(tile_img, (x, y))
+                        if tile.feet and tile.id == 15:
+                            surface.blit(tile.feet, (x, y))
+                else:
+                    if -1 < x < offset.w and -1 < y < offset.h:
+                        if explored_tiles:
+                                if explored_tiles[tile.y/32][tile.x/32] in [0, 1]:
+                                    surface.blit(tile_img, (x, y))
+
+                        else:
+                            surface.blit(tile_img, (x, y))
+

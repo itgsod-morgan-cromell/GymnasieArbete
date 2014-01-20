@@ -33,13 +33,11 @@ class MouseGui(Gui):
 
     def update(self, world, events):
         self.world = world
-        if not self.active:
-            self.show_window = False
-            return
         self.x = pygame.mouse.get_pos()[0]
         self.y = pygame.mouse.get_pos()[1] - self.image.get_bounding_rect().h
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
+
                 if pygame.mouse.get_pressed()[0]:  # Left click.
                     if self.show_window:
                         if 'LMouse' in self.options:
@@ -53,7 +51,5 @@ class MouseGui(Gui):
                                 getattr(self.data, self.options['RMouse'])(self.world)
 
     def draw(self, screen):
-        if not self.active:
-            return
         if self.show_window:
             screen.blit(self.image, (self.x, self.y))

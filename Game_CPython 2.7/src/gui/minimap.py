@@ -22,14 +22,13 @@ class MiniMap(Gui):
     def update(self, world):
         self.world = world
         world.map.dungeon.tile_w = world.map.dungeon.tile_h = 4
-        self.map.load_dungeon(world.map.dungeon)
+        self.map.load_dungeon(world.map.dungeon, True)
 
     def draw(self, screen):
         self.image.blit(pygame.image.load('res/gui/minimap.png'), (15, 15))
         floor = self.myfont.render(str(self.world.map.floor), 0, (64, 96, 31))
         self.image.blit(floor, (15+187, 15+7))
-
-        map_offset = pygame.Rect((-25, -30), (0, 0))
+        map_offset = pygame.Rect((self.world.player.x/2, self.world.player.y/2), (self.image.get_rect().w, self.image.get_rect().w))
         self.map.draw(self.image, map_offset)
         self.image.fill((0, 255, 0), pygame.Rect((self.world.player.x*4 - map_offset.x, self.world.player.y*4 - map_offset.y), (4, 4)))
         screen.blit(self.image, (self.x, self.y))
