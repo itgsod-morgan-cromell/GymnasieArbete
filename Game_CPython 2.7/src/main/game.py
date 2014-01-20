@@ -27,6 +27,8 @@ class Game(object):
         self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
 
     def new_game(self, player):
+        self.screen.blit(pygame.image.load('res/gui/loading_screen.png'), (self.WIDTH/2 - 110, self.HEIGHT/2 - 17))
+        pygame.display.flip()
         self.world = World(player)
         self.events = pygame.event.get()
         self.world.update(self.events, self.camera, (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32))
@@ -69,7 +71,7 @@ class Game(object):
                 else:
                     self.draw()
                 pygame.display.flip()
-                
+
     def update(self):
         '''
         Main update loop.

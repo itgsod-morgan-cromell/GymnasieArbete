@@ -19,13 +19,10 @@ class World(object):
         for row in range(0, len(self.map.map.tiles)):
             for tile in range(0, len(self.map.map.tiles[row])):
                 if self.map.map.tiles[row][tile].id == 10:
-                    rng = random.randint(1, 1)
-                    if rng == 1:
-                        self.map.map.tiles[row][tile].id = 1
-                        self.map.items.append(Chest((tile, row), self))
-                    else:
-                        self.map.map.tiles[row][tile].id = 1
-                        self.map.dungeon.grid[row][tile] = 1
+                    self.map.map.tiles[row][tile].id = 1
+                    self.map.dungeon.grid[row][tile] = 1
+                    self.map.items.append(Chest((tile, row), self))
+
 
     def move_up(self):
         if self.map.up:

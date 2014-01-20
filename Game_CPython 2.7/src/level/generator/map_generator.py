@@ -483,11 +483,11 @@ class Dungeon:
         possible_places = []
         for y in range(0, len(map)):
             for x in range(0, len(map[0])):
-                if map[y][x] >= average:
+                if map[y][x] >= 0:
                     possible_places.append((x, y))
 
 
-        chests_to_place = len(self.rooms) / 5
+        chests_to_place = len(self.rooms)
         if chests_to_place <= 0:
             chests_to_place = 1
         for i in range(0, chests_to_place):

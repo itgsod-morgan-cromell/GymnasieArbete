@@ -32,18 +32,12 @@ class GuiHandler(object):
         mouse_grid_y = self.mouse_grid_y + offset.y/32
         if self.mouse_grid_x*32 < offset.w - 16:
             item = world.map.get_item(mouse_grid_x, mouse_grid_y)
-
-            if world.player.x == mouse_grid_x and world.player.y == mouse_grid_y:
-                    self.mouse_col = (0, 0, 255)
-                    self.mouse = world.player
-                    self.mouse_gui.update_data(world.player)
-
-            elif item:
+            if item:
                 self.mouse_col = (0, 0, 255)
                 self.mouse = item
                 self.mouse_gui.update_data(item)
 
-            elif world.map.dungeon.grid[mouse_grid_y][mouse_grid_x] in [1]:
+            elif world.map.dungeon.grid[mouse_grid_y][mouse_grid_x] in [1, 11]:
                 self.mouse_gui.update_data(world.player)
                 if world.player.path:
                     self.mouse_gui.options = {'LMouse': 'travel'}
@@ -51,7 +45,7 @@ class GuiHandler(object):
                     self.mouse_gui.options = {}
                 self.mouse_col = (0, 255, 0)
             else:
-                    self.mouse_gui.options = {}
+                self.mouse_gui.update_data(None)
 
         else:
             mouse_rect = pygame.Rect((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), (2, 2))

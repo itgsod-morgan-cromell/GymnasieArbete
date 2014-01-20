@@ -87,9 +87,9 @@ class Menu(Gui):
                     if event.key == pygame.K_BACKSPACE:
                         self.current_string = self.current_string[0:-1]
                     elif event.key == pygame.K_RETURN:
-                        game.new_game(self.choices_to_send)
                         self.change_title(' ')
                         self.choices_to_send['name'] = ' '.join(self.current_string)
+                        game.new_game(self.choices_to_send)
                         self.choices_to_send = {}
                         self.change_options(['back to menu', 'Save game', 'Quit'])
                         self.active = False

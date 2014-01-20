@@ -1,3 +1,4 @@
+import math
 from src.gui.gui import Gui
 import pygame
 from src.gui.slot import Slot
@@ -20,29 +21,27 @@ class StatsUi(Gui):
         self.stats_rect = pygame.Rect((15, 45), (220, 124))
         self.inventory_rect = pygame.Rect((15, self.stats_rect.y + self.stats_rect.h + 30), (220, 160))
         self.slots = [Slot(self.stats_rect.x+12, self.stats_rect.y+80), Slot(self.stats_rect.x+56, self.stats_rect.y+80), Slot(self.stats_rect.x+100, self.stats_rect.y+80)]
-        self.inventory_slots = [None] * 10
+        self.inventory_slots = [None] * 20
         self.stats_font = {}
         self.update_stats()
+        self.show_inventory = True
 
     def update(self, world):
         self.world = world
         self.slots[0].containts = self.world.player.weapon
         self.slots[1].containts = self.world.player.armor
         self.slots[2].containts = self.world.player.trinket
-        for i in range(0, 10):
+        for i in range(20):
             if len(world.player.inventory) >= i + 1:
                 item = world.player.inventory[i]
             else:
                 item = None
-            y = 12
-            x = 12
-            x += (44*i)
-            if i+1 > 6:
-                y += 2*44
-                x -= 44*6
-            elif i+1 > 3:
-                y += 44
-                x -= 44*3
+            y = 7
+            x = 7
+            x += (33*i) % 165
+            y += math.trunc(i/5 - 0.1)*33
+            if i > 4:
+                y += 33
 
             x += self.inventory_rect.x
             y += self.inventory_rect.y

@@ -160,7 +160,7 @@ class Player(Entity):
 
                     start = (self.x, self.y)
                     end = (self.mouse_grid_x, self.mouse_grid_y)
-                    blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 10]
+                    blocked_tiles = [0, 2, 3, 4, 5, 6, 7]
                     self.path = None
                     start_dir = 0
                     if self.mouse_grid_x is not self.x:
