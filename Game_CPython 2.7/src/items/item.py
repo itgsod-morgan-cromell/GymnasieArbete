@@ -55,7 +55,6 @@ class Item(object):
         self.shadow.fill((0, 0, 0, 200))
 
     def drop(self, world):
-        self.options = {'LMouse': 'pickup'}
         self.unequip(world.player)
         tile = world.map.map.tiles[world.player.y][world.player.x]
         if tile:
@@ -65,12 +64,16 @@ class Item(object):
                 world.map.items.append(self)
                 if self in world.player.inventory:
                     world.player.inventory.remove(self)
+                    self.options = {'LMouse': 'pickup'}
                 elif self == world.player.weapon:
                     world.player.weapon = None
+                    self.options = {'LMouse': 'pickup'}
                 elif self == world.player.armor:
                     world.player.armor = None
+                    self.options = {'LMouse': 'pickup'}
                 elif self == world.player.trinket:
                     world.player.trinket = None
+                    self.options = {'LMouse': 'pickup'}
             else:
                 world.player.inventory.remove(self)
                 for item in world.map.items:
@@ -79,6 +82,7 @@ class Item(object):
                             item.stats['AMOUNT'] += self.stats['AMOUNT']
                             return
                 world.map.items.append(Item(self.name, self.category, self.image, self.stats, self.extra))
+                self.options = {'LMouse': 'pickup'}
 
 
 
@@ -95,7 +99,6 @@ class Item(object):
             self.equipped = False
 
     def pickup(self, world):
-        self.options = {'LMouse': 'drop'}
         if self.stackable:
             for item in world.plater.inventory:
                 if item.name == self.name:
@@ -104,8 +107,9 @@ class Item(object):
                     return
 
         if len(world.player.inventory) < 9:
-                world.player.inventory.append(self)
-                world.map.items.remove(self)
+            world.player.inventory.append(self)
+            world.map.items.remove(self)
+            self.options = {'LMouse': 'drop'}
 
     def interacting(self, world, offset):
         mouse_x = pygame.mouse.get_pos()[0]
