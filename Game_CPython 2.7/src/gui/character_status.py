@@ -3,6 +3,7 @@ from src.gui.gui import Gui
 import pygame
 from src.gui.slot import Slot
 from src.gui.textrect import *
+from src.util.get_sprite import *
 import copy
 
 
@@ -16,7 +17,7 @@ class StatsUi(Gui):
 
         Gui.__init__(self, 'character', (world.player.playable_width, 0), image, True)
         self.stats = copy.copy(world.player.stats)
-        self.icon = world.player.icon
+        self.icon = get_item_sprite('test', 3)
 
         self.stats_rect = pygame.Rect((15, 45), (220, 124))
         self.inventory_rect = pygame.Rect((15, self.stats_rect.y + self.stats_rect.h + 30), (220, 160))

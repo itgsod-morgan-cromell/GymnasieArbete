@@ -4,6 +4,7 @@ from src.level.world import World
 from src.main.gameclock import GameClock
 from src.gui.guihandler import GuiHandler
 import sys
+from src.util.get_sprite import *
 from src.profilehooks import profile
 
 
@@ -15,9 +16,10 @@ class Game(object):
 
     def __init__(self):
         pygame.init()
-        self.WIDTH = 32 * 32
-        self.HEIGHT = 24 * 32
-        self.MENU_WIDTH = 250
+        get_item_sprite('test', 0)
+        self.WIDTH = int((32 * 32)/64) * 64
+        self.HEIGHT = int((24 * 32)/64) * 64
+        self.MENU_WIDTH = 300
         self.SCALE = 1
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL | pygame.RESIZABLE)
         self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT))
@@ -54,6 +56,8 @@ class Game(object):
                                 self.menu.active = not self.menu.active
                     elif event.type == pygame.VIDEORESIZE:
                         self.WIDTH, self.HEIGHT = event.dict['size']
+                        self.WIDTH = int(self.WIDTH/64)*64
+                        self.HEIGHT = int(self.HEIGHT/64)*64
                         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL | pygame.RESIZABLE)
                         self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT))
                         self.clock = GameClock(40)
