@@ -15,7 +15,6 @@ class Chest(object):
         self.used = False
         closed_img = pygame.image.load('res/items/other/chest_closed.png')
         self.image = closed_img
-        self.options = {'LMouse': 'travel', 'RMouse': 'open'}
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.shadow.fill((0, 0, 0, 200))
 
@@ -28,19 +27,14 @@ class Chest(object):
                 self.used = True
                 open_img = pygame.image.load('res/items/other/chest_open.png')
                 self.image = open_img
-                self.options = {'LMouse': 'travel', 'RMouse': 'loot'}
 
-    def loot(self, world):
-        if world.player.x in [self.x + 1, self.x - 1, self.x] and world.player.y in [self.y + 1, self.y - 1, self.y]:
-            if self.used:
-                item = self.generate_loot()
-                item.x = self.x
-                item.y = self.y
-                self.world.map.items.append(item)
-                self.world.map.items.remove(self)
-                self.world.map.dungeon.grid[self.y][self.x] = 1
-        else:
-            print "you must stand next to the chest"
+    def loot(self):
+        item = self.generate_loot()
+        item.x = self.x
+        item.y = self.y
+        self.world.map.items.append(item)
+        self.world.map.items.remove(self)
+        self.world.map.dungeon.grid[self.y][self.x] = 1
 
     def generate_loot(self):
         types = ['WEAPON']

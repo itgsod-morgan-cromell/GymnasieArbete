@@ -1,12 +1,13 @@
+import sys
+
 import pygame
+
 from src.gui.menu import Menu
 from src.level.world import World
 from src.main.gameclock import GameClock
 from src.gui.guihandler import GuiHandler
-import sys
 from src.util.get_sprite import *
-from src.main.eventmanager import EventManager
-from src.profilehooks import profile
+from src.event_manager import EventManager
 
 
 class Game(object):

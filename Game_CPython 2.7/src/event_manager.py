@@ -1,5 +1,6 @@
 import pygame
 from src.event_constants import *
+from src.items.item_event_handler import ItemEventHandler
 
 
 class EventManager(object):
@@ -9,11 +10,14 @@ class EventManager(object):
 
     Objects can call the REGISTEREVENTHANDLER event followed by specific event types to become a so called 'handler'.
     when later this specified event type gets called, it gets redirected to the 'handlers' that has requested it.
+
+    This also stores the objects of all the sub event handlers like item_handler and stuff like that.
     """
 
     def __init__(self):
         self.event_handlers = {}
         self.events = pygame.event.get()
+        item_handler = ItemEventHandler()
 
     def register_handler(self, event):
         """
