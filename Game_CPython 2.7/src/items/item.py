@@ -1,4 +1,5 @@
 import pygame
+from src.constants import *
 
 
 class PowerUp(object):
@@ -47,7 +48,7 @@ class Item(object):
             self.stackable = False
 
         self.equipped = False
-        self.options = {'LMouse': 'pickup'}
+        self.options = {'LMouse': 'pickup', 'RMouse': 'examine'}
         self.image = pygame.image.load(image)
         self.x = 0
         self.y = 0
@@ -64,16 +65,16 @@ class Item(object):
                 world.map.items.append(self)
                 if self in world.player.inventory:
                     world.player.inventory.remove(self)
-                    self.options = {'LMouse': 'pickup'}
+                    self.options['LMouse'] = 'pickup'
                 elif self == world.player.weapon:
                     world.player.weapon = None
-                    self.options = {'LMouse': 'pickup'}
+                    self.options['LMouse'] = 'pickup'
                 elif self == world.player.armor:
                     world.player.armor = None
-                    self.options = {'LMouse': 'pickup'}
+                    self.options['LMouse'] = 'pickup'
                 elif self == world.player.trinket:
                     world.player.trinket = None
-                    self.options = {'LMouse': 'pickup'}
+                    self.options['LMouse'] = 'pickup'
             else:
                 world.player.inventory.remove(self)
                 for item in world.map.items:
@@ -82,9 +83,7 @@ class Item(object):
                             item.stats['AMOUNT'] += self.stats['AMOUNT']
                             return
                 world.map.items.append(Item(self.name, self.category, self.image, self.stats, self.extra))
-                self.options = {'LMouse': 'pickup'}
-
-
+                self.options['LMouse'] = 'pickup'
 
     def equip(self, player):
         if not self.equipped:
@@ -109,11 +108,12 @@ class Item(object):
         if len(world.player.inventory) < 9:
             world.player.inventory.append(self)
             world.map.items.remove(self)
-            self.options = {'LMouse': 'drop'}
+            self.options['LMouse'] = 'drop'
 
-    def interacting(self, world, offset):
-        mouse_x = pygame.mouse.get_pos()[0]
-        mouse_y = pygame.mouse.get_pos()[1]
+    def examine(self, world):
+        msg = 'This {0} is a {1}'.format(self.name, self.category)
+        print msg
+        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'event_type': POST_TO_CONSOLE, 'msg': msg}))
 
     def draw(self, screen, offset, explored=1):
         if explored >= 0:

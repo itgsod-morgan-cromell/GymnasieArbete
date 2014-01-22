@@ -51,6 +51,7 @@ class Chest(object):
             rarity = random.randint(0, len(rarities) - 1)
             category = random.choice(['swords', 'bows', 'wands'])
             name = random.choice(open('res/other/random names/{0}.txt'.format(category)).readlines())
+            name = name.rstrip('\n')
             stats = {'DMG': random.randint(1, 5) * self.level * (rarity + 1)}
             if category == 'bows' or category == 'wands':
                 stats['RANGE'] = 3 * (0.5 * self.level * (rarity + 1))

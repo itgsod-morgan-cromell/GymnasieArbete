@@ -24,7 +24,7 @@ class GuiHandler(object):
     def update(self, world, offset, mouse, events):
         self.mouse_col = (255, 0, 0)
         self.player_stats.update(world)
-       # self.minimap.update(world)
+        self.minimap.update(world)
         self.explorer.update(world, self.mouse)
         self.mouse_gui.update(world, events)
         self.console.update(world)
@@ -71,7 +71,7 @@ class GuiHandler(object):
 
     def draw(self, screen, offset):
         self.player_stats.draw(screen)
-       # self.minimap.draw(screen)
+        self.minimap.draw(screen)
         self.explorer.draw(screen)
         self.console.draw(screen)
 

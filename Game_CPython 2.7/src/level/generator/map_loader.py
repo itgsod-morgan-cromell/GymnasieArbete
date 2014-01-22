@@ -164,11 +164,4 @@ class Map:
                         if tile.feet and tile.id == 15:
                             surface.blit(tile.feet, (x, y))
                 else:
-                    if -1 < x < offset.w and -1 < y < offset.h:
-                        if explored_tiles:
-                                if explored_tiles[tile.y/32][tile.x/32] in [0, 1]:
-                                    surface.blit(tile_img, (x, y))
-
-                        else:
-                            surface.blit(tile_img, (x, y))
-
+                    surface.blit(tile_img, (x, y))
