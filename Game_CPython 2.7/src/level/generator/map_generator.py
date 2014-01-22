@@ -550,7 +550,7 @@ class Dungeon:
 
         print "* Setting chests...",
         start = time.time()
-        self.set_chests()
+        #self.set_chests()
         end = time.time()
         print "      DONE!   in " + str(round(end-start, 3)) + " seconds"
 

@@ -3,6 +3,7 @@ import pygame
 from src.entities.classdata import ClassData
 from src.entities.entity import Entity
 from src.level.generator.astar import *
+from src.constants import *
 
 
 class Player(Entity):
@@ -96,6 +97,7 @@ class Player(Entity):
     def move(self, xa, ya):
         if xa > 0:
             self.dir = 0
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'event_types': POST_TO_CONSOLE, 'msg': str("{0},{1}".format(self.x, self.y))}))
             xa = 1
         elif xa < 0:
             self.dir = 2

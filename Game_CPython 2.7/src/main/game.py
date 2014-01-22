@@ -5,6 +5,7 @@ from src.main.gameclock import GameClock
 from src.gui.guihandler import GuiHandler
 import sys
 from src.util.get_sprite import *
+from src.main.eventmanager import EventManager
 from src.profilehooks import profile
 
 
@@ -17,14 +18,16 @@ class Game(object):
     def __init__(self):
         pygame.init()
         get_item_sprite('test', 0)
-        self.WIDTH = int((32 * 32)/64) * 64
-        self.HEIGHT = int((24 * 32)/64) * 64
-        self.MENU_WIDTH = 300
+        self.event_manager = EventManager()
+        self.WIDTH = 30 * 32
+        self.HEIGHT = 20 * 32
+        self.MENU_WIDTH = 10 * 32
+        self.CONSOLE_HEIGHT = 6 * 32
         self.SCALE = 1
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL | pygame.RESIZABLE)
-        self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT))
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL)
+        self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT - self.CONSOLE_HEIGHT))
         self.clock = GameClock(40)
-        self.camera = pygame.Rect(0, 0, self.WIDTH - self.MENU_WIDTH, self.HEIGHT)
+        self.camera = self.world_screen.get_rect().copy()
         self.events = None
         self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
 
@@ -34,7 +37,7 @@ class Game(object):
         self.world = World(player)
         self.events = pygame.event.get()
         self.world.update(self.events, self.camera, (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32))
-        self.ui = GuiHandler(self.world)
+        self.ui = GuiHandler(self.world, self.world_screen)
 
     def run(self):
         """
@@ -45,7 +48,8 @@ class Game(object):
             pygame.display.set_caption("FPS: {0},  UPS: {1}".format(self.clock.get_fps(), self.clock.get_ups()))
             dt = self.clock.tick()
             if self.clock.update_ready:
-                self.events = pygame.event.get()
+                self.event_manager.update()
+                self.events = self.event_manager.events
                 for event in self.events:
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -83,12 +87,12 @@ class Game(object):
 
         mouse = (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32)
         self.world.update(self.events, self.camera, mouse)
-        self.camera.centerx = int(self.world.player.x)*32 + 3
+        self.camera.centerx = int(self.world.player.x)*32
         self.camera.centery = int(self.world.player.y)*32
         if self.camera.x < 0:
             self.camera.x = 0
         if self.camera.x + self.camera.w > self.world.map.dungeon.width:
-            self.camera.x = self.world.map.dungeon.width - self.camera.w + 6
+            self.camera.x = self.world.map.dungeon.width - self.camera.w
         if self.camera.y < 0:
             self.camera.y = 0
         if self.camera.y + self.camera.h > self.world.map.dungeon.height:

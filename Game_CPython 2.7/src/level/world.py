@@ -11,6 +11,7 @@ class World(object):
         self.map.setup()
         self.spawn_objects()
         self.player = Player(self.map.spawn, self, player['class'], 'Test')
+        self.output = None
 
     def generate_floor(self):
         self.map = Level(1)
@@ -22,7 +23,6 @@ class World(object):
                     self.map.map.tiles[row][tile].id = 1
                     self.map.dungeon.grid[row][tile] = 1
                     self.map.items.append(Chest((tile, row), self))
-
 
     def move_up(self):
         if self.map.up:
