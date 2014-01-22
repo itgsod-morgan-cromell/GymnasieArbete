@@ -42,8 +42,8 @@ class World(object):
             self.spawn_objects()
             self.player.x, self.player.y = self.map.down_stair
 
-    def update(self, input, offset, mouse):
-        self.player.update(input, offset, mouse)
+    def update(self, offset):
+        self.player.update(offset)
         for monster in self.map.monsters:
             monster.update()
 

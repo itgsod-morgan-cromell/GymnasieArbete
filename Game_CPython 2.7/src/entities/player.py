@@ -15,8 +15,8 @@ class Player(Entity):
         self.images = []
         for i in range(0, 4):
             rect = pygame.Rect((i*32, 0), (32, 32))
-
             self.images.append(self.spritesheet.subsurface(rect))
+
         self.dir = 0
         self.icon = self.spritesheet.subsurface(pygame.Rect((4*32, 0), (32, 32)))
         self.move_ticker = 0
@@ -26,7 +26,7 @@ class Player(Entity):
         self.trinket = None
         self.max_path_delay = 4
         self.astar = Pathfinder()
-        self.playable_width = 0
+        self.playable_area = None
         self.KEYBOARD = False
         self.stats = self.classdata.stats
         self.hp = self.stats['HP']
@@ -35,20 +35,17 @@ class Player(Entity):
         self.exp = 0
         #Radius is measured in tiles and not in pixels.
         self.radius = 9
-
-
-
         self.mouse_grid_x = 0
         self.mouse_grid_y = 0
         self.path = None
         self.path_delay = 0
         self.follow_p = False
         self.move(0, 0)
+        pygame.event.post(pygame.event.Event(REGISTER_EVENT_HANDLER,
+                                             event_register_dict([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH], self)))
 
-    def update(self, events, offset, mouse):
-        self.playable_width = offset.w
-        xa = 0
-        ya = 0
+    def update(self, offset):
+        self.playable_area = offset
         if self.path:
             if self.follow_p:
                 self.follow_p = True
@@ -71,28 +68,28 @@ class Player(Entity):
                 item.equip(self)
                 self.inventory.remove(item)
 
+        self.calculate_stats()
 
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    xa = -1
-                if event.key == pygame.K_RIGHT:
-                    xa = 1
-                if event.key == pygame.K_UP:
-                    ya = -1
-                if event.key == pygame.K_DOWN:
-                    ya = 1
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pressed()[0]:
-                    self.mouse_grid_x = mouse[0] + offset.x/32
-                    self.mouse_grid_y = mouse[1] + offset.y/32
-                    self.calculate_path(mouse)
+    def handle_event(self, event):
+        xa = 0
+        ya = 0
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                xa = -1
+            elif event.key == pygame.K_RIGHT:
+                xa = 1
+            elif event.key == pygame.K_UP:
+                ya = -1
+            elif event.key == pygame.K_DOWN:
+                ya = 1
+        elif event.type == PLAYER_FIND_PATH:
+            self.calculate_path(event.pos)
+        elif event.type == PLAYER_TRAVEL_PATH:
+            self.calculate_path(event.pos)
 
         if xa != 0 or ya != 0:
-            #self.calculate_path(mouse)
             self.move(xa, ya)
-
-        self.calculate_stats()
+            pygame.event.post(pygame.USEREVENT, {'event_type': TIME_PASSED, 'amount': 1.0})
 
     def move(self, xa, ya):
         if xa > 0:
@@ -147,44 +144,36 @@ class Player(Entity):
         if self.mp > self.stats['MP']:
             self.mp = self.stats['MP']
 
-    def calculate_path(self, mouse):
-        for row in range(0, len(self.world.map.map.tiles)):
-            for tile in range(0, len(self.world.map.map.tiles[row])):
-                if hasattr(self.world.map.map.tiles[row][tile], 'id'):
-                    if self.world.map.map.tiles[row][tile].id in [15, 16]:
-                        self.world.map.map.tiles[row][tile].id = self.world.map.dungeon.grid[row][tile]
-                        self.world.map.map.tiles[row][tile].dirs = [2, 2]
+    def calculate_path(self, end):
+        # for row in range(0, len(self.world.map.map.tiles)):
+        #     for tile in range(0, len(self.world.map.map.tiles[row])):
+        #         if hasattr(self.world.map.map.tiles[row][tile], 'id'):
+        #             if self.world.map.map.tiles[row][tile].id in [15, 16]:
+        #                 self.world.map.map.tiles[row][tile].id = self.world.map.dungeon.grid[row][tile]
+        #                 self.world.map.map.tiles[row][tile].dirs = [2, 2]
 
-        if mouse[0]*32 < self.playable_width - 16:
+        start = (self.x, self.y)
+        blocked_tiles = [0, 2, 3, 4, 5, 6, 7]
+        self.path = None
+        start_dir = 0
+        if self.mouse_grid_x is not self.x:
+            if end[0] > self.x:
+                start_dir = 2
+            elif end[0] < self.x:
+                start_dir = 6
+            if end[1] > self.y:
+                start_dir += 1
+            elif end[1] < self.y:
+                start_dir -= 1
+        elif end> self.y:
+            start_dir = 4
+        elif self.mouse_grid_y < self.y:
+            start_dir = 0
 
-            if len(self.world.map.map.tiles) - 1 >= self.mouse_grid_y:
-                if len(self.world.map.map.tiles[self.mouse_grid_y]) - 1 >= self.mouse_grid_x:
-
-                    start = (self.x, self.y)
-                    end = (self.mouse_grid_x, self.mouse_grid_y)
-                    blocked_tiles = [0, 2, 3, 4, 5, 6, 7]
-                    self.path = None
-                    start_dir = 0
-                    if self.mouse_grid_x is not self.x:
-                        if self.mouse_grid_x > self.x:
-                            start_dir = 2
-                        elif self.mouse_grid_x < self.x:
-                            start_dir = 6
-                        if self.mouse_grid_y > self.y:
-                            start_dir += 1
-                        elif self.mouse_grid_y < self.y:
-                            start_dir -= 1
-                    elif self.mouse_grid_y > self.y:
-                        start_dir = 4
-                    elif self.mouse_grid_y < self.y:
-                        start_dir = 0
-
-                    path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
-                    if path:
-                        self.path = path
-                        self.options = {'LMouse': 'travel'}
-                    else:
-                        self.options = {}
+        path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
+        if path:
+            self.path = path
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=PLAYER_FOUND_PATH))
 
     def travel(self, world=None):
         if self.path:

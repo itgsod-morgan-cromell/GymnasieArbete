@@ -74,14 +74,4 @@ class GuiHandler(object):
         self.minimap.draw(screen)
         self.explorer.draw(screen)
         self.console.draw(screen)
-
-        mouse_grid_x = self.mouse_grid_x*32
-        mouse_grid_y = self.mouse_grid_y*32
-        if mouse_grid_x < offset.w - 16:
-
-            pygame.draw.lines(self.mouse_img, self.mouse_col, False, [(8, 0), (0, 0), (0, 8)], 2) #top left
-            pygame.draw.lines(self.mouse_img, self.mouse_col, False, [(24, 0), (30, 0), (30, 8)], 2) #top right
-            pygame.draw.lines(self.mouse_img, self.mouse_col, False, [(24, 30), (30, 30), (30, 24)], 2) #bottom right
-            pygame.draw.lines(self.mouse_img, self.mouse_col, False, [(0, 24), (0, 30), (8, 30)], 2) #bottom left
-            screen.blit(self.mouse_img, (mouse_grid_x, mouse_grid_y))
         self.mouse_gui.draw(screen)

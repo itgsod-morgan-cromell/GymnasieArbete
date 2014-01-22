@@ -29,7 +29,7 @@ class Explorer(Gui):
         self.subinfo = Field(pygame.Rect((15 + 16, 10 + 70), (150, 44)), "+ 10")
         self.myfont = pygame.font.Font('res/other/font.ttf', 27)
 
-        Gui.__init__(self, 'explorer', (world.player.playable_width, 330 + 150 - 3), image, True)
+        Gui.__init__(self, 'explorer', (world.player.playable_area.w, 330 + 150 - 3), image, True)
 
     def update(self, world, data):
         if data:

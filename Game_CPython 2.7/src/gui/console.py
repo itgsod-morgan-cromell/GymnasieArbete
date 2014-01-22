@@ -22,20 +22,21 @@ class Console(Gui):
         self.log = []
         self.log_processed = None
         self.world = world
-        pygame.event.post(pygame.event.Event(pygame.USEREVENT+1, event_register_dict(POST_TO_CONSOLE, self)))
+        pygame.event.post(pygame.event.Event(REGISTER_EVENT_HANDLER, event_register_dict(POST_TO_CONSOLE, self)))
 
     def update(self, world):
         self.world = world
 
-    def process_event(self, event):
-        self.log.append(event.msg)
-        if len(self.log) > 10:
-            self.log = self.log[-10:]
-        text = ""
-        for i, line in enumerate(self.log):
-            text += line + '\n'
-        rect = pygame.Rect((5, 5), (self.width, self.height))
-        self.log_processed = (Text(rect, text))
+    def handle_event(self, event):
+        if event.type == POST_TO_CONSOLE:
+            self.log.append(event.msg)
+            if len(self.log) > 10:
+                self.log = self.log[-10:]
+            text = ""
+            for i, line in enumerate(self.log):
+                text += line + '\n'
+            rect = pygame.Rect((5, 5), (self.width, self.height))
+            self.log_processed = (Text(rect, text))
 
     def draw(self, screen):
         if self.log_processed:

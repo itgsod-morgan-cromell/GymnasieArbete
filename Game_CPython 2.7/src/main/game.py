@@ -35,9 +35,9 @@ class Game(object):
         self.screen.blit(pygame.image.load('res/gui/loading_screen.png'), (self.WIDTH/2 - 110, self.HEIGHT/2 - 17))
         pygame.display.flip()
         self.world = World(player)
-        self.events = pygame.event.get()
-        self.world.update(self.events, self.camera, (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32))
+        self.world.update(self.camera)
         self.ui = GuiHandler(self.world, self.world_screen)
+
 
     def run(self):
         """
@@ -85,8 +85,7 @@ class Game(object):
         Main update loop.
         '''
 
-        mouse = (pygame.mouse.get_pos()[0]/32, pygame.mouse.get_pos()[1]/32)
-        self.world.update(self.events, self.camera, mouse)
+        self.world.update(self.camera)
         self.camera.centerx = int(self.world.player.x)*32
         self.camera.centery = int(self.world.player.y)*32
         if self.camera.x < 0:
@@ -98,7 +97,7 @@ class Game(object):
         if self.camera.y + self.camera.h > self.world.map.dungeon.height:
             self.camera.y = self.world.map.dungeon.height - self.camera.h
 
-        self.ui.update(self.world, self.camera, mouse, self.events)
+        self.ui.update(self.world, self.camera)
 
     def draw(self):
         '''

@@ -15,7 +15,7 @@ class StatsUi(Gui):
         image = pygame.Surface((width, height))
         image.fill((127, 127, 127), pygame.Rect((0, 0), (3, height)))
 
-        Gui.__init__(self, 'character', (world.player.playable_width, 0), image, True)
+        Gui.__init__(self, 'character', (world.player.playable_area.w, 0), image, True)
         self.stats = copy.copy(world.player.stats)
         self.icon = world.player.icon
 
