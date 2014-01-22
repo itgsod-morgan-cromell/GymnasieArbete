@@ -3,7 +3,7 @@ import pygame
 from src.entities.classdata import ClassData
 from src.entities.entity import Entity
 from src.level.generator.astar import *
-from src.constants import *
+from src.event_constants import *
 
 
 class Player(Entity):
@@ -39,7 +39,7 @@ class Player(Entity):
         self.mouse_grid_y = 0
         self.path = None
         self.path_delay = 0
-        self.follow_p = False
+        self.follow_path = False
         self.move(0, 0)
         pygame.event.post(pygame.event.Event(REGISTER_EVENT_HANDLER,
                                              event_register_dict([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH], self)))
@@ -47,11 +47,11 @@ class Player(Entity):
     def update(self, offset):
         self.playable_area = offset
         if self.path:
-            if self.follow_p:
-                self.follow_p = True
+            if self.follow_path:
+                self.follow_path = True
                 self.travel()
                 return
-        self.follow_p = False
+        self.follow_path = False
         self.path_delay = 0
 
         for item in self.inventory:
@@ -71,9 +71,10 @@ class Player(Entity):
         self.calculate_stats()
 
     def handle_event(self, event):
+        etype = event.type if event.type != pygame.USEREVENT else event.event_type
         xa = 0
         ya = 0
-        if event.type == pygame.KEYDOWN:
+        if etype == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 xa = -1
             elif event.key == pygame.K_RIGHT:
@@ -82,14 +83,14 @@ class Player(Entity):
                 ya = -1
             elif event.key == pygame.K_DOWN:
                 ya = 1
-        elif event.type == PLAYER_FIND_PATH:
+        elif etype == PLAYER_FIND_PATH and not self.follow_path:
             self.calculate_path(event.pos)
-        elif event.type == PLAYER_TRAVEL_PATH:
-            self.calculate_path(event.pos)
+        elif etype == PLAYER_TRAVEL_PATH and not self.follow_path:
+            self.travel()
 
         if xa != 0 or ya != 0:
             self.move(xa, ya)
-            pygame.event.post(pygame.USEREVENT, {'event_type': TIME_PASSED, 'amount': 1.0})
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=TIME_PASSED, amount=1.0))
 
     def move(self, xa, ya):
         if xa > 0:
@@ -110,7 +111,7 @@ class Player(Entity):
         item = self.world.map.get_item(self.x + xa, self.y + ya)
         if item:
 
-            if not self.path or not self.follow_p or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
+            if not self.path or not self.follow_path or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
                 if item.type == 'item' or item.type == 'powerup':
                     xa = 0
                     ya = 0
@@ -145,12 +146,6 @@ class Player(Entity):
             self.mp = self.stats['MP']
 
     def calculate_path(self, end):
-        # for row in range(0, len(self.world.map.map.tiles)):
-        #     for tile in range(0, len(self.world.map.map.tiles[row])):
-        #         if hasattr(self.world.map.map.tiles[row][tile], 'id'):
-        #             if self.world.map.map.tiles[row][tile].id in [15, 16]:
-        #                 self.world.map.map.tiles[row][tile].id = self.world.map.dungeon.grid[row][tile]
-        #                 self.world.map.map.tiles[row][tile].dirs = [2, 2]
 
         start = (self.x, self.y)
         blocked_tiles = [0, 2, 3, 4, 5, 6, 7]
@@ -173,18 +168,14 @@ class Player(Entity):
         path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
         if path:
             self.path = path
-            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=PLAYER_FOUND_PATH))
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=PLAYER_FOUND_PATH, path=path))
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=GUI_TOOLTIP_POST, target=self,
+                                                 l_mouse=('travel', PLAYER_TRAVEL_PATH)))
 
-    def travel(self, world=None):
+    def travel(self):
         if self.path:
             self.draw_path()
-            self.follow_p = True
-        if not self.path:
-            self.path_delay = 0
-            return
-        if len(self.path) == 0:
-                self.path_delay = self.max_path_delay
-                return
+            self.follow_path = True
         if self.path_delay == 0:
             self.path_delay = self.max_path_delay
             x = self.path[0][0]
@@ -193,13 +184,12 @@ class Player(Entity):
                 self.world.map.map.tiles[y][x].id = self.world.map.dungeon.grid[y][x]
             if self.path:
                 self.path.remove(self.path[0])
-            if not self.path:
-                self.path_delay = self.max_path_delay
-                self.follow_p = False
             self.move(x - self.x, y - self.y)
             if not self.path:
                 self.path_delay = self.max_path_delay
-                self.follow_p = False
+                self.follow_path = False
+                pygame.event.post(pygame.event.Event(pygame.USEREVENT,
+                                                     event_type=PLAYER_REACHED_DESTINATION, dest=(self.x, self.y)))
 
         else:
             self.path_delay -= 1

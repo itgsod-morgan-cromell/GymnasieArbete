@@ -2,7 +2,7 @@ from src.gui.gui import Gui
 import pygame
 import sys
 from StringIO import StringIO
-from src.constants import *
+from src.event_constants import *
 from src.gui.textrect import render_textrect
 
 
@@ -28,7 +28,8 @@ class Console(Gui):
         self.world = world
 
     def handle_event(self, event):
-        if event.type == POST_TO_CONSOLE:
+        etype = event.type if event.type != pygame.USEREVENT else event.event_type
+        if etype == POST_TO_CONSOLE:
             self.log.append(event.msg)
             if len(self.log) > 10:
                 self.log = self.log[-10:]

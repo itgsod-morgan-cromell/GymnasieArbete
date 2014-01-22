@@ -21,53 +21,13 @@ class GuiHandler(object):
         self.mouse_img.convert_alpha()
 
 
-    def update(self, world, offset, mouse, events):
+    def update(self, world, offset):
         self.mouse_col = (255, 0, 0)
         self.player_stats.update(world)
         self.minimap.update(world)
         self.explorer.update(world, self.mouse)
-        self.mouse_gui.update(world, events)
+        self.mouse_gui.update(world, offset)
         self.console.update(world)
-        self.mouse = None
-        self.mouse_grid_x = mouse[0]
-        self.mouse_grid_y = mouse[1]
-        mouse_grid_x = self.mouse_grid_x + offset.x/32
-        mouse_grid_y = self.mouse_grid_y + offset.y/32
-        if self.mouse_grid_x*32 < offset.w - 16:
-            item = world.map.get_item(mouse_grid_x, mouse_grid_y)
-            if item:
-                self.mouse_col = (0, 0, 255)
-                self.mouse = item
-                self.mouse_gui.update_data(item)
-
-            elif world.map.dungeon.grid[mouse_grid_y][mouse_grid_x] in [1, 11]:
-                self.mouse_gui.update_data(world.player)
-                if world.player.path:
-                    self.mouse_gui.options = {'LMouse': 'travel'}
-                else:
-                    self.mouse_gui.options = {}
-                self.mouse_col = (0, 255, 0)
-            else:
-                self.mouse_gui.update_data(None)
-
-        else:
-            mouse_rect = pygame.Rect((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), (2, 2))
-            mouse_rect.x -= self.player_stats.x
-            mouse_rect.y -= self.player_stats.y
-            colliding_slots = []
-            for slot in self.player_stats.slots:
-                if mouse_rect.colliderect(slot.rect):
-                    colliding_slots.append(slot.containts)
-            for slot in self.player_stats.inventory_slots:
-                if mouse_rect.colliderect(slot.rect):
-                    colliding_slots.append(slot.containts)
-
-            if colliding_slots:
-                self.mouse = colliding_slots[0]
-                self.mouse_gui.update_data(colliding_slots[0])
-            else:
-                self.mouse = None
-                self.mouse_gui.active = False
 
     def draw(self, screen, offset):
         self.player_stats.draw(screen)

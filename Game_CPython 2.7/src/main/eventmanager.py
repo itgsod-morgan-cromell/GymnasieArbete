@@ -1,5 +1,5 @@
 import pygame
-from src.constants import *
+from src.event_constants import *
 
 
 class EventManager(object):
@@ -43,7 +43,6 @@ class EventManager(object):
             if event.type == pygame.USEREVENT:
                 if event.event_type in self.event_handlers:
                     for event_handler in self.event_handlers[event.event_type]:
-                        event.type = event.event_type
                         event_handler.handle_event(event)
             elif event.type == REGISTER_EVENT_HANDLER:
                 self.register_handler(event)
