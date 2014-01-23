@@ -41,8 +41,7 @@ class Player(Entity):
         self.path_delay = 0
         self.follow_path = False
         self.move(0, 0)
-        pygame.event.post(pygame.event.Event(REGISTER_EVENT_HANDLER,
-                                             event_register_dict([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH], self)))
+        register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH], self)
 
     def update(self, offset):
         self.playable_area = offset
@@ -71,7 +70,7 @@ class Player(Entity):
         self.calculate_stats()
 
     def handle_event(self, event):
-        etype = event.type if event.type != pygame.USEREVENT else event.event_type
+        etype = get_event_type(event)
         xa = 0
         ya = 0
         if etype == pygame.KEYDOWN:
@@ -90,12 +89,11 @@ class Player(Entity):
 
         if xa != 0 or ya != 0:
             self.move(xa, ya)
-            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=TIME_PASSED, amount=1.0))
 
     def move(self, xa, ya):
         if xa > 0:
             self.dir = 0
-            pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'event_type': POST_TO_CONSOLE, 'msg': str("{0},{1}-----------test--------test".format(self.x, self.y))}))
+            post_event(POST_TO_CONSOLE, msg='test')
             xa = 1
         elif xa < 0:
             self.dir = 2
@@ -110,14 +108,12 @@ class Player(Entity):
         tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
         item = self.world.map.get_item(self.x + xa, self.y + ya)
         if item:
-
-            if not self.path or not self.follow_path or item.x == self.path[-1][0] and item.y == self.path[-1][1]:
-                if item.type == 'item' or item.type == 'powerup':
-                    xa = 0
-                    ya = 0
-                elif item.type == 'chest':
-                    xa = 0
-                    ya = 0
+            if item.type == 'item' or item.type == 'powerup':
+                xa = 0
+                ya = 0
+            elif item.type == 'chest':
+                xa = 0
+                ya = 0
 
         if tile.id == 2 or tile.id == 3 or tile.id == 4 or tile.id == 5 or tile.id == 6 or tile.id == 7:
             xa = 0
@@ -133,6 +129,7 @@ class Player(Entity):
         else:
             self.x += xa
             self.y += ya
+            post_event(TIME_PASSED, amount=1.0)
             self.world.map.fog_of_war(self.x, self.y, self.radius)
 
     def calculate_stats(self):
@@ -168,9 +165,8 @@ class Player(Entity):
         path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
         if path:
             self.path = path
-            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=PLAYER_FOUND_PATH, path=path))
-            pygame.event.post(pygame.event.Event(pygame.USEREVENT, event_type=GUI_TOOLTIP_POST, target=self,
-                                                 l_mouse=('travel', PLAYER_TRAVEL_PATH)))
+            post_event(PLAYER_FOUND_PATH, path=path)
+            post_event(GUI_TOOLTIP_POST, target=self, l_mouse=('travel', PLAYER_TRAVEL_PATH))
 
     def travel(self):
         if self.path:
@@ -188,8 +184,7 @@ class Player(Entity):
             if not self.path:
                 self.path_delay = self.max_path_delay
                 self.follow_path = False
-                pygame.event.post(pygame.event.Event(pygame.USEREVENT,
-                                                     event_type=PLAYER_REACHED_DESTINATION, dest=(self.x, self.y)))
+                post_event(PLAYER_REACHED_DESTINATION, dest=(self.x, self.y))
 
         else:
             self.path_delay -= 1

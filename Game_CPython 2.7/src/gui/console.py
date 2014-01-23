@@ -22,7 +22,7 @@ class Console(Gui):
         self.log = []
         self.log_processed = None
         self.world = world
-        pygame.event.post(pygame.event.Event(REGISTER_EVENT_HANDLER, event_register_dict(POST_TO_CONSOLE, self)))
+        register_handler(POST_TO_CONSOLE, self)
 
     def update(self, world):
         self.world = world

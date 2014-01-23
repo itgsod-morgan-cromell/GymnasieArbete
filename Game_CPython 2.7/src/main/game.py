@@ -20,10 +20,10 @@ class Game(object):
         pygame.init()
         get_item_sprite('test', 0)
         self.event_manager = EventManager()
-        self.WIDTH = 30 * 32
-        self.HEIGHT = 20 * 32
-        self.MENU_WIDTH = 10 * 32
-        self.CONSOLE_HEIGHT = 6 * 32
+        self.WIDTH = int(1024/32)*32
+        self.HEIGHT = int(600 / 32)*32
+        self.MENU_WIDTH = 8 * 32
+        self.CONSOLE_HEIGHT = 4 * 32
         self.SCALE = 1
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL)
         self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT - self.CONSOLE_HEIGHT))

@@ -2,12 +2,14 @@ import glob
 import pygame
 import random
 from src.items.item import *
+from src.event_constants import *
 
 
 class Chest(object):
     def __init__(self, pos, world):
         self.name = 'chest'
         self.type = 'chest'
+        self.description = "It's a old chest. May contain some nice loot!"
         self.x = pos[0]
         self.y = pos[1]
         self.world = world
@@ -18,15 +20,18 @@ class Chest(object):
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.shadow.fill((0, 0, 0, 200))
 
-    def travel(self, world):
-        world.player.travel()
+    def use(self):
+        if self.used:
+            self.loot()
+        else:
+            self.open()
+        post_event(TIME_PASSED, amount=1.0)
 
-    def open(self, world):
-        if world.player.x in [self.x + 1, self.x - 1, self.x] and world.player.y in [self.y + 1, self.y - 1, self.y]:
-            if not self.used:
-                self.used = True
-                open_img = pygame.image.load('res/items/other/chest_open.png')
-                self.image = open_img
+    def open(self):
+        if not self.used:
+            self.used = True
+            open_img = pygame.image.load('res/items/other/chest_open.png')
+            self.image = open_img
 
     def loot(self):
         item = self.generate_loot()
@@ -35,6 +40,20 @@ class Chest(object):
         self.world.map.items.append(item)
         self.world.map.items.remove(self)
         self.world.map.dungeon.grid[self.y][self.x] = 1
+
+    def interact(self):
+        r_mouse = ('examine', ITEM_EXAMINE)
+        action = 'open' if not self.used else 'loot'
+        l_mouse = (action, ITEM_USE)
+        post_event(GUI_TOOLTIP_POST, l_mouse=l_mouse, r_mouse=r_mouse, target=self)
+
+
+    def handle_event(self, event):
+        etype = get_event_type(event)
+        if etype == ITEM_USE:
+            self.use()
+        if etype == ITEM_EXAMINE:
+            post_event(POST_TO_CONSOLE, msg=self.description)
 
     def generate_loot(self):
         types = ['WEAPON']
