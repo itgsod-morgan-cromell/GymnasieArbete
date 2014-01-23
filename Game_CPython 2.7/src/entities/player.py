@@ -3,7 +3,7 @@ import pygame
 from src.entities.classdata import ClassData
 from src.entities.entity import Entity
 from src.level.generator.astar import *
-from src.event_constants import *
+from src.constants import *
 
 
 class Player(Entity):
@@ -39,9 +39,12 @@ class Player(Entity):
         self.mouse_grid_y = 0
         self.path = None
         self.path_delay = 0
+        self.travel_dest_event = None
         self.follow_path = False
         self.move(0, 0)
-        register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH], self)
+        register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH], self.handle_event)
+        register_handler([PLAYER_EXAMINE_ITEM, PLAYER_USE_ITEM, PLAYER_PICKUP_ITEM,
+                          PLAYER_DROP_ITEM, PLAYER_EQUIP_ITEM, PLAYER_UNEQUIP_ITEM, PLAYER_REACHED_DESTINATION], self.handle_items)
 
     def update(self, offset):
         self.playable_area = offset
@@ -52,21 +55,6 @@ class Player(Entity):
                 return
         self.follow_path = False
         self.path_delay = 0
-
-        for item in self.inventory:
-            if not self.weapon and item.category == 'weapon':
-                self.weapon = item
-                item.equip(self)
-                self.inventory.remove(item)
-            if not self.armor and item.category == 'armor':
-                self.armor = item
-                item.equip(self)
-                self.inventory.remove(item)
-            if not self.trinket and item.category == 'trinket':
-                self.trinket = item
-                item.equip(self)
-                self.inventory.remove(item)
-
         self.calculate_stats()
 
     def handle_event(self, event):
@@ -83,17 +71,53 @@ class Player(Entity):
             elif event.key == pygame.K_DOWN:
                 ya = 1
         elif etype == PLAYER_FIND_PATH and not self.follow_path:
-            self.calculate_path(event.pos)
+            self.find_path(event.pos)
+            if event.post_to_gui:
+                post_event(GUI_TOOLTIP_POST, target=self, l_mouse=('travel', PLAYER_TRAVEL_PATH))
         elif etype == PLAYER_TRAVEL_PATH and not self.follow_path:
             self.travel()
-
         if xa != 0 or ya != 0:
             self.move(xa, ya)
+
+    def handle_items(self, event):
+        etype = get_event_type(event)
+
+        if etype != PLAYER_EXAMINE_ITEM and etype != PLAYER_REACHED_DESTINATION:
+            print etype
+            item = event.target
+            self.travel_dest_event = event
+            post_event(PLAYER_FIND_PATH, pos=(item.x, item.y), post_to_gui=False)
+            post_event(PLAYER_TRAVEL_PATH)
+            return
+        if PLAYER_REACHED_DESTINATION:
+            if self.travel_dest_event:
+                event = self.travel_dest_event
+                self.travel_dest_event = None
+            else:
+                return
+        etype = get_event_type(event)
+        item = event.target
+        if etype == PLAYER_USE_ITEM:
+            item.use()
+        elif etype == PLAYER_EQUIP_ITEM:
+            item.equipped = True
+        elif etype == PLAYER_UNEQUIP_ITEM:
+            item.equipped = False
+        elif etype == PLAYER_DROP_ITEM:
+            self.inventory.remove(item)
+        elif etype == PLAYER_PICKUP_ITEM:
+            self.inventory.append(item)
+        elif etype == PLAYER_EXAMINE_ITEM:
+            print item.description
+            post_event(POST_TO_CONSOLE, msg=item.description)
+
+        post_event(TIME_PASSED, amount=1.0)
+
+
 
     def move(self, xa, ya):
         if xa > 0:
             self.dir = 0
-            post_event(POST_TO_CONSOLE, msg='test')
             xa = 1
         elif xa < 0:
             self.dir = 2
@@ -108,10 +132,7 @@ class Player(Entity):
         tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
         item = self.world.map.get_item(self.x + xa, self.y + ya)
         if item:
-            if item.type == 'item' or item.type == 'powerup':
-                xa = 0
-                ya = 0
-            elif item.type == 'chest':
+            if item.type != 'item' and item.type != 'powerup':
                 xa = 0
                 ya = 0
 
@@ -119,11 +140,11 @@ class Player(Entity):
             xa = 0
             ya = 0
         if tile.id == 8 and self.KEYBOARD:
-            self.world.move_up(self)
+            post_event(WORLD_MOVE_UP)
             self.path = None
 
         elif tile.id == 9 and self.KEYBOARD:
-            self.world.move_down(self)
+            post_event(WORLD_MOVE_DOWN)
             self.path = None
 
         else:
@@ -142,7 +163,7 @@ class Player(Entity):
         if self.mp > self.stats['MP']:
             self.mp = self.stats['MP']
 
-    def calculate_path(self, end):
+    def find_path(self, end):
 
         start = (self.x, self.y)
         blocked_tiles = [0, 2, 3, 4, 5, 6, 7]
@@ -164,14 +185,20 @@ class Player(Entity):
 
         path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
         if path:
+            if len(path) > 3:
+                post_event(POST_TO_CONSOLE, msg="You can't walk that far!", color=(255, 0, 0))
+                return
             self.path = path
             post_event(PLAYER_FOUND_PATH, path=path)
-            post_event(GUI_TOOLTIP_POST, target=self, l_mouse=('travel', PLAYER_TRAVEL_PATH))
 
     def travel(self):
         if self.path:
             self.draw_path()
             self.follow_path = True
+        else:
+            self.path_delay = self.max_path_delay
+            self.follow_path = False
+            post_event(PLAYER_REACHED_DESTINATION, dest=(self.x, self.y))
         if self.path_delay == 0:
             self.path_delay = self.max_path_delay
             x = self.path[0][0]

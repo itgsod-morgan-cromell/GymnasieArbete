@@ -2,7 +2,7 @@ import glob
 import pygame
 import random
 from src.items.item import *
-from src.event_constants import *
+from src.constants import *
 
 
 class Chest(object):
@@ -25,7 +25,6 @@ class Chest(object):
             self.loot()
         else:
             self.open()
-        post_event(TIME_PASSED, amount=1.0)
 
     def open(self):
         if not self.used:
@@ -42,18 +41,10 @@ class Chest(object):
         self.world.map.dungeon.grid[self.y][self.x] = 1
 
     def interact(self):
-        r_mouse = ('examine', ITEM_EXAMINE)
+        r_mouse = ('examine', PLAYER_EXAMINE_ITEM)
         action = 'open' if not self.used else 'loot'
-        l_mouse = (action, ITEM_USE)
+        l_mouse = (action, PLAYER_USE_ITEM)
         post_event(GUI_TOOLTIP_POST, l_mouse=l_mouse, r_mouse=r_mouse, target=self)
-
-
-    def handle_event(self, event):
-        etype = get_event_type(event)
-        if etype == ITEM_USE:
-            self.use()
-        if etype == ITEM_EXAMINE:
-            post_event(POST_TO_CONSOLE, msg=self.description)
 
     def generate_loot(self):
         types = ['WEAPON']

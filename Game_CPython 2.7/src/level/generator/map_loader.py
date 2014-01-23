@@ -30,18 +30,14 @@ class MinimapTile:
         self.image.convert_alpha()
 
         self.id = tile_id
-        if self.id == 1 or self.id == 11:
-            self.image.fill((0, 0, 0))
-        elif self.id == 7:
-            self.image.fill((0, 118, 163))
+        if self.id == 1 or self.id == 11 or self.id == 7:
+            self.image.fill((40, 40, 40))
+        elif self.id in [2, 3, 4, 5, 6]:
+            self.image.fill((20, 20, 20))
         elif self.id == 8:
             self.image.fill((75, 75, 75))
         elif self.id == 9:
             self.image.fill((255, 10, 10))
-        elif self.id == 10:
-            self.image.fill((255, 255, 100))
-        elif self.id == 12:
-            self.image.fill((111, 68, 23))
 
 
 class Tile:
@@ -118,7 +114,7 @@ class Map:
         self.shadow_tile = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.shadow_tile.fill((0, 0, 0, 200))
 
-    def load_dungeon(self, dungeon, minimap=False):
+    def load_dungeon(self, dungeon, minimap=False, tile_size=None):
 
         self.dungeon = dungeon
         self.minimap = minimap
@@ -128,10 +124,10 @@ class Map:
             row = []
             for x in range(0, self.dungeon.grid_size[0]):
                 if minimap:
-                    row.append(MinimapTile(x * dungeon.tile_w,
-                                           y * dungeon.tile_h,
-                                           dungeon.tile_w,
-                                           dungeon.tile_h,
+                    row.append(MinimapTile(x * tile_size,
+                                           y * tile_size,
+                                           tile_size,
+                                           tile_size,
                                            self.dungeon.grid[y][x]))
                 else:
                     row.append(Tile(x * dungeon.tile_w,

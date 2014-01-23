@@ -1,13 +1,16 @@
 import sys
 
 import pygame
+from src.gui.console import Console
 
 from src.gui.menu import Menu
 from src.level.world import World
 from src.main.gameclock import GameClock
 from src.gui.guihandler import GuiHandler
+from src.gui.tooltip import Tooltip
 from src.util.get_sprite import *
 from src.event_manager import EventManager
+from src.constants import *
 
 
 class Game(object):
@@ -16,28 +19,26 @@ class Game(object):
     Main core of the main.
     '''
 
+
     def __init__(self):
         pygame.init()
         get_item_sprite('test', 0)
         self.event_manager = EventManager()
-        self.WIDTH = int(1024/32)*32
-        self.HEIGHT = int(600 / 32)*32
-        self.MENU_WIDTH = 8 * 32
-        self.CONSOLE_HEIGHT = 4 * 32
-        self.SCALE = 1
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL)
-        self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT - self.CONSOLE_HEIGHT))
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL)
+        self.world_screen = pygame.Surface((WIDTH - MENU_WIDTH, HEIGHT - CONSOLE_HEIGHT))
         self.clock = GameClock(40)
         self.camera = self.world_screen.get_rect().copy()
         self.events = None
         self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
 
     def new_game(self, player):
-        self.screen.blit(pygame.image.load('res/gui/loading_screen.png'), (self.WIDTH/2 - 110, self.HEIGHT/2 - 17))
+        self.screen.blit(pygame.image.load('res/gui/loading_screen.png'), (WIDTH/2 - 110, HEIGHT/2 - 17))
         pygame.display.flip()
         self.world = World(player)
         self.world.update(self.camera)
-        self.ui = GuiHandler(self.world, self.world_screen)
+        self.ui = GuiHandler(self.world)
+        self.console = Console()
+        self.tooltip = Tooltip(self.world)
 
 
     def run(self):
@@ -59,16 +60,6 @@ class Game(object):
                         if event.key == pygame.K_ESCAPE:
                             if not self.menu.main:
                                 self.menu.active = not self.menu.active
-                    elif event.type == pygame.VIDEORESIZE:
-                        self.WIDTH, self.HEIGHT = event.dict['size']
-                        self.WIDTH = int(self.WIDTH/64)*64
-                        self.HEIGHT = int(self.HEIGHT/64)*64
-                        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL | pygame.RESIZABLE)
-                        self.world_screen = pygame.Surface((self.WIDTH - self.MENU_WIDTH, self.HEIGHT))
-                        self.clock = GameClock(40)
-                        self.camera = pygame.Rect(0, 0, self.WIDTH - self.MENU_WIDTH, self.HEIGHT)
-                        self.ui = GuiHandler(self.world)
-
                 if self.menu.active:
                     self.menu.update(self, self.events)
                 else:
@@ -98,7 +89,8 @@ class Game(object):
         if self.camera.y + self.camera.h > self.world.map.dungeon.height:
             self.camera.y = self.world.map.dungeon.height - self.camera.h
 
-        self.ui.update(self.world, self.camera)
+        self.ui.update(self.world)
+        self.tooltip.update(self.world, self.camera)
 
     def draw(self):
         '''
@@ -107,4 +99,6 @@ class Game(object):
         self.screen.fill((0, 0, 0))
         self.world.draw(self.world_screen, self.camera)
         self.screen.blit(self.world_screen, (0, 0))
-        self.ui.draw(self.screen, self.camera)
+        self.ui.draw(self.screen)
+        self.console.draw(self.screen)
+        self.tooltip.draw(self.screen)

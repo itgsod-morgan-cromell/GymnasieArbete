@@ -2,6 +2,7 @@ from src.level.generator.map_generator import Dungeon
 from src.level.generator.map_loader import Map
 import copy
 import random
+from src.constants import *
 
 
 class Level(object):
@@ -111,7 +112,12 @@ class Level(object):
                     self.explored_tiles[pos[1]][pos[0]] = 1
 
 
-
+    def handle_event(self, event):
+        etype = get_event_type(event)
+        if etype == PLAYER_DROP_ITEM:
+            self.items.append(event.target)
+        elif etype == PLAYER_PICKUP_ITEM:
+            self.items.remove(event.target)
 
 
 

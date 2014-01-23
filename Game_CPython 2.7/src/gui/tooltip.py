@@ -1,7 +1,7 @@
 import pygame
 from src.gui.gui import Gui
 from src.gui.textrect import render_textrect
-from src.event_constants import *
+from src.constants import *
 import copy
 
 
@@ -14,13 +14,15 @@ class Mouse_select(object):
         self.image = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.image.convert_alpha()
         self.offset = pygame.Rect(0, 0, 0, 0)
-        register_handler([pygame.MOUSEMOTION, TIME_PASSED], self)
+        register_handler([pygame.MOUSEMOTION, TIME_PASSED], self.handle_event)
 
     def handle_event(self, event):
         etype = event.type if event.type != pygame.USEREVENT else event.event_type
         if etype == pygame.MOUSEMOTION:
             if 0 < self.rect.x > self.offset.w or 0 < self.rect.y > self.offset.h:
                 self.in_map = False
+                post_event(GUI_TOOLTIP_CLEAR)
+                post_event(SIDEBARMOTION, pos=event.pos, rel=event.rel, buttons=event.buttons)
             else:
                 self.in_map = True
                 old_grid_x = int(self.rect.x/32)
@@ -52,7 +54,7 @@ class Mouse_select(object):
             item.interact()
         elif self.world.map.dungeon.grid[y][x] in [1, 11]:
             self.color = (0, 255, 0)
-            post_event(PLAYER_FIND_PATH, pos=(x, y))
+            post_event(PLAYER_FIND_PATH, pos=(x, y), post_to_gui=True)
 
 
 
@@ -73,7 +75,7 @@ class Mouse_select(object):
             screen.blit(self.image, (x, y))
 
 
-class MouseGui(Gui):
+class Tooltip(Gui):
     def __init__(self, world):
         self.world = world
         self.data = None
@@ -84,7 +86,7 @@ class MouseGui(Gui):
         self.show_window = False
         self.mouse = Mouse_select(world)
         Gui.__init__(self, 'character', (0, 0), image, True)
-        register_handler([GUI_TOOLTIP_CLEAR, GUI_TOOLTIP_POST, pygame.MOUSEBUTTONDOWN], self)
+        register_handler([GUI_TOOLTIP_CLEAR, GUI_TOOLTIP_POST, pygame.MOUSEBUTTONDOWN], self.handle_event)
 
 
     def update_data(self):
@@ -113,6 +115,12 @@ class MouseGui(Gui):
 
                         self.target = None
                 self.show_window = not self.show_window
+            elif pygame.mouse.get_pressed()[1]:  # Middle click.
+                if self.show_window:
+                    if 'MM-MOUSE' in self.options:
+                        post_event(self.options['MM-MOUSE'][1], target=self.target)
+                        self.show_window = False
+                        self.target = None
             elif pygame.mouse.get_pressed()[2]:  # Right click.
                     if self.show_window:
                         if 'R-MOUSE' in self.options:
@@ -124,9 +132,15 @@ class MouseGui(Gui):
             self.target = event.target
             self.options = {}
             if hasattr(event, 'l_mouse'):
-                self.options['L-MOUSE'] = event.l_mouse
+                if event.l_mouse:
+                    self.options['L-MOUSE'] = event.l_mouse
+            if hasattr(event, 'mm_mouse'):
+                if event.mm_mouse:
+                    self.options['MM-MOUSE'] = event.mm_mouse
             if hasattr(event, 'r_mouse'):
-                self.options['R-MOUSE'] = event.r_mouse
+                if event.r_mouse:
+                    self.options['R-MOUSE'] = event.r_mouse
+
             self.update_data()
         elif etype == GUI_TOOLTIP_CLEAR:
             self.target = None

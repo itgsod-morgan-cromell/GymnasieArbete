@@ -1,20 +1,37 @@
-import random
-
 from src.items.chest import Chest
 from src.entities.player import Player
 from src.level.level import Level
+from src.constants import *
 
 
 class World(object):
     def __init__(self, player):
-        self.generate_floor()
+        self.map = Level(1)
         self.map.setup()
         self.spawn_objects()
         self.player = Player(self.map.spawn, self, player['class'], 'Test')
         self.output = None
+        register_handler([WORLD_MOVE_DOWN, WORLD_MOVE_UP], self.handle_event)
+        register_handler([PLAYER_DROP_ITEM, PLAYER_PICKUP_ITEM], self.map.handle_event)
 
-    def generate_floor(self):
-        self.map = Level(1)
+    def handle_event(self, event):
+        etype = get_event_type(event)
+        if etype == WORLD_MOVE_DOWN:
+            if self.map.down:
+                self.map = self.map.down
+            else:
+                self.map.down = Level(self.map.floor + 1, self.map)
+                self.map = self.map.down
+                self.spawn_objects()
+                self.player.x, self.player.y = self.map.down_stair
+        elif etype == WORLD_MOVE_UP:
+            if self.map.up:
+                self.map = self.map.up
+            else:
+                self.map.up = Level(self.map.floor - 1, None, self.map)
+                self.map = self.map.up
+                self.spawn_objects()
+                self.player.x, self.player.y = self.map.up_stair
 
     def spawn_objects(self):
         for row in range(0, len(self.map.map.tiles)):
@@ -23,24 +40,6 @@ class World(object):
                     self.map.map.tiles[row][tile].id = 1
                     self.map.dungeon.grid[row][tile] = 1
                     self.map.items.append(Chest((tile, row), self))
-
-    def move_up(self):
-        if self.map.up:
-            self.map = self.map.up
-        else:
-            self.map.up = Level(self.map.floor - 1, None, self.map)
-            self.map = self.map.up
-            self.spawn_objects()
-            self.player.x, self.player.y = self.map.up_stair
-
-    def move_down(self):
-        if self.map.down:
-            self.map = self.map.down
-        else:
-            self.map.down = Level(self.map.floor + 1, self.map)
-            self.map = self.map.down
-            self.spawn_objects()
-            self.player.x, self.player.y = self.map.down_stair
 
     def update(self, offset):
         self.player.update(offset)

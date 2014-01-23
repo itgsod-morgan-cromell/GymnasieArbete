@@ -1,5 +1,5 @@
 import pygame
-from src.event_constants import *
+from src.constants import *
 
 
 class PowerUp(object):
@@ -41,79 +41,37 @@ class Item(object):
         self.extra = extra
         self.type = 'item'
         self.category = category
+        self.description = 'a {0}'.format(self.category)
         self.stats = stats
         if 'AMOUNT' in self.stats:
             self.stackable = True
         else:
             self.stackable = False
 
+        self.picked_up = False
         self.equipped = False
-        self.options = {'LMouse': 'pickup', 'RMouse': 'examine'}
         self.image = pygame.image.load(image)
         self.x = 0
         self.y = 0
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.shadow.fill((0, 0, 0, 200))
 
-    def drop(self, world):
-        self.unequip(world.player)
-        tile = world.map.map.tiles[world.player.y][world.player.x]
-        if tile:
-            self.x = world.player.x
-            self.y = world.player.y
-            if not self.stackable:
-                world.map.items.append(self)
-                if self in world.player.inventory:
-                    world.player.inventory.remove(self)
-                    self.options['LMouse'] = 'pickup'
-                elif self == world.player.weapon:
-                    world.player.weapon = None
-                    self.options['LMouse'] = 'pickup'
-                elif self == world.player.armor:
-                    world.player.armor = None
-                    self.options['LMouse'] = 'pickup'
-                elif self == world.player.trinket:
-                    world.player.trinket = None
-                    self.options['LMouse'] = 'pickup'
+    def use(self):
+        pass
+
+    def interact(self):
+        r_mouse = ('examine', PLAYER_EXAMINE_ITEM)
+        if self.picked_up:
+            l_mouse = ('drop', PLAYER_DROP_ITEM)
+            if self.equipped:
+                mm_mouse = ('unquip', PLAYER_UNEQUIP_ITEM)
             else:
-                world.player.inventory.remove(self)
-                for item in world.map.items:
-                    if item.x == world.player.x and item.y == world.player.y:
-                        if item.name == self.name:
-                            item.stats['AMOUNT'] += self.stats['AMOUNT']
-                            return
-                world.map.items.append(Item(self.name, self.category, self.image, self.stats, self.extra))
-                self.options['LMouse'] = 'pickup'
+                mm_mouse = ('equip', PLAYER_EQUIP_ITEM)
+        else:
+            l_mouse = ('pick up', PLAYER_PICKUP_ITEM)
+            mm_mouse = None
 
-    def equip(self, player):
-        if not self.equipped:
-            for elem in self.stats:
-                player.stats[elem] = player.stats.get(elem, 0) + self.stats[elem]
-            self.equipped = True
-
-    def unequip(self, player):
-        if self.equipped:
-            for elem in self.stats:
-                player.stats[elem] = player.stats.get(elem, 0) - self.stats[elem]
-            self.equipped = False
-
-    def pickup(self, world):
-        if self.stackable:
-            for item in world.plater.inventory:
-                if item.name == self.name:
-                    world.map.items.remove(self)
-                    item.stats['AMOUNT'] += self.stats['AMOUNT']
-                    return
-
-        if len(world.player.inventory) < 9:
-            world.player.inventory.append(self)
-            world.map.items.remove(self)
-            self.options['LMouse'] = 'drop'
-
-    def examine(self, world):
-        msg = 'This {0} is a {1}'.format(self.name, self.category)
-        print msg
-        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {'event_type': POST_TO_CONSOLE, 'msg': msg}))
+        post_event(GUI_TOOLTIP_POST, l_mouse=l_mouse, r_mouse=r_mouse, mm_mouse=mm_mouse, target=self)
 
     def draw(self, screen, offset, explored=1):
         if explored >= 0:
