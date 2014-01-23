@@ -148,10 +148,10 @@ class Map:
                 if not self.minimap:
                     if -1 < x < offset.w and -1 < y < offset.h:
                         if explored_tiles:
-                            if explored_tiles[tile.y/32][tile.x/32] == 0:
+                            if explored_tiles[tile.y/tile.h][tile.x/tile.w] == 0:
                                 surface.blit(tile_img, (x, y))
                                 surface.blit(self.shadow_tile, (x, y))
-                            elif explored_tiles[tile.y/32][tile.x/32] == 1:
+                            elif explored_tiles[tile.y/tile.h][tile.x/tile.w] == 1:
                                 surface.blit(tile_img, (x, y))
                             else:
                                 pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, 32, 32))
@@ -160,4 +160,8 @@ class Map:
                         if tile.feet and tile.id == 15:
                             surface.blit(tile.feet, (x, y))
                 else:
-                    surface.blit(tile_img, (x, y))
+                    if explored_tiles:
+                        if explored_tiles[tile.y/tile.h][tile.x/tile.w] in [1, 0]:
+                            surface.blit(tile_img, (x, y))
+                    else:
+                        surface.blit(tile_img, (x, y))

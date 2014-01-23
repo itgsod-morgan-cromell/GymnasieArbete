@@ -33,7 +33,7 @@ class ZoomArrow(object):
 class MiniMap(Gui):
     def __init__(self, world):
         self.world = world
-        self.tile_size = 4
+        self.tile_size = 6
         self.width = 192
         self.height = 192
         self.camera = pygame.Rect((0, 0), (self.width, self.height)).copy()
@@ -48,7 +48,7 @@ class MiniMap(Gui):
         x = self.world.player.x * self.tile_size
         y = self.world.player.y * self.tile_size
         self.camera.center = (x, y)
-        self.map.draw(self.image, self.camera)
+        self.map.draw(self.image, self.camera, self.world.map.explored_tiles)
         self.image.fill((0, 255, 0), pygame.Rect((x - self.camera.x, y - self.camera.y),
                                                  (self.tile_size, self.tile_size)))
         self.image.blit(self.zoom_in_arrow.arrow, (self.zoom_in_arrow.rect.x, self.zoom_in_arrow.rect.y))
@@ -62,7 +62,7 @@ class MiniMap(Gui):
         y = self.world.player.y * self.tile_size
         self.camera.center = (x, y)
         self.map.load_dungeon(self.world.map.dungeon, True, self.tile_size)
-        self.map.draw(self.image, self.camera)
+        self.map.draw(self.image, self.camera, self.world.map.explored_tiles)
         self.image.fill((0, 255, 0), pygame.Rect((x - self.camera.x, y - self.camera.y),
                                                  (self.tile_size, self.tile_size)))
         self.zoom_in_arrow.create()
@@ -83,20 +83,25 @@ class MiniMap(Gui):
                 self.zoom_in()
             elif mouse_rect.colliderect(self.zoom_out_arrow.rect):
                 self.zoom_out()
+        elif etype == pygame.MOUSEBUTTONDOWN and event.button in [4, 5]:
+            if event.button == 4:
+                self.zoom_in()
+            elif event.button == 5:
+                self.zoom_out()
 
 
     def zoom_in(self):
         if self.zoom_in_arrow.zoom_level < self.zoom_in_arrow.max_zoom_level:
             self.zoom_in_arrow.zoom_level += 1
             self.zoom_out_arrow.zoom_level -= 1
-            self.tile_size += 1
+            self.tile_size += 2
             self.redraw()
 
     def zoom_out(self):
         if self.zoom_out_arrow.zoom_level < self.zoom_out_arrow.max_zoom_level:
             self.zoom_out_arrow.zoom_level += 1
             self.zoom_in_arrow.zoom_level -= 1
-            self.tile_size -= 1
+            self.tile_size -= 2
             self.redraw()
 
 

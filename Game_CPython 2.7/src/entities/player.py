@@ -185,9 +185,6 @@ class Player(Entity):
 
         path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
         if path:
-            if len(path) > 3:
-                post_event(POST_TO_CONSOLE, msg="You can't walk that far!", color=(255, 0, 0))
-                return
             self.path = path
             post_event(PLAYER_FOUND_PATH, path=path)
 
