@@ -29,7 +29,7 @@ class Game(object):
         self.clock = GameClock(40)
         self.camera = self.world_screen.get_rect().copy()
         self.events = None
-        self.menu = Menu((self.screen.get_width()/2, self.screen.get_height()/2), ['New Game', 'Load Game', 'Quit'])
+        self.menu = Menu()
 
     def new_game(self, player):
         self.screen.blit(pygame.image.load('res/gui/loading_screen.png'), (WIDTH/2 - 110, HEIGHT/2 - 17))
@@ -60,9 +60,7 @@ class Game(object):
                         if event.key == pygame.K_ESCAPE:
                             if not self.menu.main:
                                 self.menu.active = not self.menu.active
-                if self.menu.active:
-                    self.menu.update(self, self.events)
-                else:
+                if not self.menu.active:
                     self.update()
 
             if self.clock.frame_ready:

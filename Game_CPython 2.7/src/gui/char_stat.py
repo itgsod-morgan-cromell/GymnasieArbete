@@ -25,6 +25,7 @@ class Bar(object):
         self.text = '{0}/{1}'.format(self.current, self.max)
         if self.hovering:
             self.image.blit(render_textrect(self.text, 50, self.rect, (255, 255, 255), None, 1,), (0, 0))
+
     def refresh(self):
         self.image.fill((84, 84, 84))
         width = int((self.current/self.max)*self.image.get_width())
