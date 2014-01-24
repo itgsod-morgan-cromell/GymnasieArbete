@@ -2,8 +2,9 @@ from src.gui.gui import Gui
 import pygame
 import sys
 from StringIO import StringIO
-from src.constants import *
+from src.event_helper import *
 from src.gui.textrect import render_textrect
+from src.options import *
 
 
 class Text(object):

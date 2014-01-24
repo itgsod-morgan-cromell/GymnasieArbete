@@ -1,5 +1,6 @@
 from src.gui.textrect import *
-from src.constants import *
+from src.event_helper import *
+from src.options import *
 from src.gui.slot import Slot
 from src.gui.gui import Gui
 import pygame
@@ -12,7 +13,7 @@ class Bar(object):
         self.max = max
         self.color = color
         self.info = info
-        self.hovering = False
+        self.hovering = ALWAYS_SHOW_STATS
         self.image = pygame.Surface((176, 16))
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
@@ -21,6 +22,9 @@ class Bar(object):
         width = int((self.current/self.max)*self.image.get_width())
         self.image.fill(color, rect=pygame.Rect((0, 0), (width, self.image.get_height())))
         self.image.blit(render_textrect(str(info), 50, self.rect, (255, 255, 255)), (3, 0))
+        self.text = '{0}/{1}'.format(self.current, self.max)
+        if self.hovering:
+            self.image.blit(render_textrect(self.text, 50, self.rect, (255, 255, 255), None, 1,), (0, 0))
     def refresh(self):
         self.image.fill((84, 84, 84))
         width = int((self.current/self.max)*self.image.get_width())
@@ -53,9 +57,9 @@ class CharStats(Gui):
             mouse_rect = pygame.Rect(event.pos, (2, 2)).copy()
             mouse_rect.x -= (WIDTH-MENU_WIDTH) + self.x
             mouse_rect.y -= self.y
-            self.exp.hovering = False
-            self.hp.hovering = False
-            self.mp.hovering = False
+            self.exp.hovering = ALWAYS_SHOW_STATS
+            self.hp.hovering = ALWAYS_SHOW_STATS
+            self.mp.hovering = ALWAYS_SHOW_STATS
             if mouse_rect.colliderect(self.exp.rect):
                 self.exp.hovering = True
             elif mouse_rect.colliderect(self.hp.rect):

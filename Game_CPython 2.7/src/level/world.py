@@ -1,7 +1,7 @@
 from src.items.chest import Chest
 from src.entities.player import Player
 from src.level.level import Level
-from src.constants import *
+from src.event_helper import *
 
 
 class World(object):

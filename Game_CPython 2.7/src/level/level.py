@@ -2,7 +2,7 @@ from src.level.generator.map_generator import Dungeon
 from src.level.generator.map_loader import Map
 import copy
 import random
-from src.constants import *
+from src.event_helper import *
 
 
 class Level(object):

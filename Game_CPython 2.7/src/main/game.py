@@ -10,7 +10,7 @@ from src.gui.guihandler import GuiHandler
 from src.gui.tooltip import Tooltip
 from src.util.get_sprite import *
 from src.event_manager import EventManager
-from src.constants import *
+from src.options import *
 
 
 class Game(object):

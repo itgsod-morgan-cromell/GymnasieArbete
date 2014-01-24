@@ -2,7 +2,7 @@ import glob
 import pygame
 import random
 from src.items.item import *
-from src.constants import *
+from src.event_helper import *
 
 
 class Chest(object):

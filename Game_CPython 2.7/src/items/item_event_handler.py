@@ -1,5 +1,5 @@
 import pygame
-from src.constants import *
+from src.event_helper import *
 
 
 class ItemEventHandler(object):

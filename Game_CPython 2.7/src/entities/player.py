@@ -3,7 +3,7 @@ import pygame
 from src.entities.classdata import ClassData
 from src.entities.entity import Entity
 from src.level.generator.astar import *
-from src.constants import *
+from src.event_helper import *
 
 
 class Player(Entity):

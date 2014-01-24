@@ -1,7 +1,7 @@
 import pygame
 from src.gui.gui import Gui
 from src.gui.textrect import render_textrect
-from src.constants import *
+from src.event_helper import *
 import copy
 
 

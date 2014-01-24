@@ -1,8 +1,8 @@
 import pygame
 from src.gui.gui import Gui
 from src.level.generator.map_loader import Map
-import copy
-from src.constants import *
+from src.options import *
+from src.event_helper import *
 
 
 class ZoomArrow(object):

@@ -3,8 +3,7 @@ from src.gui.char_stat import CharStats
 
 from src.gui.explorer import Explorer
 from src.gui.minimap import MiniMap
-from src.gui.console import Console
-from src.constants import *
+from src.options import *
 
 
 class GuiHandler(object):
