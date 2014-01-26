@@ -29,17 +29,17 @@ class Menu(Gui):
 
     def handle_event(self, event):
         etype = get_event_type(event)
-        if etype == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            mouse_rect = pygame.Rect(event.pos, (2, 2))
-            button = mouse_rect.collidelist(self.buttons)
-            self.buttons[button].onclick()
+        if self.active:
+            if etype == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_rect = pygame.Rect(event.pos, (2, 2))
+                button = mouse_rect.collidelist(self.buttons)
+                self.buttons[button].onclick()
 
-        elif etype == MENU_QUIT_GAME:
-            pygame.event.post(pygame.event.Event(pygame.QUIT))
-
-
-
-
+            elif etype == MENU_NEW_GAME:
+                self.main = False
+                self.active = False
+            elif etype == MENU_QUIT_GAME:
+                pygame.event.post(pygame.event.Event(pygame.QUIT))
 
     def draw(self, screen):
         self.image.fill((0, 0, 0))

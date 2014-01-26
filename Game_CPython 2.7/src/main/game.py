@@ -11,6 +11,7 @@ from src.gui.tooltip import Tooltip
 from src.util.get_sprite import *
 from src.event_manager import EventManager
 from src.options import *
+from src.event_helper import *
 
 
 class Game(object):
@@ -30,8 +31,10 @@ class Game(object):
         self.camera = self.world_screen.get_rect().copy()
         self.events = None
         self.menu = Menu()
+        register_handler(MENU_NEW_GAME, self.new_game)
 
-    def new_game(self, player):
+    def new_game(self, event):
+        player = {'name':'Test', 'class':'warrior'}
         self.screen.blit(pygame.image.load('res/gui/loading_screen.png'), (WIDTH/2 - 110, HEIGHT/2 - 17))
         pygame.display.flip()
         self.world = World(player)
@@ -61,7 +64,8 @@ class Game(object):
                             if not self.menu.main:
                                 self.menu.active = not self.menu.active
                 if not self.menu.active:
-                    self.update()
+                    if pygame.mouse.get_focused():
+                        self.update()
 
             if self.clock.frame_ready:
                 if self.menu.active:

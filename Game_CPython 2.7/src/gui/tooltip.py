@@ -48,10 +48,11 @@ class Mouse_select(object):
         y += int(self.offset.y/32)
         if 0 < x > self.world.map.dungeon.grid_size_x - 1 or 0 < y > self.world.map.dungeon.grid_size_y - 1:
             return
-        item = self.world.map.get_item(x, y)
-        if item:
-            self.color = (0, 0, 255)
-            item.interact()
+        items = self.world.map.get_item(x, y)
+        if items:
+            for item in items:
+                self.color = (0, 0, 255)
+                item.interact()
         elif self.world.map.dungeon.grid[y][x] in [1, 11]:
             self.color = (0, 255, 0)
             post_event(PLAYER_FIND_PATH, pos=(x, y), post_to_gui=True)
@@ -84,9 +85,10 @@ class Tooltip(Gui):
         self.options = {}
         self.target = None
         self.show_window = False
+        self.item_tooltip = None
         self.mouse = Mouse_select(world)
         Gui.__init__(self, 'character', (0, 0), image, True)
-        register_handler([GUI_TOOLTIP_CLEAR, GUI_TOOLTIP_POST, pygame.MOUSEBUTTONDOWN], self.handle_event)
+        register_handler([GUI_TOOLTIP_CLEAR, GUI_TOOLTIP_POST, GUI_EXAMINE_ITEM, GUI_EXAMINE_ITEM_CLEAR, pygame.MOUSEBUTTONDOWN], self.handle_event)
 
 
     def update_data(self):
@@ -106,7 +108,7 @@ class Tooltip(Gui):
         self.mouse.update(offset, world)
 
     def handle_event(self, event):
-        etype = event.type if event.type != pygame.USEREVENT else event.event_type
+        etype = get_event_type(event)
         if etype == pygame.MOUSEBUTTONDOWN and self.target:
             if pygame.mouse.get_pressed()[0]:  # Left click.
                 if self.show_window:
@@ -146,8 +148,17 @@ class Tooltip(Gui):
             self.target = None
             self.options = None
 
+        elif etype == GUI_EXAMINE_ITEM:
+            self.item_tooltip = event.tooltip
+
+        elif etype == GUI_EXAMINE_ITEM_CLEAR:
+            self.item_tooltip = None
+
+
+
     def draw(self, screen):
         self.mouse.draw(screen)
         if self.show_window:
             screen.blit(self.image, (self.x, self.y))
-
+        if self.item_tooltip:
+            screen.blit(self.item_tooltip, (self.x - self.item_tooltip.get_width(), self.y - self.item_tooltip.get_height()))

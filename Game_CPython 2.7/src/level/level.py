@@ -122,10 +122,13 @@ class Level(object):
 
 
     def get_item(self, x, y):
+        items = []
         for item in self.items:
             if item:
                 if item.x == x and item.y == y:
-                    return item
+                    items.append(item)
+        if items:
+            return items
 
     def get_line(self, x1, y1, x2, y2):
         points = []

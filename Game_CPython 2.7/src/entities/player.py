@@ -42,9 +42,9 @@ class Player(Entity):
         self.travel_dest_event = None
         self.follow_path = False
         self.move(0, 0)
-        register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH], self.handle_event)
+        register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_TRAVEL_PATH, TIME_PASSED], self.handle_event)
         register_handler([PLAYER_EXAMINE_ITEM, PLAYER_USE_ITEM, PLAYER_PICKUP_ITEM,
-                          PLAYER_DROP_ITEM, PLAYER_EQUIP_ITEM, PLAYER_UNEQUIP_ITEM, PLAYER_REACHED_DESTINATION], self.handle_items)
+                          PLAYER_DROP_ITEM, PLAYER_EQUIP_ITEM, PLAYER_UNEQUIP_ITEM], self.handle_items)
 
     def update(self, offset):
         self.playable_area = offset
@@ -81,21 +81,6 @@ class Player(Entity):
 
     def handle_items(self, event):
         etype = get_event_type(event)
-
-        if etype != PLAYER_EXAMINE_ITEM and etype != PLAYER_REACHED_DESTINATION:
-            print etype
-            item = event.target
-            self.travel_dest_event = event
-            post_event(PLAYER_FIND_PATH, pos=(item.x, item.y), post_to_gui=False)
-            post_event(PLAYER_TRAVEL_PATH)
-            return
-        if PLAYER_REACHED_DESTINATION:
-            if self.travel_dest_event:
-                event = self.travel_dest_event
-                self.travel_dest_event = None
-            else:
-                return
-        etype = get_event_type(event)
         item = event.target
         if etype == PLAYER_USE_ITEM:
             item.use()
@@ -107,10 +92,6 @@ class Player(Entity):
             self.inventory.remove(item)
         elif etype == PLAYER_PICKUP_ITEM:
             self.inventory.append(item)
-        elif etype == PLAYER_EXAMINE_ITEM:
-            print item.description
-            post_event(POST_TO_CONSOLE, msg=item.description)
-
         post_event(TIME_PASSED, amount=1.0)
 
 
@@ -130,11 +111,17 @@ class Player(Entity):
             ya = -1
         # Check collision from the grid.
         tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
-        item = self.world.map.get_item(self.x + xa, self.y + ya)
-        if item:
-            if item.type != 'item' and item.type != 'powerup':
-                xa = 0
-                ya = 0
+        items = self.world.map.get_item(self.x + xa, self.y + ya)
+        if items:
+            for item in items:
+                if item:
+                    if item.type == 'chest':
+                        xa = 0
+                        ya = 0
+                    elif item.type == 'item':
+                        post_event(GUI_EXPLORER_ITEMS, items=items)
+        else:
+            post_event(GUI_EXPLORER_CLEAR)
 
         if tile.id == 2 or tile.id == 3 or tile.id == 4 or tile.id == 5 or tile.id == 6 or tile.id == 7:
             xa = 0

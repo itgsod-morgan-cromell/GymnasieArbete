@@ -49,28 +49,23 @@ class CharStats(Gui):
         self.exp = Bar(world.player.exp, world.player.stats['EXP'], 'Lvl {0}'.format(world.player.lvl), (50, 255, 10), (5, 20))
         self.hp = Bar(world.player.hp, world.player.stats['HP'], 'HP', (224, 52, 52), (5, 45))
         self.mp = Bar(world.player.mp, world.player.stats['MP'], 'MP', (96, 132, 224), (5, 70))
-        register_handler(SIDEBARMOTION, self.handle_event)
 
 
-    def handle_event(self, event):
-        etype = get_event_type(event)
-        if etype == SIDEBARMOTION:
-            mouse_rect = pygame.Rect(event.pos, (2, 2)).copy()
-            mouse_rect.x -= (WIDTH-MENU_WIDTH) + self.x
-            mouse_rect.y -= self.y
-            self.exp.hovering = ALWAYS_SHOW_STATS
-            self.hp.hovering = ALWAYS_SHOW_STATS
-            self.mp.hovering = ALWAYS_SHOW_STATS
-            if mouse_rect.colliderect(self.exp.rect):
-                self.exp.hovering = True
-            elif mouse_rect.colliderect(self.hp.rect):
-                self.hp.hovering = True
-            elif mouse_rect.colliderect(self.mp.rect):
-                self.mp.hovering = True
-            self.exp.refresh()
-            self.hp.refresh()
-            self.mp.refresh()
-
+    def mouse(self, mouse, event):
+        mouse.x -= self.x
+        mouse.y -= self.y
+        self.exp.hovering = ALWAYS_SHOW_STATS
+        self.hp.hovering = ALWAYS_SHOW_STATS
+        self.mp.hovering = ALWAYS_SHOW_STATS
+        if mouse.colliderect(self.exp.rect):
+            self.exp.hovering = True
+        elif mouse.colliderect(self.hp.rect):
+            self.hp.hovering = True
+        elif mouse.colliderect(self.mp.rect):
+            self.mp.hovering = True
+        self.exp.refresh()
+        self.hp.refresh()
+        self.mp.refresh()
 
 
 

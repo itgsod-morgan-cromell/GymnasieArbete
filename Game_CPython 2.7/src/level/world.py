@@ -11,8 +11,8 @@ class World(object):
         self.spawn_objects()
         self.player = Player(self.map.spawn, self, player['class'], 'Test')
         self.output = None
-        register_handler([WORLD_MOVE_DOWN, WORLD_MOVE_UP], self.handle_event)
-        register_handler([PLAYER_DROP_ITEM, PLAYER_PICKUP_ITEM], self.map.handle_event)
+        register_handler([WORLD_MOVE_DOWN, WORLD_MOVE_UP, PLAYER_DROP_ITEM], self.handle_event)
+        register_handler([PLAYER_PICKUP_ITEM], self.map.handle_event)
 
     def handle_event(self, event):
         etype = get_event_type(event)
@@ -32,6 +32,11 @@ class World(object):
                 self.map = self.map.up
                 self.spawn_objects()
                 self.player.x, self.player.y = self.map.up_stair
+        elif etype == PLAYER_DROP_ITEM:
+            event.target.x = self.player.x
+            event.target.y = self.player.y
+            self.map.items.append(event.target)
+            self.player.move(0, 0)
 
     def spawn_objects(self):
         for row in range(0, len(self.map.map.tiles)):

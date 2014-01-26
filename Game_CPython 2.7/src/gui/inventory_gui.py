@@ -7,7 +7,7 @@ from src.event_helper import *
 class Slot(object):
     def __init__(self, x, y, object=None):
         self.object = object
-        self.type = 'explorer'
+        self.type = 'inventory'
         if object:
             self.image = object
         else:
@@ -22,14 +22,12 @@ class Slot(object):
         surface.blit(self.image, (self.x, self.y))
 
 
-
-
-class Explorer(Gui):
+class InventoryGui(Gui):
     def __init__(self):
         self.width = MENU_WIDTH
         self.height = 80
 
-        Gui.__init__(self, 'explorer', (30, 400),
+        Gui.__init__(self, 'inventory', (30, 300),
                      pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32).convert_alpha(), False)
         self.slots = []
         self.slots_rect = []
@@ -37,19 +35,7 @@ class Explorer(Gui):
             for x in range(0, 4):
                 self.slots_rect.append(pygame.Rect(5 + x*35, 5 + y*35, 32, 32))
                 self.slots.append(Slot(5 + x*35, 5 + y*35))
-        register_handler([GUI_EXPLORER_ITEMS, GUI_EXPLORER_CLEAR], self.handle_event)
-
-    def handle_event(self, event):
-        etype = get_event_type(event)
-
-        if etype == GUI_EXPLORER_ITEMS:
-            for i, item in enumerate(event.items):
-                self.slots[i].object = item
-        elif etype == GUI_EXPLORER_CLEAR:
-            for slot in self.slots:
-                slot.object = None
-                slot.image = pygame.Surface((32, 32))
-
+        register_handler(PLAYER_PICKUP_ITEM, self.handle_event)
 
     def get_slot(self, mouse):
         mouse.x -= self.x
@@ -58,6 +44,18 @@ class Explorer(Gui):
         if self.slots[slot] and slot != -1:
             return self.slots[slot]
 
+
+    def handle_event(self, event):
+        etype = get_event_type(event)
+        if etype == PLAYER_PICKUP_ITEM:
+            if hasattr(event, 'slot'):
+                event.slot.object = event.target
+            else:
+                for slot in self.slots:
+                    if not slot.object:
+                        slot.object = event.target
+                        return
+
     def mouse(self, mouse, event):
         if event.type == pygame.MOUSEMOTION:
             slot = self.get_slot(mouse)
@@ -65,7 +63,6 @@ class Explorer(Gui):
                 post_event(GUI_EXAMINE_ITEM, tooltip=slot.object.examine())
             else:
                 post_event(GUI_EXAMINE_ITEM_CLEAR)
-
 
 
     def draw(self, surface):

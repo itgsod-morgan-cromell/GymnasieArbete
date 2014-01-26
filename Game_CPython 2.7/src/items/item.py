@@ -1,5 +1,7 @@
 import pygame
 from src.event_helper import *
+from src.options import *
+from src.gui.textrect import render_textrect
 
 
 class PowerUp(object):
@@ -41,7 +43,7 @@ class Item(object):
         self.extra = extra
         self.type = 'item'
         self.category = category
-        self.description = 'a {0}'.format(self.category)
+        self.description = 'a {0} used for testing. This is starting to look pretty good.'.format(self.category)
         self.stats = stats
         if 'AMOUNT' in self.stats:
             self.stackable = True
@@ -55,6 +57,7 @@ class Item(object):
         self.y = 0
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.shadow.fill((0, 0, 0, 200))
+        self.stats_font = pygame.font.Font('res/other/visitor2.ttf', 20)
 
     def use(self):
         pass
@@ -72,6 +75,33 @@ class Item(object):
             mm_mouse = None
 
         post_event(GUI_TOOLTIP_POST, l_mouse=l_mouse, r_mouse=r_mouse, mm_mouse=mm_mouse, target=self)
+
+
+    def examine(self):
+        width = 250
+        info = pygame.Surface((width, 80))
+        info.fill((54, 54, 54))
+        info.blit(self.image, (0, 0))
+        info.blit(render_textrect(self.name, 32, info.get_rect(), (255, 255, 255)), (40, 5))
+        info.blit(render_textrect(self.description, 20, info.get_rect(), (255, 255, 255)), (0, 40))
+
+        stats = pygame.Surface((width, 50))
+        stats.fill((54, 54, 54))
+        y = 0
+        for stat, i in self.stats.items():
+            stats.blit(self.stats_font.render('{0}: '.format(stat), 0, (255, 255, 255)), (0, y*10))
+            stats.blit(self.stats_font.render(str(i), 0, (255, 255, 143)), (self.stats_font.size('{0}: '.format(stat))[0], y*10))
+            y += 1
+        image = pygame.Surface((width + 20, info.get_rect().h + stats.get_rect().h + 20))
+        image.fill((54, 54, 54))
+        image.blit(info, (10, 10))
+        image.blit(stats, (10, info.get_rect().h + 20))
+        pygame.draw.line(image, (0, 0, 0), (10, info.get_rect().h + 13), (info.get_rect().w + 10, info.get_rect().h + 13), 2)
+        pygame.draw.rect(image, (155, 155, 155), image.get_rect(), 1)
+        return image
+
+
+
 
     def draw(self, screen, offset, explored=1):
         if explored >= 0:
