@@ -2,7 +2,7 @@
 import pygame
 from src.entities.classdata import ClassData
 from src.entities.entity import Entity
-from src.level.generator.astar import *
+from src.level.dungeon_generator.astar import *
 from src.event_helper import *
 
 
@@ -110,8 +110,8 @@ class Player(Entity):
             self.dir = 3
             ya = -1
         # Check collision from the grid.
-        tile = self.world.map.map.tiles[self.y + ya][self.x + xa]
-        items = self.world.map.get_item(self.x + xa, self.y + ya)
+        tile = self.world.map.tiles[self.y + ya][self.x + xa]
+        items = self.world.get_item(self.x + xa, self.y + ya)
         if items:
             for item in items:
                 if item:
@@ -120,17 +120,21 @@ class Player(Entity):
                         ya = 0
                     elif item.type == 'item':
                         post_event(GUI_EXPLORER_ITEMS, items=items)
+        for monster in self.world.monsters:
+            if monster.x == self.x+xa and monster.y == self.y+ya:
+                xa = 0
+                ya = 0
         else:
             post_event(GUI_EXPLORER_CLEAR)
-
-        if tile.id == 2 or tile.id == 3 or tile.id == 4 or tile.id == 5 or tile.id == 6 or tile.id == 7:
+        id = tile.id if hasattr(tile, 'id') else tile
+        if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7:
             xa = 0
             ya = 0
-        if tile.id == 8 and self.KEYBOARD:
+        if id == 8 and self.KEYBOARD:
             post_event(WORLD_MOVE_UP)
             self.path = None
 
-        elif tile.id == 9 and self.KEYBOARD:
+        elif id == 9 and self.KEYBOARD:
             post_event(WORLD_MOVE_DOWN)
             self.path = None
 
@@ -138,7 +142,7 @@ class Player(Entity):
             self.x += xa
             self.y += ya
             post_event(TIME_PASSED, amount=1.0)
-            self.world.map.fog_of_war(self.x, self.y, self.radius)
+            self.world.fog_of_war(self.x, self.y, self.radius)
 
     def calculate_stats(self):
         if self.exp >= self.stats['EXP']:
@@ -170,7 +174,7 @@ class Player(Entity):
         elif self.mouse_grid_y < self.y:
             start_dir = 0
 
-        path = self.astar.find_path(self.world.map.dungeon.grid, start, end, blocked_tiles, start_dir)
+        path = self.astar.find_path(self.world.dungeon.grid, start, end, blocked_tiles, start_dir)
         if path:
             self.path = path
             post_event(PLAYER_FOUND_PATH, path=path)
@@ -187,8 +191,8 @@ class Player(Entity):
             self.path_delay = self.max_path_delay
             x = self.path[0][0]
             y = self.path[0][1]
-            if hasattr(self.world.map.map.tiles[y][x], 'id'):
-                self.world.map.map.tiles[y][x].id = self.world.map.dungeon.grid[y][x]
+            if hasattr(self.world.map.tiles[y][x], 'id'):
+                self.world.map.tiles[y][x].id = self.world.dungeon.grid[y][x]
             if self.path:
                 self.path.remove(self.path[0])
             self.move(x - self.x, y - self.y)
@@ -203,9 +207,9 @@ class Player(Entity):
     def draw_path(self):
 
         for i in range(0, len(self.path)):
-            tile = self.world.map.map.tiles[self.path[i][1]][self.path[i][0]]
+            tile = self.world.map.tiles[self.path[i][1]][self.path[i][0]]
             if hasattr(tile, 'id'):
-                tile.id = self.world.map.dungeon.grid[self.path[i][1]][self.path[i][0]]
+                tile.id = self.world.dungeon.grid[self.path[i][1]][self.path[i][0]]
                 tile.dirs = [2, 2]
 
                 if len(self.path) > i + 1:
@@ -221,7 +225,7 @@ class Player(Entity):
                 if current_node:
                     c = current_node
 
-                self.world.map.map.tiles[self.path[i][1]][self.path[i][0]].dirs[1] = 9
+                self.world.map.tiles[self.path[i][1]][self.path[i][0]].dirs[1] = 9
                 if p:
                     tile.dirs[0] = p.dir
                     tile.dirs[1] = c.dir
@@ -247,7 +251,7 @@ class Player(Entity):
                 else:
                     tile.id = 15
                 tile.load_image()
-                self.world.map.map.tiles[self.path[i][1]][self.path[i][0]] = tile
+                self.world.map.tiles[self.path[i][1]][self.path[i][0]] = tile
 
     def draw(self, screen, offset):
         screen.blit(self.images[self.dir], (self.x*32-offset.x, self.y*32-offset.y))

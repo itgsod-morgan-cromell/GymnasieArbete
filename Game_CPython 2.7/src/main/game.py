@@ -84,12 +84,12 @@ class Game(object):
         self.camera.centery = int(self.world.player.y)*32
         if self.camera.x < 0:
             self.camera.x = 0
-        if self.camera.x + self.camera.w > self.world.map.dungeon.width:
-            self.camera.x = self.world.map.dungeon.width - self.camera.w
+        if self.camera.x + self.camera.w > self.world.map.width:
+            self.camera.x = self.world.map.width - self.camera.w
         if self.camera.y < 0:
             self.camera.y = 0
-        if self.camera.y + self.camera.h > self.world.map.dungeon.height:
-            self.camera.y = self.world.map.dungeon.height - self.camera.h
+        if self.camera.y + self.camera.h > self.world.map.height:
+            self.camera.y = self.world.map.height - self.camera.h
 
         self.ui.update(self.world)
         self.tooltip.update(self.world, self.camera)

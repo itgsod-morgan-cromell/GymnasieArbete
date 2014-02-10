@@ -139,7 +139,6 @@ class Map:
 
 
     def draw(self, surface, offset, explored_tiles=None):
-
         for row in self.tiles:
             for tile in row:
                 x = tile.x -offset.x

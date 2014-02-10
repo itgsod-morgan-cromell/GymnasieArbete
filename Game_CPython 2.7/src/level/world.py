@@ -1,15 +1,16 @@
-from src.items.chest import Chest
+
 from src.entities.player import Player
-from src.level.level import Level
+from src.level.dungeon import DungeonLevel
 from src.event_helper import *
+from src.level.overworld import OverworldLevel
 
 
 class World(object):
     def __init__(self, player):
-        self.map = Level(1)
+        self.map = DungeonLevel(1)
         self.map.setup()
-        self.spawn_objects()
-        self.player = Player(self.map.spawn, self, player['class'], 'Test')
+        self.map.spawn_objects()
+        self.player = Player(self.map.spawn, self.map, player['class'], 'Test')
         self.output = None
         register_handler([WORLD_MOVE_DOWN, WORLD_MOVE_UP, PLAYER_DROP_ITEM], self.handle_event)
         register_handler([PLAYER_PICKUP_ITEM], self.map.handle_event)
@@ -20,7 +21,7 @@ class World(object):
             if self.map.down:
                 self.map = self.map.down
             else:
-                self.map.down = Level(self.map.floor + 1, self.map)
+                self.map.down = DungeonLevel(self.map.floor + 1, self.map)
                 self.map = self.map.down
                 self.spawn_objects()
                 self.player.x, self.player.y = self.map.down_stair
@@ -28,7 +29,7 @@ class World(object):
             if self.map.up:
                 self.map = self.map.up
             else:
-                self.map.up = Level(self.map.floor - 1, None, self.map)
+                self.map.up = DungeonLevel(self.map.floor - 1, None, self.map)
                 self.map = self.map.up
                 self.spawn_objects()
                 self.player.x, self.player.y = self.map.up_stair
@@ -38,13 +39,6 @@ class World(object):
             self.map.items.append(event.target)
             self.player.move(0, 0)
 
-    def spawn_objects(self):
-        for row in range(0, len(self.map.map.tiles)):
-            for tile in range(0, len(self.map.map.tiles[row])):
-                if self.map.map.tiles[row][tile].id == 10:
-                    self.map.map.tiles[row][tile].id = 1
-                    self.map.dungeon.grid[row][tile] = 1
-                    self.map.items.append(Chest((tile, row), self))
 
     def update(self, offset):
         self.player.update(offset)

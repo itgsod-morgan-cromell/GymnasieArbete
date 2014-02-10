@@ -37,18 +37,23 @@ class Explorer(Gui):
             for x in range(0, 4):
                 self.slots_rect.append(pygame.Rect(5 + x*35, 5 + y*35, 32, 32))
                 self.slots.append(Slot(5 + x*35, 5 + y*35))
-        register_handler([GUI_EXPLORER_ITEMS, GUI_EXPLORER_CLEAR], self.handle_event)
+        register_handler([GUI_EXPLORER_ITEMS, GUI_EXPLORER_CLEAR, PLAYER_PICKUP_ITEM], self.handle_event)
 
     def handle_event(self, event):
         etype = get_event_type(event)
 
         if etype == GUI_EXPLORER_ITEMS:
+            self.active = True
             for i, item in enumerate(event.items):
                 self.slots[i].object = item
         elif etype == GUI_EXPLORER_CLEAR:
             for slot in self.slots:
                 slot.object = None
+                self.active = False
                 slot.image = pygame.Surface((32, 32))
+        elif etype == PLAYER_PICKUP_ITEM:
+            if event.target in self.slots:
+                self.slots.remove(event.target)
 
 
     def get_slot(self, mouse):
@@ -62,6 +67,7 @@ class Explorer(Gui):
         if event.type == pygame.MOUSEMOTION:
             slot = self.get_slot(mouse)
             if slot and slot.object:
+
                 post_event(GUI_EXAMINE_ITEM, tooltip=slot.object.examine())
             else:
                 post_event(GUI_EXAMINE_ITEM_CLEAR)
@@ -69,8 +75,9 @@ class Explorer(Gui):
 
 
     def draw(self, surface):
-        for slot in self.slots:
-            slot.draw(self.image)
-        surface.blit(self.image, (self.x, self.y))
+        if self.active:
+            for slot in self.slots:
+                slot.draw(self.image)
+            surface.blit(self.image, (self.x, self.y))
 
 

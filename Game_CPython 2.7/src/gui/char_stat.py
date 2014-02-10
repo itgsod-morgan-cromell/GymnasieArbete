@@ -43,13 +43,22 @@ class CharStats(Gui):
         Gui.__init__(self, 'character', (0, 200), pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32), True)
         self.image.convert_alpha()
         self.player_image = world.player.images[0].copy()
+        self.time_passed = 0.0
         self.player_image = pygame.transform.scale(self.player_image, (self.player_image.get_width()/2,
                                                                        self.player_image.get_height()/2))
         self.name = render_textrect(world.player.name, 30, self.image.get_rect(), (255, 255, 255))
+        self.time_passed_text = render_textrect(self.time_passed, 30, pygame.Rect(0, 0, 30, 30), (255, 255, 255), (54, 54, 54))
         self.exp = Bar(world.player.exp, world.player.stats['EXP'], 'Lvl {0}'.format(world.player.lvl), (50, 255, 10), (5, 20))
         self.hp = Bar(world.player.hp, world.player.stats['HP'], 'HP', (224, 52, 52), (5, 45))
         self.mp = Bar(world.player.mp, world.player.stats['MP'], 'MP', (96, 132, 224), (5, 70))
+        register_handler(TIME_PASSED, self.handle_event)
 
+
+    def handle_event(self, event):
+        etype = get_event_type(event)
+        if etype == TIME_PASSED:
+            self.time_passed += event.amount
+            self.time_passed_text = render_textrect(self.time_passed, 30, pygame.Rect(0, 0, 100, 30), (255, 255, 255), (54, 54, 54))
 
     def mouse(self, mouse, event):
         mouse.x -= self.x
@@ -71,6 +80,7 @@ class CharStats(Gui):
 
     def draw(self, surface):
         self.image.blit(self.player_image, (5, 0))
+        self.image.blit(self.time_passed_text, (130, 0))
         self.image.blit(self.name, (40, 0))
         self.image.blit(self.exp.image, (self.exp.rect.x, self.exp.rect.y))
         self.image.blit(self.hp.image, (self.hp.rect.x, self.hp.rect.y))

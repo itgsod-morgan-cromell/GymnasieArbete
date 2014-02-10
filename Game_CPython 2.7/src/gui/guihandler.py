@@ -31,9 +31,9 @@ class GuiHandler(object):
 
         if gui == self.char_stat:
             self.char_stat.mouse(mouse_rect, event)
-        if gui == self.minimap:
+        elif gui == self.minimap:
             self.minimap.mouse(mouse_rect, event)
-        if gui == self.explorer:
+        elif gui == self.explorer:
             self.explorer.mouse(mouse_rect, event)
             slot = self.explorer.get_slot(mouse_rect)
             if event.type == pygame.MOUSEBUTTONUP and self.held_item:
@@ -43,6 +43,8 @@ class GuiHandler(object):
                         post_event(PLAYER_DROP_ITEM, target=self.held_item.object)
                     elif self.held_item.type == 'explorer':
                         slot.object = self.held_item.object
+        else:
+            post_event(GUI_EXAMINE_ITEM_CLEAR)
 
         if gui == self.inventory:
             self.inventory.mouse(mouse_rect, event)
@@ -58,6 +60,7 @@ class GuiHandler(object):
             if slot and slot.object:
                 self.held_item = copy.copy(slot)
                 slot.object = None
+                pygame.mouse.set_visible(False)
                 slot.image = pygame.Surface((32, 32))
                 post_event(GUI_EXAMINE_ITEM_CLEAR)
 
@@ -72,6 +75,7 @@ class GuiHandler(object):
                     elif self.held_item.type == 'explorer':
                         self.explorer.slots[self.explorer.slots_rect.index(self.held_item.rect)].object = self.held_item.object
                 self.held_item = None
+            pygame.mouse.set_visible(True)
 
 
     def get_gui(self, mouse):

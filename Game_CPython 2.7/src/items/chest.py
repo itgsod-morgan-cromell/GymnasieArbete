@@ -13,7 +13,7 @@ class Chest(object):
         self.x = pos[0]
         self.y = pos[1]
         self.world = world
-        self.level = self.world.map.floor
+        self.level = self.world.floor
         self.used = False
         closed_img = pygame.image.load('res/items/other/chest_closed.png')
         self.image = closed_img
@@ -36,9 +36,9 @@ class Chest(object):
         item = self.generate_loot()
         item.x = self.x
         item.y = self.y
-        self.world.map.items.append(item)
-        self.world.map.items.remove(self)
-        self.world.map.dungeon.grid[self.y][self.x] = 1
+        self.world.items.append(item)
+        self.world.items.remove(self)
+        self.world.dungeon.grid[self.y][self.x] = 1
 
     def interact(self):
         r_mouse = ('examine', PLAYER_EXAMINE_ITEM)

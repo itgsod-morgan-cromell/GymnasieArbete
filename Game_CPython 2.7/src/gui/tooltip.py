@@ -46,16 +46,19 @@ class Mouse_select(object):
     def interact(self, x, y):
         x += int(self.offset.x/32)
         y += int(self.offset.y/32)
-        if 0 < x > self.world.map.dungeon.grid_size_x - 1 or 0 < y > self.world.map.dungeon.grid_size_y - 1:
+        if 0 < x > self.world.map.grid_size_x - 1 or 0 < y > self.world.map.grid_size_y - 1:
             return
         items = self.world.map.get_item(x, y)
         if items:
             for item in items:
                 self.color = (0, 0, 255)
                 item.interact()
-        elif self.world.map.dungeon.grid[y][x] in [1, 11]:
-            self.color = (0, 255, 0)
-            post_event(PLAYER_FIND_PATH, pos=(x, y), post_to_gui=True)
+        else:
+            tile = self.world.map.map.tiles[y][x]
+            id = tile.id if hasattr(tile, 'id') else tile
+            if id in [1, 11]:
+                self.color = (0, 255, 0)
+                post_event(PLAYER_FIND_PATH, pos=(x, y), post_to_gui=True)
 
 
 

@@ -1,11 +1,12 @@
-from src.level.generator.map_generator import Dungeon
-from src.level.generator.map_loader import Map
+from src.level.dungeon_generator.map_generator import Dungeon
+from src.level.dungeon_generator.map_loader import Map
 import copy
+from src.items.chest import Chest
 import random
 from src.event_helper import *
+from src.entities.enemy import *
 
-
-class Level(object):
+class DungeonLevel(object):
     def __init__(self, floor, up=None, down=None):
         self.monsters = []
         self.items = []
@@ -17,6 +18,10 @@ class Level(object):
         self.dungeon.generate_dungeon()
         self.explored_tiles = copy.deepcopy(self.dungeon.grid)
         self.map = Map()
+        self.width = self.dungeon.width
+        self.height = self.dungeon.height
+        self.grid_size_x = self.dungeon.grid_size_x
+        self.grid_size_y = self.dungeon.grid_size_y
         self.map.load_dungeon(self.dungeon)
         for y in range(0, len(self.dungeon.grid)):
                 for x in range(0, len(self.dungeon.grid[0])):
@@ -118,6 +123,19 @@ class Level(object):
             self.items.append(event.target)
         elif etype == PLAYER_PICKUP_ITEM:
             self.items.remove(event.target)
+
+
+    def spawn_objects(self):
+        for row in range(0, len(self.map.tiles)):
+            for tile in range(0, len(self.map.tiles[row])):
+                if self.map.tiles[row][tile].id == 10:
+                    self.map.tiles[row][tile].id = 1
+                    self.map.tiles[row][tile].load_image()
+                    self.items.append(Chest((tile, row), self))
+                elif self.map.tiles[row][tile].id == 7:
+                    self.map.tiles[row][tile].id = 1
+                    self.map.tiles[row][tile].load_image()
+                    self.monsters.append(Monster('test', 'warrior', (tile, row), self))
 
 
 

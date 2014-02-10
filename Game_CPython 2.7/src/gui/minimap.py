@@ -1,6 +1,6 @@
 import pygame
 from src.gui.gui import Gui
-from src.level.generator.map_loader import Map
+from src.level.dungeon_generator.map_loader import Map
 from src.options import *
 from src.event_helper import *
 
