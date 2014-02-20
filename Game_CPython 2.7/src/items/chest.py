@@ -3,7 +3,8 @@ import pygame
 import random
 from src.items.item import *
 from src.event_helper import *
-
+from src.util.get_sprite import *
+import os
 
 class Chest(object):
     def __init__(self, pos, world):
@@ -53,17 +54,17 @@ class Chest(object):
         if type == 'WEAPON':
             rarities = ['common', 'uncommon', 'rare', 'epic']
             rarity = random.randint(0, len(rarities) - 1)
-            category = random.choice(['swords', 'bows', 'wands'])
+            category = random.choice(['sword', 'bow', 'wand'])
             name = random.choice(open('res/other/random names/{0}.txt'.format(category)).readlines())
             name = name.rstrip('\n')
             stats = {'DMG': random.randint(1, 5) * self.level * (rarity + 1)}
-            if category == 'bows' or category == 'wands':
+            if category == 'bow' or category == 'wand':
                 stats['RANGE'] = 3 * (0.5 * self.level * (rarity + 1))
-                if category == 'wands':
+                if category == 'wand':
                     stats['COST'] = stats['DMG'] * random.randint(2, 5)
-            return Item(name,
-                        'weapon',
-                        random.choice(glob.glob('res/items/weapons/{0}/*'.format(category))),
+            return Item(name, 'weapon',
+                        'RHand',
+                        random.choice(os.listdir('res/items/weapon')),
                         stats,
                         {'rarity': rarities[rarity]})
 

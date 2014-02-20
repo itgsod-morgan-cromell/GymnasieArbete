@@ -1,10 +1,13 @@
 import pygame
+import random
 
-
-def get_item_sprite(sheet, id):
+def get_item_sprite(sheet, id='rand'):
     items = pygame.image.load("res/spritesheets/items/{0}.png".format(sheet))
     spritesheet_width = items.get_width()
     spritesheet_height = items.get_height()
+    if id == 'rand':
+        max = (spritesheet_width * spritesheet_height)/32
+        id = random.randint(max)
     x = id*32 % spritesheet_width
     y = int(id*32/spritesheet_width)
     y *= 32

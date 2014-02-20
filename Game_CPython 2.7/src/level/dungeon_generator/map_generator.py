@@ -119,6 +119,7 @@ class Dungeon:
             10 = chest
             11 = path from up to down staircases (floor tile)
             12 = door vertical
+            15 = Player
 
         -self.rooms stores the Room object from the Room class, which stores
          what tiles are room holds, the size of the room, and the coordinate

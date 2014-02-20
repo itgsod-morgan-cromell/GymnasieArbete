@@ -4,6 +4,8 @@ from src.entities.classdata import ClassData
 from src.entities.entity import Entity
 from src.level.dungeon_generator.astar import *
 from src.event_helper import *
+import random
+import os
 
 
 class Player(Entity):
@@ -11,19 +13,11 @@ class Player(Entity):
         self.lvl = 1
         self.classdata = ClassData(_class)
         Entity.__init__(self, name, pos, world)
-        self.spritesheet = pygame.image.load('res/player/{0}.png'.format(_class))
-        self.images = []
-        for i in range(0, 4):
-            rect = pygame.Rect((i*32, 0), (32, 32))
-            self.images.append(self.spritesheet.subsurface(rect))
-
+        self.image = self.build_player(_class)
         self.dir = 0
-        self.icon = self.spritesheet.subsurface(pygame.Rect((4*32, 0), (32, 32)))
+        self.icon = self.image
         self.move_ticker = 0
         self.inventory = []
-        self.weapon = None
-        self.armor = None
-        self.trinket = None
         self.max_path_delay = 4
         self.astar = Pathfinder()
         self.playable_area = None
@@ -94,7 +88,10 @@ class Player(Entity):
             self.inventory.append(item)
         post_event(TIME_PASSED, amount=1.0)
 
-
+    def build_player(self, base):
+        image = self.get_random_image('res/entities/player/base')
+        image.blit(self.get_random_image('res/entities/player/beard'), (0, 0))
+        return image
 
     def move(self, xa, ya):
         if xa > 0:
@@ -139,8 +136,10 @@ class Player(Entity):
             self.path = None
 
         else:
+            self.world.dungeon.grid[self.y][self.x] = 1
             self.x += xa
             self.y += ya
+            self.world.dungeon.grid[self.y][self.x] = 15
             post_event(TIME_PASSED, amount=1.0)
             self.world.fog_of_war(self.x, self.y, self.radius)
 
@@ -254,4 +253,14 @@ class Player(Entity):
                 self.world.map.tiles[self.path[i][1]][self.path[i][0]] = tile
 
     def draw(self, screen, offset):
-        screen.blit(self.images[self.dir], (self.x*32-offset.x, self.y*32-offset.y))
+        x = self.x*32-offset.x
+        y = self.y*32-offset.y
+        for item in self.inventory:
+            if item.slot is 'armor_back' and item.equipped:
+                screen.blit(item.equipped_image, (x, y))
+        screen.blit(self.image, (x, y))
+        for item in self.inventory:
+            if item.slot == 'armor' and item.slot is not 'armor_back' and item.equipped:
+                screen.blit(item.equipped_image, (x, y))
+            elif item.slot == 'RHand':
+                screen.blit(item.equipped_image, (x, y))

@@ -4,7 +4,7 @@ import xlrd
 
 class ClassData(object):
     def __init__(self, _class):
-        self.data = xlrd.open_workbook('res/player/{0}.xls'.format(_class))
+        self.data = xlrd.open_workbook('res/entities/classes/{0}.xls'.format(_class))
         self.pfs = {}
         self.calculate_pf()
         self.stats = {}

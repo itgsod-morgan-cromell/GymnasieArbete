@@ -42,7 +42,7 @@ class CharStats(Gui):
         self.height = 95
         Gui.__init__(self, 'character', (0, 200), pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32), True)
         self.image.convert_alpha()
-        self.player_image = world.player.images[0].copy()
+        self.player_image = world.player.image.copy()
         self.time_passed = 0.0
         self.player_image = pygame.transform.scale(self.player_image, (self.player_image.get_width()/2,
                                                                        self.player_image.get_height()/2))

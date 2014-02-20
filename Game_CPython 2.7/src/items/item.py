@@ -38,11 +38,12 @@ class PowerUp(object):
 
 
 class Item(object):
-    def __init__(self, name, category, image, stats, extra={}):
+    def __init__(self, name, category, slot, image, stats, extra={}):
         self.name = name
         self.extra = extra
         self.type = 'item'
         self.category = category
+        self.slot = slot
         self.description = 'a {0} used for testing. This is starting to look pretty good.'.format(self.category)
         self.stats = stats
         if 'AMOUNT' in self.stats:
@@ -52,7 +53,8 @@ class Item(object):
 
         self.picked_up = False
         self.equipped = False
-        self.image = pygame.image.load(image)
+        self.image = pygame.image.load('res/items/{0}/{1}'.format(category, image))
+        self.equipped_image = pygame.image.load('res/entities/player/equipment/{0}/{1}'.format(slot, image))
         self.x = 0
         self.y = 0
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
@@ -82,7 +84,7 @@ class Item(object):
         info = pygame.Surface((width, 80))
         info.fill((54, 54, 54))
         info.blit(self.image, (0, 0))
-        info.blit(render_textrect(self.name, 32, info.get_rect(), (255, 255, 255)), (40, 5))
+        info.blit(render_textrect(self.name, 32, info.get_rect(), eval(self.extra['rarity'])), (40, 5))
         info.blit(render_textrect(self.description, 20, info.get_rect(), (255, 255, 255)), (0, 40))
 
         stats = pygame.Surface((width, 50))

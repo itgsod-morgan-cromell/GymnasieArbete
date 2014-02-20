@@ -14,7 +14,6 @@ class DungeonLevel(object):
         self.floor = floor
         self.down = down
         self.dungeon = Dungeon((random.randint(33, 50), random.randint(33, 50)), "None", 100, (5, 5), (32, 32), (32, 32))
-
         self.dungeon.generate_dungeon()
         self.explored_tiles = copy.deepcopy(self.dungeon.grid)
         self.map = Map()

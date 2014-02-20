@@ -11,6 +11,7 @@ class World(object):
         self.map.setup()
         self.map.spawn_objects()
         self.player = Player(self.map.spawn, self.map, player['class'], 'Test')
+        self.map.player = self.player
         self.output = None
         register_handler([WORLD_MOVE_DOWN, WORLD_MOVE_UP, PLAYER_DROP_ITEM], self.handle_event)
         register_handler([PLAYER_PICKUP_ITEM], self.map.handle_event)
@@ -18,21 +19,26 @@ class World(object):
     def handle_event(self, event):
         etype = get_event_type(event)
         if etype == WORLD_MOVE_DOWN:
+            self.map.player = None
             if self.map.down:
                 self.map = self.map.down
+
             else:
                 self.map.down = DungeonLevel(self.map.floor + 1, self.map)
                 self.map = self.map.down
                 self.spawn_objects()
-                self.player.x, self.player.y = self.map.down_stair
+            self.map.player = self.player
+            self.player.x, self.player.y = self.map.down_stair
         elif etype == WORLD_MOVE_UP:
+            self.map.player = None
             if self.map.up:
                 self.map = self.map.up
             else:
                 self.map.up = DungeonLevel(self.map.floor - 1, None, self.map)
                 self.map = self.map.up
                 self.spawn_objects()
-                self.player.x, self.player.y = self.map.up_stair
+            self.map.player = self.player
+            self.player.x, self.player.y = self.map.up_stair
         elif etype == PLAYER_DROP_ITEM:
             event.target.x = self.player.x
             event.target.y = self.player.y
@@ -51,7 +57,7 @@ class World(object):
             explored = self.map.explored_tiles[item.y][item.x]
             item.draw(screen, offset, explored)
         for monster in self.map.monsters:
-            if self.map.explored_tiles[monster.y][monster.x] >= 0:
+            if self.map.explored_tiles[monster.y][monster.x] > 0:
                 monster.draw(screen, offset)
         self.player.draw(screen, offset)
 

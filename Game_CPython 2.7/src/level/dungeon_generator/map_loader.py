@@ -67,7 +67,7 @@ class Tile:
         self.feet = None
         if self.id == 0:
             self.image.fill((0, 0, 0))
-        elif self.id == 1 or self.id == 11:
+        elif self.id == 1 or self.id == 11 or self.id == 15:
             self.load_tile_image('floor', 'cobble_blood', (1, 12))
         elif self.id == 2 or self.id == 3 or self.id == 4 or self.id == 5 or self.id == 6:
             self.load_tile_image('wall', 'brick_dark', (0, 3))
