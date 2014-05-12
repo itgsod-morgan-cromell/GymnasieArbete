@@ -96,6 +96,13 @@ class Player(Entity):
     def handle_items(self, event):
         etype = get_event_type(event)
         item = event.target
+
+        if etype == PLAYER_EXAMINE_ITEM:
+            print item
+            if hasattr(item, 'description'):
+                post_event(POST_TO_CONSOLE, msg=item.description)
+            return
+
         if item in self.inventory:
             can_interact = True
         else:

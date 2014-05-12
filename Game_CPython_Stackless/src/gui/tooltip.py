@@ -98,14 +98,13 @@ class Tooltip(Gui):
                         'standard': pygame.image.load('../res/other/cursors/default.gif'),
                         'open': pygame.image.load('../res/other/cursors/examine.png')}
         self.options = {}
-        self.target = None
         self.show_window = False
         self.tooltip_delay = 0
         self.item_tooltip = None
         self.mouse = Mouse_select(world)
         Gui.__init__(self, 'character', (0, 0), image, True)
         register_handler(
-            [GUI_TOOLTIP_CLEAR, GUI_TOOLTIP_POST, GUI_EXAMINE_ITEM, GUI_EXAMINE_ITEM_CLEAR, pygame.MOUSEBUTTONDOWN],
+            [GUI_TOOLTIP_CLEAR, TIME_PASSED, GUI_TOOLTIP_POST, GUI_EXAMINE_ITEM, GUI_EXAMINE_ITEM_CLEAR, pygame.MOUSEBUTTONDOWN],
             self.handle_event)
 
 
@@ -113,9 +112,14 @@ class Tooltip(Gui):
         self.show_window = False
         i = 0
         self.image.fill(0)
+        string_len = 0
         for key, event in self.options.items():
             string = "[{0}] : {1}".format(key, event[0])
-            rect = pygame.Rect((0, 20 * i), (len(string) * 10, 20))
+            if len(string) > string_len:
+                string_len = len(string)
+        for key, event in self.options.items():
+            string = "[{0}] : {1}".format(key, event[0])
+            rect = pygame.Rect((0, 20 * i), (string_len * 10, 20))
             i += 1
             self.image.blit(render_textrect(string, 20, rect, (255, 255, 255), (24, 72, 240)), (rect.x, rect.y))
 
@@ -139,39 +143,33 @@ class Tooltip(Gui):
 
     def handle_event(self, event):
         etype = get_event_type(event)
-        if etype == pygame.MOUSEBUTTONDOWN and self.target:
+        if etype == pygame.MOUSEBUTTONDOWN and self.options:
 
             if pygame.mouse.get_pressed()[0]:  # Left click.
                 if 'L-MOUSE' in self.options:
-                    post_event(self.options['L-MOUSE'][1], target=self.target)
-                    self.target = None
+                    post_event(self.options['L-MOUSE'][1], target=self.options['L-MOUSE'][2])
             elif pygame.mouse.get_pressed()[1]:  # Middle click.
                 if 'MM-MOUSE' in self.options:
-                    post_event(self.options['MM-MOUSE'][1], target=self.target)
-                    self.target = None
+                    post_event(self.options['MM-MOUSE'][1], target=self.options['MM-MOUSE'][2])
             elif pygame.mouse.get_pressed()[2]:  # Right click.
                 if 'R-MOUSE' in self.options:
-                    post_event(self.options['R-MOUSE'][1], target=self.target)
-                    self.target = None
-            self.options = {}
+                    post_event(self.options['R-MOUSE'][1], target=self.options['R-MOUSE'][2])
 
         elif etype == GUI_TOOLTIP_POST:
-            self.target = event.target
             #self.options = {}
             if hasattr(event, 'l_mouse'):
                 if event.l_mouse:
-                    self.options['L-MOUSE'] = event.l_mouse
+                    self.options['L-MOUSE'] = event.l_mouse + (event.target,)
             if hasattr(event, 'mm_mouse'):
                 if event.mm_mouse:
-                    self.options['MM-MOUSE'] = event.mm_mouse
+                    self.options['MM-MOUSE'] = event.mm_mouse + (event.target,)
             if hasattr(event, 'r_mouse'):
                 if event.r_mouse:
-                    self.options['R-MOUSE'] = event.r_mouse
+                    self.options['R-MOUSE'] = event.r_mouse + (event.target,)
 
 
             self.update_data()
-        elif etype == GUI_TOOLTIP_CLEAR:
-            self.target = None
+        elif etype == GUI_TOOLTIP_CLEAR or etype == TIME_PASSED:
             self.options = {}
 
 
@@ -185,7 +183,7 @@ class Tooltip(Gui):
     def draw(self, screen):
         self.mouse.draw(screen)
         if self.show_window:
-            screen.blit(self.image, (self.x - 16, self.y + 8))
+            screen.blit(self.image, (self.x + 20, self.y + 20))
         if self.item_tooltip:
             screen.blit(self.item_tooltip,
                         (self.x - self.item_tooltip.get_width(), self.y - self.item_tooltip.get_height()))

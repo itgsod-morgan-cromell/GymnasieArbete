@@ -31,7 +31,8 @@ class Menu(Gui):
             if etype == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mouse_rect = pygame.Rect(event.pos, (2, 2))
                 button = mouse_rect.collidelist(self.buttons)
-                self.buttons[button].onclick()
+                if button != -1:
+                    self.buttons[button].onclick()
 
             elif etype == MENU_NEW_GAME:
                 self.main = False

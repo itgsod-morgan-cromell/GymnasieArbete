@@ -47,6 +47,7 @@ class EventManager(object):
         self.events = pygame.event.get()
         for event in self.events:
             if event.type == pygame.USEREVENT:
+                print self.namestr(event.event_type, globals())
                 if event.event_type in self.event_handlers:
                     for event_handler in self.event_handlers[event.event_type]:
                         event_handler(event)
@@ -57,3 +58,6 @@ class EventManager(object):
                     for event_handler in self.event_handlers[event.type]:
                         event_handler(event)
 
+
+    def namestr(self, obj, namespace):
+        return [name for name in namespace if namespace[name] is obj]
