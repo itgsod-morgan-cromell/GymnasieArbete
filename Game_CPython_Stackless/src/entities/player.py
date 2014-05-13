@@ -11,7 +11,7 @@ class Player(Entity):
     def __init__(self, pos, world, _class, name):
         self.lvl = 1
         self.classdata = ClassData(_class)
-        Entity.__init__(self, name, pos, world)
+        Entity.__init__(self, name, pos, world, 'player')
         self.image = self.build_player(_class)
         self.dir = 0
         self.icon = self.image
@@ -40,6 +40,7 @@ class Player(Entity):
                           PLAYER_DROP_ITEM, PLAYER_EQUIP_ITEM, PLAYER_UNEQUIP_ITEM], self.handle_items)
 
     def update(self, offset):
+        self.stats['DMG'] = 100
         self.playable_area = offset
         if self.path:
             if self.follow_path:
@@ -154,13 +155,12 @@ class Player(Entity):
                         post_event(GUI_EXPLORER_ITEMS, items=items)
         for monster in self.world.monsters:
             if monster.x == self.x + xa and monster.y == self.y + ya:
+                post_event(ENTITY_ATTACK, attacker=self, target=monster)
                 xa = 0
                 ya = 0
         else:
             post_event(GUI_EXPLORER_CLEAR)
         id = tile.id if hasattr(tile, 'id') else tile
-        if id == 7:
-            pass
         if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7:
             xa = 0
             ya = 0

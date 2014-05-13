@@ -18,20 +18,38 @@ class ClassData(object):
                 self.pfs[str(sheet.row_values(row)[0])] = int(sheet.row_values(row)[1])
 
     def calculate_stats(self, player=None):
+        self.stats['LUCK'] = 0
+        self.stats['DMG'] = 0
+        self.stats['HIT_CHANCE'] = 0
+        self.stats['CRIT_CHANCE'] = 0
+        self.stats['CRIT_MULTIPLIER'] = 0
+        self.stats['HP'] = 0
+        self.stats['MP'] = 0
+        self.stats['SR'] = 0
+        self.stats['DEF'] = 0
+        self.stats['EVA'] = 0
         if player:
             lvl = player.lvl
-            shield_eva = player.armor
+            for item in player.inventory:
+                if item.equipped:
+                    self.stats = dict(self.stats.items()+item.equipped.stats.items())
+
         else:
             lvl = 1
-            shield_eva = 0
+            armor = 0
         for key, pf in self.pfs.items():
             self.stats[key] = (pf * lvl) + (2 * (lvl % 3)) + (10 + lvl)
 
-        self.stats['Luck'] = math.log(2 ** lvl) + 10
-        self.stats['HP'] = self.stats['MP'] = (self.stats['CON'] / 2) + (self.pfs['CON'] * lvl) + (self.pfs['CON'] * 4)
-        self.stats['SR'] = (self.stats['WIS'] / 2) + (3 * lvl) + 12
-        self.stats['Fort'] = ((self.stats['STR'] + self.stats['CON']) / 4) + lvl * 2 + 10
-        self.stats['Eva'] = (self.stats['DEX'] / 2) + (lvl * 6) + 10 + shield_eva
+        self.stats['LUCK'] += math.log(2 ** lvl) + 10
+        self.stats['HIT_CHANCE'] += math.log(self.stats['DEX']**3)*10
+        self.stats['CRIT_CHANCE'] += math.log(self.stats['DEX']**3)*2
+        self.stats['CRIT_MULTIPLIER'] += math.log(self.stats['DEX']*lvl)/10 + 1
+        self.stats['HP'] += (self.stats['CON'] / 2) + (self.pfs['CON'] * lvl) + (self.pfs['CON'] * 4)
+        self.stats['MP'] += (self.stats['CON'] / 2) + (self.pfs['CON'] * lvl) + (self.pfs['CON'] * 4)
+        self.stats['SR'] += (self.stats['WIS'] / 2) + (3 * lvl) + 12
+        self.stats['DEF'] += ((self.stats['STR'] + self.stats['CON']) / 4) + lvl * 2 + 10
+        self.stats['EVA'] += (self.stats['DEX'] / 2) + (lvl * 6)
+        self.stats['DMG'] += self.stats['STR']
         if lvl == 1:
             self.stats['EXP'] = 30
         else:

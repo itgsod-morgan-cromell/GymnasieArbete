@@ -61,8 +61,14 @@ class CharStats(Gui):
                        (5, 20))
         self.hp = Bar(self.world.player.hp, self.world.player.stats['HP'], 'HP', (224, 52, 52), (5, 45))
         self.mp = Bar(self.world.player.mp, self.world.player.stats['MP'], 'MP', (96, 132, 224), (5, 70))
-        
 
+    def update(self):
+        if self.exp.current != self.world.player.exp:
+            self.exp.refresh(self.world.player.exp)
+        if self.hp.current != self.world.player.hp:
+            self.hp.refresh(self.world.player.hp)
+        if self.mp.current != self.world.player.mp:
+            self.mp.refresh(self.world.player.mp)
 
     def handle_event(self, event):
         etype = get_event_type(event)
@@ -70,12 +76,6 @@ class CharStats(Gui):
             self.time_passed += event.amount
             self.time_passed_text = render_textrect(self.time_passed, 20, pygame.Rect(0, 0, 100, 100), (255, 255, 255),
                                                     (54, 54, 54))
-            if self.exp.current != self.world.player.exp:
-                self.exp.refresh(self.world.player.exp)
-            if self.hp.current != self.world.player.hp:
-                self.hp.refresh(self.world.player.hp)
-            if self.mp.current != self.world.player.mp:
-                self.mp.refresh(self.world.player.mp)
 
     def mouse(self, mouse, event):
         mouse.x -= self.x

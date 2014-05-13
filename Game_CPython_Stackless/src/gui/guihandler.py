@@ -20,8 +20,9 @@ class GuiHandler(object):
         register_handler([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION], self.handle_event)
         self.held_item = None
 
-    def update(self, world):
-        pass
+    def update(self):
+        self.char_stat.update()
+
 
     def handle_event(self, event):
         mouse_rect = pygame.Rect(event.pos, (2, 2)).copy()

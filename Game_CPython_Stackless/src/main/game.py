@@ -12,6 +12,7 @@ from src.util.get_sprite import *
 from src.event_manager import EventManager
 from src.options import *
 from src.event_helper import *
+from src.combat.combat_handler import *
 
 
 
@@ -38,6 +39,7 @@ class Game(object):
         pygame.display.flip()
         self.world = World(player)
         self.world.update(self.camera)
+        self.combat_handler = CombatHandler()
         self.ui = GuiHandler(self.world)
         self.console = Console()
         self.tooltip = Tooltip(self.world)
@@ -88,7 +90,7 @@ class Game(object):
         if self.camera.y + self.camera.h > self.world.map.height:
             self.camera.y = self.world.map.height - self.camera.h
 
-        self.ui.update(self.world)
+        self.ui.update()
         self.tooltip.update(self.world, self.camera)
 
     def draw(self):

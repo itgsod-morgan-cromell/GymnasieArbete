@@ -11,8 +11,10 @@ class Monster(Entity):
     def __init__(self, name, _class, pos, world):
         self.lvl = 1
         self.classdata = ClassData(_class)
-        Entity.__init__(self, name, pos, world, 'Enemy')
-        self.image = self.get_random_image('../res/entities/monster')
+        name = random.choice(os.listdir('../res/entities/monster'))
+        print name
+        Entity.__init__(self, name.replace(".png", ""), pos, world, 'monster')
+        self.image = pygame.image.load('../res/entities/monster/{0}'.format(name))
         self.dir = 0
         self.icon = self.image
         self.move_ticker = 0
@@ -36,7 +38,6 @@ class Monster(Entity):
         register_handler(TIME_PASSED, self.time_passed)
 
     def update(self):
-
         self.calculate_stats()
 
     def time_passed(self, event):
@@ -197,13 +198,7 @@ class Monster(Entity):
             self.follow_path = False
 
     def attack(self, target):
-        #TODO fix damage with weapon
-        if self.weapon:
-            damage = 10
-        else:
-            damage = self.stats['STR']
-        post_event(ENTITY_ATTACK, attacker=self, target=target, damage=damage)
-        target.hp -= damage
+        post_event(ENTITY_ATTACK, attacker=self, target=target)
 
     def draw(self, screen, offset):
         screen.blit(self.image, (self.x * 32 - offset.x, self.y * 32 - offset.y))
