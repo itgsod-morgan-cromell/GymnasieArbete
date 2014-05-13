@@ -1,6 +1,7 @@
 import pygame
 
-REGISTER_EVENT_HANDLER = 25
+REGISTER_EVENT_HANDLER = 25 #Not ocuppied by pygame events
+UNREGISTER_EVENT_HANDLER = 26
 
 SIDEBARMOTION = 8
 CLEAR_CONSOLE = 9
@@ -52,3 +53,6 @@ def post_event(event_type, **kwargs):
 
 def register_handler(types, handler):
     pygame.event.post(pygame.event.Event(REGISTER_EVENT_HANDLER, event_types=types, handler=handler))
+
+def unregister_handler(types, handler):
+    pygame.event.post(pygame.event.Event(UNREGISTER_EVENT_HANDLER, event_types=types, handler=handler))

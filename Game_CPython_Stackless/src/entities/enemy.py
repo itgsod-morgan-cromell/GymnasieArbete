@@ -13,8 +13,8 @@ class Monster(Entity):
         self.lvl = 1
         self.classdata = ClassData(_class)
         name = random.choice(os.listdir('../res/entities/monster'))
-        print name
-        Entity.__init__(self, name.replace(".png", ""), pos, world, 'monster')
+        name_string = name.replace("_", ' ')
+        Entity.__init__(self, name_string.replace(".png", ""), pos, world, 'monster')
         self.image = pygame.image.load('../res/entities/monster/{0}'.format(name))
         self.dir = 0
         self.icon = self.image
@@ -48,7 +48,6 @@ class Monster(Entity):
                 self.find_path(self.target)
             if self.path:
                 if self.path[-1][0] != self.target[0] or self.path[-1][1] != self.target[1]:
-                    print "NOT THE SAME"
                     self.find_path(self.target)
                 if self.path:
                     self.travel()
@@ -78,7 +77,8 @@ class Monster(Entity):
             return False
 
     def die(self):
-        pass
+        self.world.monsters.remove(self)
+        unregister_handler(TIME_PASSED, self.time_passed)
 
     def move(self, xa, ya):
         if xa > 0:

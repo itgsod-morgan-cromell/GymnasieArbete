@@ -20,7 +20,6 @@ class EventManager(object):
         item_handler = ItemEventHandler()
 
     def unregister_handler(self, event):
-        print('unregistering event...')
         event_types = event.event_types
         event_handler = event.handler
         if type(event_types) != list:
@@ -30,8 +29,7 @@ class EventManager(object):
             if event_type in self.event_handlers:
                 self.event_handlers[event_type].remove(event_handler)
             else:
-                self.event_handlers[event_type] = [event_handler]
-
+                self.event_handlers[event_type] = None
 
     def register_handler(self, event):
         """
@@ -39,10 +37,8 @@ class EventManager(object):
         Im not using the pygame built in event.type system for my own types because i don't want to collide
         with the built in events.
         """
-        print("registering event....")
         event_types = event.event_types
         event_handler = event.handler
-        print(event_types)
         if type(event_types) != list:
             event_types = [event_types]
 
@@ -61,12 +57,14 @@ class EventManager(object):
         self.events = pygame.event.get()
         for event in self.events:
             if event.type == pygame.USEREVENT:
-                print self.namestr(event.event_type, globals())
+               # print self.namestr(event.event_type, globals())
                 if event.event_type in self.event_handlers:
                     for event_handler in self.event_handlers[event.event_type]:
                         event_handler(event)
             elif event.type == REGISTER_EVENT_HANDLER:
                 self.register_handler(event)
+            elif event.type == UNREGISTER_EVENT_HANDLER:
+                self.unregister_handler(event)
             else:
                 if event.type in self.event_handlers:
                     for event_handler in self.event_handlers[event.type]:
