@@ -20,16 +20,21 @@ class EventManager(object):
         item_handler = ItemEventHandler()
 
     def unregister_handler(self, event):
-        event_types = event.event_types
         event_handler = event.handler
+        if event.event_types:
+            event_types = event.event_types
+        else:
+            for event_types in self.event_handlers:
+                if event_handler in self.event_handlers[event_types]:
+                    self.event_handlers[event_types].remove(event_handler)
+            return
+
         if type(event_types) != list:
             event_types = [event_types]
 
         for event_type in event_types:
             if event_type in self.event_handlers:
                 self.event_handlers[event_type].remove(event_handler)
-            else:
-                self.event_handlers[event_type] = None
 
     def register_handler(self, event):
         """

@@ -78,7 +78,7 @@ class Monster(Entity):
 
     def die(self):
         self.world.monsters.remove(self)
-        unregister_handler(TIME_PASSED, self.time_passed)
+        unregister_handler(self.time_passed)
 
     def move(self, xa, ya):
         if xa > 0:
