@@ -5,6 +5,7 @@ from src.level.dungeon_generator.astar import *
 from src.event_helper import *
 import random
 import os
+from src.level.dungeon_generator.fov import *
 
 
 class Monster(Entity):
@@ -41,87 +42,43 @@ class Monster(Entity):
         self.calculate_stats()
 
     def time_passed(self, event):
-        amount = event.amount
-        xa = 0
-        ya = 0
         self.scan_fov()
         if self.target:
             if not self.path:
                 self.find_path(self.target)
             if self.path:
-                self.travel()
+                if self.path[-1][0] != self.target[0] or self.path[-1][1] != self.target[1]:
+                    print "NOT THE SAME"
+                    self.find_path(self.target)
+                if self.path:
+                    self.travel()
 
 
 
     def scan_fov(self):
-        x0 = self.x
-        y0 = self.y
+        self.target = None
+        x = self.x
+        y = self.y
         radius = self.radius
-        end_points = []
-        lines = []
-        f = 1 - radius
-        ddf_x = 1
-        ddf_y = -2 * radius
-        x = 0
-        y = radius
+        fov = FOVCalc()
+        fov.NOT_VISIBLE_BLOCKS_VISION = True
+        fov.RESTRICTIVENESS = 0
+        fov.VISIBLE_ON_EQUAL = False
+        fov.calc_visible_cells_from(x, y, radius, self.is_unobstructed)
 
-        end_points.append((x0, y0 + radius))
-        end_points.append((x0, y0 - radius))
-        end_points.append((x0 + radius, y0))
-        end_points.append((x0 - radius, y0))
-        end_points.append((x0 - 7, y0 + 3))
-        end_points.append((x0 + 7, y0 + 3))
-        end_points.append((x0 - 7, y0 - 3))
-        end_points.append((x0 + 7, y0 - 3))
-        end_points.append((x0 - 3, y0 - 7))
-        end_points.append((x0 + 3, y0 - 7))
-        end_points.append((x0 - 7, y0 - 6))
-        end_points.append((x0 - 7, y0 + 6))
-        end_points.append((x0 + 7, y0 - 6))
-        end_points.append((x0 + 7, y0 + 6))
+    def is_unobstructed(self, x, y):
+        if x == self.world.player.x and y == self.world.player.y:
+            self.target = (self.world.player.x, self.world.player.y)
+        try:
+            if self.world.map.tiles[y][x].id in [0, 2, 3, 4, 5, 6]:
+                return False
+            else:
+                return True
+        except IndexError:
+            return False
 
-        end_points.append((x0 - 6, y0 - 7))
-        end_points.append((x0 + 6, y0 - 7))
-        end_points.append((x0 - 6, y0 + 7))
-        end_points.append((x0 + 6, y0 + 7))
-
-        while x < y:
-            if f >= 0:
-                y -= 1
-                ddf_y += 1
-                f += ddf_y
-            x += 1
-            ddf_x += 1
-            f += ddf_x
-            end_points.append((x0 + x, y0 + y))
-            end_points.append((x0 - x, y0 + y))
-            end_points.append((x0 + x, y0 - y))
-            end_points.append((x0 - x, y0 - y))
-            end_points.append((x0 + y, y0 + x))
-            end_points.append((x0 - y, y0 + x))
-            end_points.append((x0 + y, y0 - x))
-            end_points.append((x0 - y, y0 - x))
-
-        for i in range(len(end_points)):
-            if end_points[i][0] < 0:
-                end_points[i] = (0, end_points[i][1])
-            elif end_points[i][0] > len(self.world.dungeon.grid[0]) - 1:
-                end_points[i] = (len(self.world.dungeon.grid[0]) - 1, end_points[i][1])
-            if end_points[i][1] < 0:
-                end_points[i] = (end_points[i][0], 0)
-            elif end_points[i][1] > len(self.world.dungeon.grid) - 1:
-                end_points[i] = (end_points[i][0], len(self.world.dungeon.grid) - 1)
-
-            line = self.world.get_line(x0, y0, end_points[i][0], end_points[i][1])
-            lines.append(line)
-
-        for line in lines:
-            for pos in line:
-                x = pos[0]
-                y = pos[1]
-                if self.world.dungeon.grid[y][x] in [15]:
-                    self.target = (self.world.player.x, self.world.player.y)
-                    break
+    def die(self):
+        pass
 
     def move(self, xa, ya):
         if xa > 0:

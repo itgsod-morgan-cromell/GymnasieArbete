@@ -59,7 +59,7 @@ class Item(object):
         self.x = 0
         self.y = 0
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
-        self.shadow.fill((0, 0, 0, 200))
+        self.shadow.fill((0, 0, 0, 150))
         self.stats_font = pygame.font.Font('../res/other/visitor2.ttf', 20)
 
     def use(self):

@@ -19,6 +19,20 @@ class EventManager(object):
         self.events = pygame.event.get()
         item_handler = ItemEventHandler()
 
+    def unregister_handler(self, event):
+        print('unregistering event...')
+        event_types = event.event_types
+        event_handler = event.handler
+        if type(event_types) != list:
+            event_types = [event_types]
+
+        for event_type in event_types:
+            if event_type in self.event_handlers:
+                self.event_handlers[event_type].remove(event_handler)
+            else:
+                self.event_handlers[event_type] = [event_handler]
+
+
     def register_handler(self, event):
         """
         This method registers the handler and puts it in a dictionary for easy access without iterating through it.

@@ -20,7 +20,7 @@ class Chest(object):
         closed_img = pygame.image.load('../res/items/other/chest_closed.png')
         self.image = closed_img
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
-        self.shadow.fill((0, 0, 0, 200))
+        self.shadow.fill((0, 0, 0, 150))
 
     def use(self):
         if self.used:

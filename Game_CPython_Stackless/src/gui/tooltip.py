@@ -51,13 +51,22 @@ class Mouse_select(object):
         if 0 < x > self.world.map.grid_size_x - 1 or 0 < y > self.world.map.grid_size_y - 1:
             return
         items = self.world.map.get_item(x, y)
-        if items:
+        m = None
+        for monster in self.world.map.monsters:
+            if monster.x == x and monster.y == y:
+                m = monster
+        if m:
+            self.color = (255, 255, 0)
+            post_event(PLAYER_ITEM_PROXIMITY, true=GUI_TOOLTIP_POST, target=m, range=1, args={'l_mouse': ('attack', PLAYER_ATTACK_ENTITY), 'target': m})
+            post_event(GUI_TOOLTIP_POST, r_mouse=('examine', PLAYER_EXAMINE_ENTITY), target=m)
+        elif items:
             for item in items:
                 if self.world.map.map.tiles[y][x].explored == 0:
                     self.color = (255, 0, 0)
                 else:
                     self.color = (0, 0, 255)
                     item.interact()
+
         else:
             tile = self.world.map.map.tiles[y][x]
             id = tile.id if hasattr(tile, 'id') else tile

@@ -64,7 +64,7 @@ class MiniMap(Gui):
         y = self.world.player.y * self.tile_size
         self.camera.center = (x, y)
         self.map.load_dungeon(self.world.map.dungeon, None, True, self.tile_size)
-        self.map.draw(self.image, self.camera)
+        self.map.draw(self.image, self.camera, self.world.map.map.tiles)
         self.image.fill((0, 255, 0), pygame.Rect((x - self.camera.x, y - self.camera.y),
                                                  (self.tile_size, self.tile_size)))
         self.zoom_in_arrow.create()

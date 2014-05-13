@@ -52,8 +52,8 @@ class World(object):
         for monster in self.map.monsters:
             monster.update()
             if monster.hp <= 0:
+                monster.die()
                 self.map.monsters.remove(monster)
-                monster = None
 
     def draw(self, screen, offset):
         self.map.map.draw(screen, offset)

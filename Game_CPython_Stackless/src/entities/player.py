@@ -35,7 +35,8 @@ class Player(Entity):
         self.travel_dest_event = None
         self.follow_path = False
         self.move(0, 0)
-        register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_ITEM_PROXIMITY, PLAYER_TRAVEL_PATH, TIME_PASSED], self.handle_event)
+        register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_ITEM_PROXIMITY, PLAYER_TRAVEL_PATH,
+                          PLAYER_ATTACK_ENTITY, TIME_PASSED], self.handle_event)
         register_handler([PLAYER_EXAMINE_ITEM, PLAYER_USE_ITEM, PLAYER_PICKUP_ITEM,
                           PLAYER_DROP_ITEM, PLAYER_EQUIP_ITEM, PLAYER_UNEQUIP_ITEM], self.handle_items)
 
@@ -46,6 +47,9 @@ class Player(Entity):
             if self.follow_path:
                 self.follow_path = True
                 self.travel()
+                for monster in self.world.monsters:
+                    if monster.target:
+                        self.path = None
                 return
         self.follow_path = False
         self.path_delay = 0
@@ -71,7 +75,9 @@ class Player(Entity):
                 post_event(GUI_TOOLTIP_COLOR, target=self, color=(0, 255, 0))
             elif event.post_to_gui:
                 post_event(GUI_TOOLTIP_COLOR, target=self, color=(255, 0, 0))
-
+        elif etype == PLAYER_ATTACK_ENTITY:
+            post_event(ENTITY_ATTACK, attacker=self, target=event.target)
+            post_event(TIME_PASSED, amount=1.0)
         elif etype == PLAYER_ITEM_PROXIMITY and not self.follow_path:
             self.find_path((event.target.x, event.target.y))
             if self.x == event.target.x and self.y == event.target.y or self.path and len(self.path) <= event.range:

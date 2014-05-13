@@ -26,7 +26,7 @@ class Game(object):
         get_item_sprite('test', 0)
         self.event_manager = EventManager()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.HWACCEL)
-        self.world_screen = pygame.Surface((WIDTH - MENU_WIDTH, HEIGHT - CONSOLE_HEIGHT))
+        self.world_screen = pygame.Surface((WIDTH - MENU_WIDTH, HEIGHT))
         self.clock = GameClock(40)
         self.camera = self.world_screen.get_rect().copy()
         self.events = None

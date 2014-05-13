@@ -116,7 +116,7 @@ class Map:
         self.dungeon = None
         self.tiles = []
         self.shadow_tile = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
-        self.shadow_tile.fill((0, 0, 0, 200))
+        self.shadow_tile.fill((0, 0, 0, 150))
 
     def load_dungeon(self, dungeon, tileset='test_tileset', minimap=False, tile_size=None):
 
@@ -151,16 +151,16 @@ class Map:
                 if tile_reference:
                     tile.explored = tile_reference[tile.y/tile.h][tile.x/tile.w].explored
                 if not self.minimap:
-                    if -1 < x < offset.w and -1 < y < offset.h:
+                    if -32 < x < offset.w and -32 < y < offset.h:
                         if tile.explored:
                             surface.blit(tile_img, (x, y))
                             if tile.explored == 1:  # Gray tile
                                 surface.blit(self.shadow_tile, (x, y))
                         else:  # Black tile
-                            pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, 32, 32))
+                            pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, tile.w, tile.h))
                 #Minimap draw
                 else:
                     if tile.explored:
                         surface.blit(tile_img, (x, y))
                     else:
-                        surface.blit(tile_img, (x, y))
+                        pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(x, y, tile.w, tile.h))
