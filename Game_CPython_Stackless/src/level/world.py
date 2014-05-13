@@ -56,7 +56,7 @@ class World(object):
             explored = self.map.map.tiles[item.y][item.x].explored
             item.draw(screen, offset, explored)
         for monster in self.map.monsters:
-            if self.map.explored_tiles[monster.y][monster.x] > 0:
+            if self.map.map.tiles[monster.y][monster.x].explored > 0:
                 monster.draw(screen, offset)
         self.player.draw(screen, offset)
 
