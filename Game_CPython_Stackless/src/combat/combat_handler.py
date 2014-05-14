@@ -26,7 +26,7 @@ class CombatHandler(object):
                     post_event(POST_TO_CONSOLE, msg='{0} take {1} damage'.format(target_name, damage))
                     event.target.hp -= damage
                 else:
-                    post_event(POST_TO_CONSOLE, msg='{0} blocks all the damage'.format(target_name))
+                    post_event(POST_TO_CONSOLE, msg='{0} block all the damage'.format(target_name))
             else:
                 post_event(POST_TO_CONSOLE, msg='{0} swing at {1} but misses...'.format(attacker_name, target_name))
 

@@ -17,7 +17,10 @@ class Slot(object):
         self.rect = pygame.Rect(x, y, 32, 32)
 
     def draw(self, surface):
+        surface.fill((0, 0, 0), self.rect)
         if self.object:
+            if self.object.equipped:
+                surface.fill((0, 255, 0), self.rect)
             self.image = self.object.image
         surface.blit(self.image, (self.x, self.y))
 
@@ -61,8 +64,10 @@ class InventoryGui(Gui):
             slot = self.get_slot(mouse)
             if slot and slot.object:
                 post_event(GUI_EXAMINE_ITEM, tooltip=slot.object.examine())
+                slot.object.interact('left')
             else:
                 post_event(GUI_EXAMINE_ITEM_CLEAR)
+                post_event(GUI_TOOLTIP_CLEAR)
 
 
     def draw(self, surface):

@@ -1,7 +1,7 @@
 import pygame
 
-WIDTH = int(800 / 64) * 64
-HEIGHT = int(600 / 64) * 64
+WIDTH = int(1240 / 64) * 64
+HEIGHT = int(700 / 64) * 64
 MENU_WIDTH = int(200 / 64) * 64
 CONSOLE_HEIGHT = HEIGHT/4
 SCALE = 1

@@ -25,11 +25,7 @@ class PowerUp(object):
 
     def pickup(self, world):
         world.map.items.remove(self)
-        if type(world.player.stats[self.name]) == list:
-            world.player.stats[self.name][0] += self.amount
-        else:
 
-            world.player.stats[self.name] += self.amount
 
     def draw(self, screen, offset):
         screen.blit(self.image, (self.x * 32 - offset.x, self.y * 32 - offset.y))
@@ -45,7 +41,7 @@ class Item(object):
         self.type = 'item'
         self.category = category
         self.slot = slot
-        self.description = 'a {0} used for testing. This is starting to look pretty good.'.format(self.category)
+        self.description = 'a {0}'.format(self.category)
         self.stats = stats
         if 'AMOUNT' in self.stats:
             self.stackable = True
@@ -65,20 +61,19 @@ class Item(object):
     def use(self):
         pass
 
-    def interact(self):
-        r_mouse = ('examine', PLAYER_EXAMINE_ITEM)
+    def interact(self, orientation=None):
+
         if self.picked_up:
-            l_mouse = ('drop', PLAYER_DROP_ITEM)
             if self.equipped:
-                mm_mouse = ('unquip', PLAYER_UNEQUIP_ITEM)
+                r_mouse = ('unequip', PLAYER_UNEQUIP_ITEM)
             else:
-                mm_mouse = ('equip', PLAYER_EQUIP_ITEM)
+                r_mouse = ('equip', PLAYER_EQUIP_ITEM)
         else:
+            r_mouse = ('examine', PLAYER_EXAMINE_ITEM)
             l_mouse = ('pick up', PLAYER_PICKUP_ITEM)
-            mm_mouse = None
             post_event(PLAYER_ITEM_PROXIMITY, target=self, range=0, true=GUI_TOOLTIP_POST, args={'l_mouse': l_mouse, 'target': self})
 
-        post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, mm_mouse=mm_mouse, target=self)
+        post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self, orientation=orientation)
 
 
     def examine(self):
@@ -86,8 +81,8 @@ class Item(object):
         info = pygame.Surface((width, 80))
         info.fill((54, 54, 54))
         info.blit(self.image, (0, 0))
-        info.blit(render_textrect(self.name, 32, info.get_rect(), eval(self.extra['rarity'])), (40, 5))
-        info.blit(render_textrect(self.description, 20, info.get_rect(), (255, 255, 255)), (0, 40))
+        info.blit(render_textrect(self.name, 32, pygame.Rect(0, 0, width, 40), eval(self.extra['rarity'])), (40, 1))
+        info.blit(render_textrect(self.description, 15, pygame.Rect(0, 0, width, 40), (255, 255, 255)), (0, 45))
 
         stats = pygame.Surface((width, 50))
         stats.fill((54, 54, 54))
@@ -105,7 +100,6 @@ class Item(object):
                          (info.get_rect().w + 10, info.get_rect().h + 13), 2)
         pygame.draw.rect(image, (155, 155, 155), image.get_rect(), 1)
         return image
-
 
     def draw(self, screen, offset, explored=1):
         if explored:

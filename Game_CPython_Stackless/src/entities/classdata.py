@@ -17,7 +17,7 @@ class ClassData(object):
             if row > 0: # Dont parse the title of each row.
                 self.pfs[str(sheet.row_values(row)[0])] = int(sheet.row_values(row)[1])
 
-    def calculate_stats(self, player=None):
+    def calculate_stats(self, target=None):
         self.stats['LUCK'] = 0
         self.stats['DMG'] = 0
         self.stats['HIT_CHANCE'] = 0
@@ -28,15 +28,15 @@ class ClassData(object):
         self.stats['SR'] = 0
         self.stats['DEF'] = 0
         self.stats['EVA'] = 0
-        if player:
-            lvl = player.lvl
-            for item in player.inventory:
+        self.stats['RANGE'] = 1
+        if target:
+            lvl = target.lvl
+            for item in target.inventory:
                 if item.equipped:
-                    self.stats = dict(self.stats.items()+item.equipped.stats.items())
+                    self.stats = dict(self.stats.items()+item.stats.items())
 
         else:
             lvl = 1
-            armor = 0
         for key, pf in self.pfs.items():
             self.stats[key] = (pf * lvl) + (2 * (lvl % 3)) + (10 + lvl)
 

@@ -41,7 +41,6 @@ class Player(Entity):
                           PLAYER_DROP_ITEM, PLAYER_EQUIP_ITEM, PLAYER_UNEQUIP_ITEM], self.handle_items)
 
     def update(self, offset):
-        self.stats['DMG'] = 100
         self.playable_area = offset
         if self.path:
             if self.follow_path:
@@ -54,6 +53,7 @@ class Player(Entity):
         self.follow_path = False
         self.path_delay = 0
         self.calculate_stats()
+        self.stats['DMG'] = 100
 
     def handle_event(self, event):
         etype = get_event_type(event)
@@ -105,7 +105,6 @@ class Player(Entity):
         item = event.target
 
         if etype == PLAYER_EXAMINE_ITEM:
-            print item
             if hasattr(item, 'description'):
                 post_event(POST_TO_CONSOLE, msg=item.description)
             return
@@ -124,9 +123,11 @@ class Player(Entity):
             elif etype == PLAYER_DROP_ITEM:
                 if item in self.inventory:
                     self.inventory.remove(item)
+                    item.picked_up = False
             elif etype == PLAYER_PICKUP_ITEM:
                 if item.x == self.x and item.y == self.y:
                     self.inventory.append(item)
+                    item.picked_up = True
             post_event(TIME_PASSED, amount=1.0)
 
     def build_player(self, base):
@@ -190,6 +191,8 @@ class Player(Entity):
         if self.exp >= self.stats['EXP']:
             self.lvl += 1
             self.exp = 0
+        self.classdata.calculate_stats(self)
+        self.stats = self.classdata.stats
 
         if self.hp > self.stats['HP']:
             self.hp = self.stats['HP']
@@ -312,5 +315,5 @@ class Player(Entity):
         for item in self.inventory:
             if item.slot == 'armor' and item.slot is not 'armor_back' and item.equipped:
                 screen.blit(item.equipped_image, (x, y))
-            elif item.slot == 'RHand':
+            elif item.slot == 'RHand' and item.equipped:
                 screen.blit(item.equipped_image, (x, y))

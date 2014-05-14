@@ -14,14 +14,14 @@ class Mouse_select(object):
         self.image = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.image.convert_alpha()
         self.offset = pygame.Rect(0, 0, 0, 0)
-        register_handler([pygame.MOUSEMOTION, TIME_PASSED, GUI_TOOLTIP_COLOR], self.handle_event)
+        register_handler([pygame.MOUSEMOTION, TIME_PASSED, GUI_TOOLTIP_COLOR, ENTITY_ATTACK], self.handle_event)
 
     def handle_event(self, event):
         etype = event.type if event.type != pygame.USEREVENT else event.event_type
         if etype == pygame.MOUSEMOTION:
             if 0 < self.rect.x > self.offset.w or 0 < self.rect.y > self.offset.h:
                 self.in_map = False
-                post_event(GUI_TOOLTIP_CLEAR)
+
                 post_event(SIDEBARMOTION, pos=event.pos, rel=event.rel, buttons=event.buttons)
             else:
                 self.in_map = True
@@ -34,7 +34,7 @@ class Mouse_select(object):
                     self.interact(new_grid_x, new_grid_y)
             self.rect.x = copy.copy(event.pos[0])
             self.rect.y = copy.copy(event.pos[1])
-        elif etype == TIME_PASSED:
+        elif etype == TIME_PASSED or etype == ENTITY_ATTACK:
             if 0 < self.rect.x > self.offset.w or 0 < self.rect.y > self.offset.h:
                 self.in_map = False
             else:
@@ -57,7 +57,8 @@ class Mouse_select(object):
                 m = monster
         if m:
             self.color = (255, 255, 0)
-            post_event(PLAYER_ITEM_PROXIMITY, true=GUI_TOOLTIP_POST, target=m, range=1, args={'l_mouse': ('attack', PLAYER_ATTACK_ENTITY), 'target': m})
+            post_event(PLAYER_ITEM_PROXIMITY, true=GUI_TOOLTIP_POST, target=m, range=self.world.player.stats['RANGE'],
+                       args={'l_mouse': ('attack', PLAYER_ATTACK_ENTITY), 'target': m})
             post_event(GUI_TOOLTIP_POST, r_mouse=('examine', PLAYER_EXAMINE_ENTITY), target=m)
         elif items:
             for item in items:
@@ -101,6 +102,7 @@ class Tooltip(Gui):
     def __init__(self, world):
         self.world = world
         self.data = None
+        self.orientation = None
         image = pygame.Surface((200, 300), pygame.SRCALPHA, 32)
        # image.convert_alpha()
         self.cursors = {'travel': pygame.image.load('../res/other/cursors/travel.png'),
@@ -166,6 +168,8 @@ class Tooltip(Gui):
 
         elif etype == GUI_TOOLTIP_POST:
             #self.options = {}
+            if hasattr(event, 'orientation'):
+                self.orientation = event.orientation
             if hasattr(event, 'l_mouse'):
                 if event.l_mouse:
                     self.options['L-MOUSE'] = event.l_mouse + (event.target,)
@@ -192,7 +196,11 @@ class Tooltip(Gui):
     def draw(self, screen):
         self.mouse.draw(screen)
         if self.show_window:
-            screen.blit(self.image, (self.x + 20, self.y + 20))
+            if self.orientation:
+                if self.orientation == 'left':
+                    screen.blit(self.image, (self.x - self.image.get_width() + 20, self.y + 20))
+            else:
+                screen.blit(self.image, (self.x + 20, self.y + 20))
         if self.item_tooltip:
             screen.blit(self.item_tooltip,
                         (self.x - self.item_tooltip.get_width(), self.y - self.item_tooltip.get_height()))

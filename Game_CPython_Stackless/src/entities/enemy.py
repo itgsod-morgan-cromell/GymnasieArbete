@@ -40,6 +40,8 @@ class Monster(Entity):
 
     def update(self):
         self.calculate_stats()
+        if self.hp <= 0:
+            self.die()
 
     def time_passed(self, event):
         self.scan_fov()
@@ -79,6 +81,7 @@ class Monster(Entity):
     def die(self):
         self.world.monsters.remove(self)
         unregister_handler(self.time_passed)
+        self.world.dungeon.grid[self.y][self.x] = 1
 
     def move(self, xa, ya):
         if xa > 0:
@@ -107,9 +110,15 @@ class Monster(Entity):
                 if monster.x == self.x + xa and monster.y == self.y + ya:
                     xa = 0
                     ya = 0
-
-        if self.world.player and self.x +xa == self.world.player.x and self.y +ya == self.world.player.y:
-            self.attack(self.world.player)
+        for weapon_range_y in range(-self.stats['RANGE'], self.stats['RANGE']):
+            for weapon_range_x in range(-self.stats['RANGE'], self.stats['RANGE']):
+                if weapon_range_y != 0:
+                    weapon_range_y += -1 if weapon_range_y > 0 else 1
+                if weapon_range_x != 0:
+                    weapon_range_x += -1 if weapon_range_x > 0 else 1
+                if self.world.player and self.x + xa + weapon_range_x == self.world.player.x and self.y + ya + weapon_range_y == self.world.player.y:
+                    self.attack(self.world.player)
+                    return
         id = tile.id if hasattr(tile, 'id') else tile
         if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7 or id == 10 or id == 15:
             xa = 0
@@ -124,6 +133,8 @@ class Monster(Entity):
         if self.exp >= self.stats['EXP']:
             self.lvl += 1
             self.exp = 0
+        self.classdata.calculate_stats(self)
+        self.stats = self.classdata.stats
 
         if self.hp > self.stats['HP']:
             self.hp = self.stats['HP']

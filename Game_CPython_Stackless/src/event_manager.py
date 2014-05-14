@@ -1,7 +1,7 @@
 import pygame
 from src.event_helper import *
 from src.items.item_event_handler import ItemEventHandler
-
+from src.combat.combat_handler import *
 
 class EventManager(object):
     """
@@ -18,6 +18,7 @@ class EventManager(object):
         self.event_handlers = {}
         self.events = pygame.event.get()
         item_handler = ItemEventHandler()
+        combat_handler = CombatHandler()
 
     def unregister_handler(self, event):
         event_handler = event.handler

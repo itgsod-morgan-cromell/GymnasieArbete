@@ -12,7 +12,7 @@ from src.util.get_sprite import *
 from src.event_manager import EventManager
 from src.options import *
 from src.event_helper import *
-#from src.combat.combat_handler import *
+
 
 
 
@@ -39,7 +39,6 @@ class Game(object):
         pygame.display.flip()
         self.world = World(player)
         self.world.update(self.camera)
-        #self.combat_handler = CombatHandler()
         self.ui = GuiHandler(self.world)
         self.console = Console()
         self.tooltip = Tooltip(self.world)

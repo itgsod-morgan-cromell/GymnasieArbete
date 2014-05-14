@@ -58,7 +58,7 @@ class GuiHandler(object):
                     elif self.held_item.type == 'inventory':
                         slot.object = self.held_item.object
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             if slot and slot.object:
                 self.held_item = copy.copy(slot)
                 slot.object = None
