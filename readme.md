@@ -1,13 +1,13 @@
-ï»¿# GymnasieArbete 2013-2014
+# GymnasieArbete 2013-2014
 
-Detta gymnasiearbete utfÃ¶rs av:
+Detta gymnasiearbete utförs av:
 
 * Morgan Cromell
 
 
-# FrÃ¥gestÃ¤llning
+# Frågeställning
 
-Vilken version Ã¤r bÃ¤st av python fÃ¶r att programmera spel i? 
+Vilken version är bäst av python för att programmera spel i? 
 Version av python vi ska testa: 
 
 * cPython
@@ -18,4 +18,15 @@ Version av python vi ska testa:
 
 # Dokumentation
 
-FÃ¶r full documentation lÃ¤s Wikin och kommentarerna i koden. Observera dock att kommentarerna i koden Ã¤r skriven pÃ¥ engelska.
+För full documentation läs Wikin och kommentarerna i koden. Observera dock att kommentarerna i koden är skriven på engelska.
+
+
+#TODO
+Här är en lista med allt jag vill göra till spelet som inte är implementerat än.
+
+* Gör om item klassen.
+* Bättre tidssystem
+* Mera stats
+* Projektilsystem för ranged combat (Pilar, stenar ect.)
+* skillsystem
+* Bättre inventory

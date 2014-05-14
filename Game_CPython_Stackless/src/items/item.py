@@ -35,13 +35,12 @@ class PowerUp(object):
 
 
 class Item(object):
-    def __init__(self, name, category, slot, image, stats, extra={}):
+    def __init__(self, name, type, slot, image, stats, extra={}):
         self.name = name
         self.extra = extra
-        self.type = 'item'
-        self.category = category
+        self.type = type
         self.slot = slot
-        self.description = 'a {0}'.format(self.category)
+        self.description = 'a {0}'.format(self.type)
         self.stats = stats
         if 'AMOUNT' in self.stats:
             self.stackable = True
@@ -50,8 +49,8 @@ class Item(object):
 
         self.picked_up = False
         self.equipped = False
-        self.image = pygame.image.load('../res/items/{0}/{1}'.format(category, image))
-        self.equipped_image = pygame.image.load('../res/entities/player/equipment/{0}/{1}'.format(slot, image))
+        self.image = pygame.image.load('../res/items/weapon/{0}/{1}'.format(type, image))
+        self.equipped_image = pygame.image.load('../res/entities/player/equipment/weapon/{0}/{1}'.format(type, image))
         self.x = 0
         self.y = 0
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
@@ -75,6 +74,17 @@ class Item(object):
 
         post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self, orientation=orientation)
 
+
+    def equip(self, target):
+        if target.item_slots[self.slot]:
+            target.item_slots[self.slot].unequip(target)
+        target.item_slots[self.slot] = self
+        self.equipped = True
+
+    def unequip(self, target):
+        if target.item_slots[self.slot] == self:
+            self.equipped = False
+            target.item_slots[self.slot] = None
 
     def examine(self):
         width = 250

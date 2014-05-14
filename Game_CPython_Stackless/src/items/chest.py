@@ -65,9 +65,9 @@ class Chest(object):
                 stats['RANGE'] = 3 * (0.5 * self.level * (rarity + 1))
                 if category == 'wand':
                     stats['COST'] = stats['DMG'] * random.randint(2, 5)
-            return Item(name, 'weapon',
-                        'RHand',
-                        random.choice(os.listdir('../res/items/weapon')),
+            return Item(name, category,
+                        'hand1',
+                        random.choice(os.listdir('../res/items/weapon/{0}'.format(category))),
                         stats,
                         {'rarity': rarities[rarity]})
 

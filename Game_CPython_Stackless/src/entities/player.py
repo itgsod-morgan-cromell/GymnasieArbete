@@ -17,6 +17,7 @@ class Player(Entity):
         self.icon = self.image
         self.move_ticker = 0
         self.inventory = []
+        self.item_slots = {'back': None, 'armor': None, 'hand1': None, 'hand2': None}
         self.max_path_delay = 1
         self.astar = Pathfinder()
         self.playable_area = None
@@ -117,9 +118,9 @@ class Player(Entity):
             if etype == PLAYER_USE_ITEM:
                 item.use()
             elif etype == PLAYER_EQUIP_ITEM:
-                item.equipped = True
+                item.equip(self)
             elif etype == PLAYER_UNEQUIP_ITEM:
-                item.equipped = False
+                item.unequip(self)
             elif etype == PLAYER_DROP_ITEM:
                 if item in self.inventory:
                     self.inventory.remove(item)
@@ -308,12 +309,12 @@ class Player(Entity):
     def draw(self, screen, offset):
         x = self.x * 32 - offset.x
         y = self.y * 32 - offset.y
-        for item in self.inventory:
-            if item.slot is 'armor_back' and item.equipped:
-                screen.blit(item.equipped_image, (x, y))
+        if self.item_slots['back']:
+            screen.blit(self.item_slots['back'].equipped_image, (x, y))
         screen.blit(self.image, (x, y))
-        for item in self.inventory:
-            if item.slot == 'armor' and item.slot is not 'armor_back' and item.equipped:
-                screen.blit(item.equipped_image, (x, y))
-            elif item.slot == 'RHand' and item.equipped:
-                screen.blit(item.equipped_image, (x, y))
+        if self.item_slots['armor']:
+                screen.blit(self.item_slots['armor'].equipped_image, (x, y))
+        if self.item_slots['hand1']:
+                screen.blit(self.item_slots['hand1'].equipped_image, (x, y))
+        if self.item_slots['hand2']:
+                screen.blit(self.item_slots['hand2'].equipped_image, (x, y))
