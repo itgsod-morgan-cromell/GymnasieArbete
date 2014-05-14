@@ -29,6 +29,7 @@ class ClassData(object):
         self.stats['DEF'] = 0
         self.stats['EVA'] = 0
         self.stats['RANGE'] = 1
+        self.stats['COST'] = 0
         if target:
             lvl = target.lvl
             for item in target.inventory:

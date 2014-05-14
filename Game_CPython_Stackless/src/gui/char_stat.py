@@ -9,8 +9,8 @@ import pygame
 class Bar(object):
     def __init__(self, current, max, info, color, pos):
         self.info = info
-        self.current = current
-        self.max = max
+        self.current = current * 1.0
+        self.max = max * 1.0
         self.color = color
         self.info = info
         self.hovering = ALWAYS_SHOW_STATS
@@ -22,7 +22,7 @@ class Bar(object):
         width = int((self.current / self.max) * self.image.get_width())
         self.image.fill(color, rect=pygame.Rect((0, 0), (width, self.image.get_height())))
         self.image.blit(render_textrect(str(info), 50, self.rect, (255, 255, 255)), (3, 0))
-        self.text = '{0}/{1}'.format(self.current, self.max)
+        self.text = '{0}/{1}'.format(int(self.current), int(self.max))
         if self.hovering:
             self.image.blit(render_textrect(self.text, 50, self.rect, (255, 255, 255), None, 1, ), (0, 0))
 
@@ -30,10 +30,10 @@ class Bar(object):
         if new_value:
             self.current = new_value
         self.image.fill((84, 84, 84))
-        width = int((self.current / self.max) * self.image.get_width())
+        width = int((self.current/self.max) * self.image.get_width())
         self.image.fill(self.color, rect=pygame.Rect((0, 0), (width, self.image.get_height())))
         self.image.blit(render_textrect(str(self.info), 50, self.rect, (255, 255, 255)), (3, 0))
-        self.text = '{0}/{1}'.format(self.current, self.max)
+        self.text = '{0}/{1}'.format(int(self.current), int(self.max))
         if self.hovering:
             self.image.blit(render_textrect(self.text, 50, self.rect, (255, 255, 255), None, 1, ), (0, 0))
 
@@ -89,9 +89,6 @@ class CharStats(Gui):
             self.hp.hovering = True
         elif mouse.colliderect(self.mp.rect):
             self.mp.hovering = True
-        self.exp.refresh()
-        self.hp.refresh()
-        self.mp.refresh()
 
 
     def draw(self, surface):

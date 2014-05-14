@@ -21,14 +21,14 @@ class Player(Entity):
         self.max_path_delay = 1
         self.astar = Pathfinder()
         self.playable_area = None
-        self.KEYBOARD = False
+        self.KEYBOARD = True
         self.stats = self.classdata.stats
         self.hp = self.stats['HP']
         self.mp = self.stats['MP']
         self.gold = 0
         self.exp = 0
         #Radius is measured in tiles and not in pixels.
-        self.radius = 7
+        self.radius = 8
         self.mouse_grid_x = 0
         self.mouse_grid_y = 0
         self.path = None
@@ -123,6 +123,8 @@ class Player(Entity):
                 item.unequip(self)
             elif etype == PLAYER_DROP_ITEM:
                 if item in self.inventory:
+                    if self.item_slots[item.slot] == item:
+                        item.unequip(self)
                     self.inventory.remove(item)
                     item.picked_up = False
             elif etype == PLAYER_PICKUP_ITEM:
@@ -172,6 +174,7 @@ class Player(Entity):
         if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7:
             xa = 0
             ya = 0
+        print id
         if id == 8 and self.KEYBOARD:
             post_event(WORLD_MOVE_UP)
             self.path = None
@@ -184,7 +187,6 @@ class Player(Entity):
             self.world.dungeon.grid[self.y][self.x] = 1
             self.x += xa
             self.y += ya
-            self.world.dungeon.grid[self.y][self.x] = 15
             post_event(TIME_PASSED, amount=1.0)
             self.world.fog_of_war(self.x, self.y, self.radius)
 

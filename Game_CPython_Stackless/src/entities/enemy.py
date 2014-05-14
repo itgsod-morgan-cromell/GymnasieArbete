@@ -36,7 +36,6 @@ class Monster(Entity):
         self.follow_path = False
         self.move(0, 0)
         self.target = None
-        register_handler(TIME_PASSED, self.time_passed)
 
     def update(self):
         self.calculate_stats()
@@ -71,7 +70,7 @@ class Monster(Entity):
         if x == self.world.player.x and y == self.world.player.y:
             self.target = (self.world.player.x, self.world.player.y)
         try:
-            if self.world.map.tiles[y][x].id in [0, 2, 3, 4, 5, 6]:
+            if self.world.map.tiles[y][x].id in [0, 2, 3, 4, 5, 6, 8, 9]:
                 return False
             else:
                 return True
@@ -80,7 +79,6 @@ class Monster(Entity):
 
     def die(self):
         self.world.monsters.remove(self)
-        unregister_handler(self.time_passed)
         self.world.dungeon.grid[self.y][self.x] = 1
 
     def move(self, xa, ya):
@@ -120,7 +118,7 @@ class Monster(Entity):
                     self.attack(self.world.player)
                     return
         id = tile.id if hasattr(tile, 'id') else tile
-        if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7 or id == 10 or id == 15:
+        if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7 or id == 10 or id == 8 or id == 9:
             xa = 0
             ya = 0
         else:
@@ -144,7 +142,7 @@ class Monster(Entity):
     def find_path(self, end):
 
         start = (self.x, self.y)
-        blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 15]
+        blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 8, 9]
         self.path = None
         path = self.astar.find_path(self.world.dungeon.grid, start, end, blocked_tiles, 0)
         if path:

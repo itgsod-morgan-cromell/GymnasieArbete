@@ -15,11 +15,12 @@
 
 
 
-
+import os
 import random
 import time
 from src.level.dungeon_generator.astar import *
 from src.level.dungeon_generator.distance_map import *
+
 
 
 class Room:
@@ -228,6 +229,7 @@ class Dungeon:
         self.tile_h = tile_size[1]
         self.rooms = []
         self.grid = []
+        self.tileset = random.choice(os.listdir('../res/tilesets'))
         self.width = self.grid_size_x * self.tile_w
         self.height = self.grid_size_y * self.tile_h
 

@@ -51,10 +51,10 @@ class Chest(object):
         post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self)
 
     def generate_loot(self):
-        types = ['WEAPON']
+        types = ['weapon']
         type = random.choice(types)
 
-        if type == 'WEAPON':
+        if type == 'weapon':
             rarities = ['common', 'uncommon', 'rare', 'epic']
             rarity = random.randint(0, len(rarities) - 1)
             category = random.choice(['sword', 'bow', 'wand'])
@@ -65,13 +65,12 @@ class Chest(object):
                 stats['RANGE'] = 3 * (0.5 * self.level * (rarity + 1))
                 if category == 'wand':
                     stats['COST'] = stats['DMG'] * random.randint(2, 5)
-            return Item(name, category,
-                        'hand1',
-                        random.choice(os.listdir('../res/items/weapon/{0}'.format(category))),
-                        stats,
-                        {'rarity': rarities[rarity]})
+            return Equipment(name, category,
+                             'hand1',
+                             stats,
+                             {'rarity': rarities[rarity]})
 
-        elif type == 'POWERUP':
+        elif type == 'powerup':
 
             return PowerUp(random.choice(['GOLD', 'HP']),
                            random.randint(10, 100) * self.level)

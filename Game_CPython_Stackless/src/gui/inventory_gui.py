@@ -30,7 +30,7 @@ class InventoryGui(Gui):
         self.width = MENU_WIDTH
         self.height = 80
 
-        Gui.__init__(self, 'inventory', (30, 300),
+        Gui.__init__(self, 'inventory', (30, 400),
                      pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32).convert_alpha(), False)
         self.slots = []
         self.slots_rect = []
@@ -67,7 +67,6 @@ class InventoryGui(Gui):
                 slot.object.interact('left')
             else:
                 post_event(GUI_EXAMINE_ITEM_CLEAR)
-                post_event(GUI_TOOLTIP_CLEAR)
 
 
     def draw(self, surface):

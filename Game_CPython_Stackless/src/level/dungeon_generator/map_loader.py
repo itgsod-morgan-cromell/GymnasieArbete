@@ -59,7 +59,7 @@ class Tile:
         #self.load_image()
 
     def load_tile_image(self, type):
-        tileset_dir = '../res/tiles/{0}'.format(self.tileset)
+        tileset_dir = '../res/tilesets/{0}'.format(self.tileset)
         if os.path.isdir('{0}/{1}'.format(tileset_dir, type)):
             tile = random.choice(os.listdir('{0}/{1}'.format(tileset_dir, type)))
             self.image.blit(pygame.image.load('{0}/{1}/{2}'.format(tileset_dir, type, tile)), (0, 0))
@@ -118,7 +118,7 @@ class Map:
         self.shadow_tile = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
         self.shadow_tile.fill((0, 0, 0, 150))
 
-    def load_dungeon(self, dungeon, tileset='test_tileset', minimap=False, tile_size=None):
+    def load_dungeon(self, dungeon, minimap=False, tile_size=None):
 
         self.dungeon = dungeon
         self.minimap = minimap
@@ -138,7 +138,7 @@ class Map:
                                     y * dungeon.tile_h,
                                     dungeon.tile_w,
                                     dungeon.tile_h,
-                                    self.dungeon.grid[y][x], tileset))
+                                    self.dungeon.grid[y][x], dungeon.tileset))
             self.tiles.append(row)
 
 

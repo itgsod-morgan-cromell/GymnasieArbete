@@ -2,6 +2,8 @@ import pygame
 from src.event_helper import *
 from src.options import *
 from src.gui.textrect import render_textrect
+import random
+import os
 
 
 class PowerUp(object):
@@ -34,8 +36,8 @@ class PowerUp(object):
                     (self.x * 32 - offset.x + 12, self.y * 32 - offset.y + 16))
 
 
-class Item(object):
-    def __init__(self, name, type, slot, image, stats, extra={}):
+class Equipment(object):
+    def __init__(self, name, type, slot, stats, extra={}):
         self.name = name
         self.extra = extra
         self.type = type
@@ -49,8 +51,11 @@ class Item(object):
 
         self.picked_up = False
         self.equipped = False
-        self.image = pygame.image.load('../res/items/weapon/{0}/{1}'.format(type, image))
-        self.equipped_image = pygame.image.load('../res/entities/player/equipment/weapon/{0}/{1}'.format(type, image))
+        image_dir = '../res/items/{0}/{1}'.format(slot, type)
+        equipped_image_dir = '../res/entities/player/{0}/{1}'.format(slot, type)
+        image_name = random.choice(os.listdir(image_dir))
+        self.image = pygame.image.load('{0}/{1}'.format(image_dir, image_name))
+        self.equipped_image = pygame.image.load('{0}/{1}'.format(equipped_image_dir, image_name))
         self.x = 0
         self.y = 0
         self.shadow = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
@@ -73,7 +78,6 @@ class Item(object):
             post_event(PLAYER_ITEM_PROXIMITY, target=self, range=0, true=GUI_TOOLTIP_POST, args={'l_mouse': l_mouse, 'target': self})
 
         post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self, orientation=orientation)
-
 
     def equip(self, target):
         if target.item_slots[self.slot]:

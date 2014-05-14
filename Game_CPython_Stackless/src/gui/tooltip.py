@@ -3,6 +3,7 @@ from src.gui.gui import Gui
 from src.gui.textrect import render_textrect
 from src.event_helper import *
 import copy
+from src.options import *
 
 
 class Mouse_select(object):
@@ -21,8 +22,6 @@ class Mouse_select(object):
         if etype == pygame.MOUSEMOTION:
             if 0 < self.rect.x > self.offset.w or 0 < self.rect.y > self.offset.h:
                 self.in_map = False
-
-                post_event(SIDEBARMOTION, pos=event.pos, rel=event.rel, buttons=event.buttons)
             else:
                 self.in_map = True
                 old_grid_x = int(self.rect.x / 32)
@@ -104,10 +103,6 @@ class Tooltip(Gui):
         self.data = None
         self.orientation = None
         image = pygame.Surface((200, 300), pygame.SRCALPHA, 32)
-       # image.convert_alpha()
-        self.cursors = {'travel': pygame.image.load('../res/other/cursors/travel.png'),
-                        'standard': pygame.image.load('../res/other/cursors/default.gif'),
-                        'open': pygame.image.load('../res/other/cursors/examine.png')}
         self.options = {}
         self.show_window = False
         self.tooltip_delay = 0
@@ -167,7 +162,6 @@ class Tooltip(Gui):
                     post_event(self.options['R-MOUSE'][1], target=self.options['R-MOUSE'][2])
 
         elif etype == GUI_TOOLTIP_POST:
-            #self.options = {}
             if hasattr(event, 'orientation'):
                 self.orientation = event.orientation
             if hasattr(event, 'l_mouse'):
@@ -191,6 +185,8 @@ class Tooltip(Gui):
 
         elif etype == GUI_EXAMINE_ITEM_CLEAR:
             self.item_tooltip = None
+            if self.x > WIDTH - MENU_WIDTH:
+                self.options = {}
 
 
     def draw(self, screen):

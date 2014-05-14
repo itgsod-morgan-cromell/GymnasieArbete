@@ -1,7 +1,6 @@
 import pygame
 from src.gui.char_stat import CharStats
 
-from src.gui.explorer import Explorer
 from src.gui.inventory_gui import InventoryGui
 from src.gui.minimap import MiniMap
 from src.options import *
@@ -15,14 +14,12 @@ class GuiHandler(object):
         self.bg = pygame.Surface((self.rect.w, self.rect.h))
         self.char_stat = CharStats(world)
         self.minimap = MiniMap(world)
-        self.explorer = Explorer()
         self.inventory = InventoryGui()
         register_handler([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION], self.handle_event)
         self.held_item = None
 
     def update(self):
         self.char_stat.update()
-
 
     def handle_event(self, event):
         mouse_rect = pygame.Rect(event.pos, (2, 2)).copy()
@@ -35,28 +32,16 @@ class GuiHandler(object):
             self.char_stat.mouse(mouse_rect, event)
         elif gui == self.minimap:
             self.minimap.mouse(mouse_rect, event)
-        elif gui == self.explorer:
-            self.explorer.mouse(mouse_rect, event)
-            slot = self.explorer.get_slot(mouse_rect)
-            if event.type == pygame.MOUSEBUTTONUP and self.held_item:
-                if slot and not slot.object:
-                    if self.held_item.type == 'inventory':
-                        post_event(GUI_EXPLORER_CLEAR)
-                        post_event(PLAYER_DROP_ITEM, target=self.held_item.object)
-                    elif self.held_item.type == 'explorer':
-                        slot.object = self.held_item.object
-        else:
-            post_event(GUI_EXAMINE_ITEM_CLEAR)
 
-        if gui == self.inventory:
+        elif gui == self.inventory:
             self.inventory.mouse(mouse_rect, event)
             slot = self.inventory.get_slot(mouse_rect)
             if event.type == pygame.MOUSEBUTTONUP and self.held_item:
                 if slot and not slot.object:
-                    if self.held_item.type == 'explorer':
-                        post_event(PLAYER_PICKUP_ITEM, target=self.held_item.object, slot=slot)
-                    elif self.held_item.type == 'inventory':
+                    if self.held_item.type == 'inventory':
                         slot.object = self.held_item.object
+        else:
+            post_event(GUI_EXAMINE_ITEM_CLEAR)
 
         if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
             if slot and slot.object:
@@ -65,6 +50,10 @@ class GuiHandler(object):
                 pygame.mouse.set_visible(False)
                 slot.image = pygame.Surface((32, 32))
                 post_event(GUI_EXAMINE_ITEM_CLEAR)
+                post_event(GUI_TOOLTIP_CLEAR)
+        if self.held_item:
+            post_event(GUI_TOOLTIP_CLEAR)
+            post_event(GUI_TOOLTIP_COLOR, color=(0, 0, 0, 0))
 
         if event.type == pygame.MOUSEBUTTONUP:
             if self.held_item:
@@ -75,9 +64,6 @@ class GuiHandler(object):
                         else:
                             self.inventory.slots[
                                 self.inventory.slots_rect.index(self.held_item.rect)].object = self.held_item.object
-                    elif self.held_item.type == 'explorer':
-                        self.explorer.slots[
-                            self.explorer.slots_rect.index(self.held_item.rect)].object = self.held_item.object
                 self.held_item = None
             pygame.mouse.set_visible(True)
 
@@ -89,9 +75,6 @@ class GuiHandler(object):
         elif mouse.colliderect(pygame.Rect(self.minimap.x, self.minimap.y,
                                            self.minimap.width, self.minimap.height)):
             return self.minimap
-        elif mouse.colliderect(pygame.Rect(self.explorer.x, self.explorer.y,
-                                           self.explorer.width, self.explorer.height)):
-            return self.explorer
         elif mouse.colliderect(pygame.Rect(self.inventory.x, self.inventory.y,
                                            self.inventory.width, self.inventory.height)):
             return self.inventory
@@ -101,7 +84,6 @@ class GuiHandler(object):
         self.bg.fill((54, 54, 54))
         self.minimap.draw(self.bg)
         self.char_stat.draw(self.bg)
-        self.explorer.draw(self.bg)
         self.inventory.draw(self.bg)
         screen.blit(self.bg, (self.rect.x, self.rect.y))
         if self.held_item:

@@ -14,6 +14,7 @@ class World(object):
         self.output = None
         register_handler([WORLD_MOVE_DOWN, WORLD_MOVE_UP, PLAYER_DROP_ITEM], self.handle_event)
         register_handler([PLAYER_PICKUP_ITEM], self.map.handle_event)
+        register_handler(TIME_PASSED, self.time_passed)
 
     def handle_event(self, event):
         etype = get_event_type(event)
@@ -25,7 +26,7 @@ class World(object):
             else:
                 self.map.down = DungeonLevel(self.map.floor + 1, self.map)
                 self.map = self.map.down
-                self.spawn_objects()
+                self.map.spawn_objects()
             self.map.player = self.player
             self.player.x, self.player.y = self.map.down_stair
         elif etype == WORLD_MOVE_UP:
@@ -35,7 +36,7 @@ class World(object):
             else:
                 self.map.up = DungeonLevel(self.map.floor - 1, None, self.map)
                 self.map = self.map.up
-                self.spawn_objects()
+                self.map.spawn_objects()
             self.map.player = self.player
             self.player.x, self.player.y = self.map.up_stair
         elif etype == PLAYER_DROP_ITEM:
@@ -51,6 +52,10 @@ class World(object):
             self.player = None
         for monster in self.map.monsters:
             monster.update()
+
+    def time_passed(self, event):
+        for monster in self.map.monsters:
+            monster.time_passed(event)
 
     def draw(self, screen, offset):
         self.map.map.draw(screen, offset)
