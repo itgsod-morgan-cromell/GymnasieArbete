@@ -80,15 +80,26 @@ class CharStats(Gui):
     def mouse(self, mouse, event):
         mouse.x -= self.x
         mouse.y -= self.y
-        self.exp.hovering = ALWAYS_SHOW_STATS
-        self.hp.hovering = ALWAYS_SHOW_STATS
-        self.mp.hovering = ALWAYS_SHOW_STATS
+
         if mouse.colliderect(self.exp.rect):
             self.exp.hovering = True
+            self.exp.refresh()
         elif mouse.colliderect(self.hp.rect):
             self.hp.hovering = True
+            self.hp.refresh()
         elif mouse.colliderect(self.mp.rect):
             self.mp.hovering = True
+            self.mp.refresh()
+        else:
+            if self.exp.hovering:
+                self.exp.hovering = False
+                self.exp.refresh()
+            elif self.hp.hovering:
+                self.hp.hovering = False
+                self.hp.refresh()
+            elif self.mp.hovering:
+                self.mp.hovering = False
+                self.mp.refresh()
 
 
     def draw(self, surface):
