@@ -25,6 +25,7 @@ class Monster(Entity):
         self.trinket = None
         self.astar = Pathfinder()
         self.stats = self.classdata.stats
+        self.item_slots = {'back': None, 'armor': None, 'hand1': None, 'hand2': None}
         self.hp = self.stats['HP']
         self.mp = self.stats['MP']
         self.gold = 0

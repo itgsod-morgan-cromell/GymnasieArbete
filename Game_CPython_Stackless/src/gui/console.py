@@ -11,7 +11,7 @@ class Text(object):
         self.data = data
         self.rect = rect
         if type(data) == str:
-            self.image = render_textrect(data, 15, rect, color)
+            self.image = render_textrect(data, CONSOLE_FONT_SIZE, rect, color)
 
 
 class Console(Gui):
@@ -27,14 +27,45 @@ class Console(Gui):
     def handle_event(self, event):
         etype = event.type if event.type != pygame.USEREVENT else event.event_type
         if etype == POST_TO_CONSOLE:
-            rect = pygame.Rect((5, 5), (self.width, 15))
-            color = event.color if hasattr(event, 'color') else (255, 255, 255)
-            self.log_processed.append(Text(rect, event.msg, color))
+            if hasattr(event, 'color'):
+                color = event.color
+            else:
+                color = (255, 255, 255)
+            self.log_processed.append(self.create_text(event.msg, color))
             if len(self.log_processed) > 7:
                 self.log_processed = self.log_processed[-7:]
         elif etype == CLEAR_CONSOLE:
             self.log_processed = []
 
+    def create_text(self, msg, color):
+        t = int(200 * (CONSOLE_FONT_SIZE/10))
+        if type(msg) == list:
+            for i, m in enumerate(msg):
+                msg_width = (len(m) * t)
+                last_msg_width = 0
+                for i2 in range(0, len(msg)):
+                    print i2
+                    if i2 < i:
+                        last_msg_width += (len(msg[i2].data) * CONSOLE_FONT_SIZE * 0.6 + 8)
+                rect = pygame.Rect((5 + last_msg_width, 5), (msg_width, 20))
+                if type(m) == tuple:
+                    print m[0]
+                    msg[i] = Text(rect, m[0], m[1])
+                else:
+                    msg[i] = Text(rect, m, color)
+            return msg
+        else:
+            msg_width = (len(msg) * t)
+            rect = pygame.Rect((5, 5), (msg_width, 20))
+            text = Text(rect, msg, color)
+            return text
+
+
+
     def draw(self, screen):
         for y, msg in enumerate(self.log_processed):
-            screen.blit(msg.image, (msg.rect.x + self.x, msg.rect.y + self.y + y * msg.rect.h))
+            if type(msg) == list:
+                for m in msg:
+                    screen.blit(m.image, (m.rect.x + self.x, m.rect.y + self.y + y * m.rect.h))
+            else:
+                screen.blit(msg.image, (msg.rect.x + self.x, msg.rect.y + self.y + y * msg.rect.h))

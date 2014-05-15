@@ -8,23 +8,45 @@ class CombatHandler(object):
         register_handler(ENTITY_ATTACK, self.handle_attacks)
 
     def handle_attacks(self, event):
+        msg = []
+        c1 = 'The (m) tries to hit you but misses.'
+        c2 = 'The (m) hits you with his (w).'
+        c3 = '_You try to hit the (m) but misses.'
+        c4 = '_You hit the (m) with your (w)'
+        color = (255, 255, 255)
         etype = get_event_type(event)
         if etype == ENTITY_ATTACK:
-            post_event(POST_TO_CONSOLE, msg=' ')
+
             hits = self.hit(event.attacker, event.target)
             if event.target.type == 'player':
                 target_name = 'you'
             else:
                 target_name = event.target.name
             if event.attacker.type == 'player':
-                attacker_name = 'you'
+                attacker_name = '_you'
+                c3 = c3.replace('(m)', target_name)
+                c4 = c4.replace('(m)', target_name)
+                if event.attacker.item_slots['hand1']:
+                    c4 = c4.replace('(w)', event.attacker.item_slots['hand1'].type)
+                else:
+                    c4 = c4.replace('(w)', 'fist')
+                c = (128, 128, 128)
             else:
                 attacker_name = event.attacker.name
+                c1 = c1.replace('(m)', attacker_name)
+                c2 = c2.replace('(m)', attacker_name)
+                if event.attacker.item_slots['hand1']:
+                    c2 = c2.replace('(w)', event.attacker.item_slots['hand1'].type)
+                else:
+                    c2 = c2.replace('(w)', 'fist')
+                c = (255, 255, 255)
 
             if event.attacker.mp > event.attacker.stats['COST']:
                 event.attacker.mp -= event.attacker.stats['COST']
             else:
-                post_event(POST_TO_CONSOLE, msg='{0} does not have enough mana to attack'.format(attacker_name))
+                if attacker_name == '_you':
+                    post_event(POST_TO_CONSOLE, msg='{0} do not have enough mana to attack'.format(attacker_name), color=c)
+                return
 
             if hits:
                 crits = self.crit(event.attacker)
@@ -32,20 +54,27 @@ class CombatHandler(object):
                     damage = self.calc_damage(event.attacker, event.target, event.attacker.stats['CRIT_MULTIPLIER'])
                 else:
                     damage = self.calc_damage(event.attacker, event.target)
-                post_event(POST_TO_CONSOLE, msg='{0} swing at {1}'.format(attacker_name, target_name))
+                if attacker_name == '_you':
+                    msg.append((c4, (128, 128, 128)))
+                else:
+                    msg.append(c2)
                 if damage:
                     if crits:
-                        post_event(POST_TO_CONSOLE, msg='{0} crit!'.format(attacker_name), color=(255, 255, 0))
-                    if target_name == 'you':
-                        color = (255, 0, 0)
-                    else:
-                        color = (0, 255, 0)
-                    post_event(POST_TO_CONSOLE, msg='{0} take {1} damage'.format(target_name, damage), color=color)
+                        msg.append(("Its's a devastating attack!", (255, 255, 0)))
                     event.target.hp -= damage
+                    msg.append('{0} take'.format(target_name))
+                    msg.append((str(damage), (255, 0, 0)))
+                    msg.append('damage')
                 else:
-                    post_event(POST_TO_CONSOLE, msg='{0} block all the damage'.format(target_name))
+                    msg.append('But deals no damage')
             else:
-                post_event(POST_TO_CONSOLE, msg='{0} swing at {1} but misses...'.format(attacker_name, target_name))
+                if attacker_name == '_you':
+                    msg.append((c3, (128, 128, 128)))
+                else:
+                    msg.append(c1)
+
+            if msg:
+                post_event(POST_TO_CONSOLE, msg=msg)
 
     def hit(self, attacker, target):
         hit_chance = attacker.stats['HIT_CHANCE']

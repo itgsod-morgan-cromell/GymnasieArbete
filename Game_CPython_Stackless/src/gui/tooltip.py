@@ -125,9 +125,9 @@ class Tooltip(Gui):
                 string_len = len(string)
         for key, event in self.options.items():
             string = "[{0}] : {1}".format(key, event[0])
-            rect = pygame.Rect((0, 20 * i), (string_len * 10, 20))
+            rect = pygame.Rect((0, TOOLTIP_FONT_SIZE * i), (string_len * 10, TOOLTIP_FONT_SIZE))
             i += 1
-            self.image.blit(render_textrect(string, 20, rect, (255, 255, 255), (24, 72, 240)), (rect.x, rect.y))
+            self.image.blit(render_textrect(string, TOOLTIP_FONT_SIZE, rect, (255, 255, 255), (24, 72, 240)), (rect.x, rect.y))
 
     def update(self, world, offset):
         self.world = world

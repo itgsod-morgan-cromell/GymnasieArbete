@@ -174,7 +174,6 @@ class Player(Entity):
         if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7:
             xa = 0
             ya = 0
-        print id
         if id == 8 and self.KEYBOARD:
             post_event(WORLD_MOVE_UP)
             self.path = None

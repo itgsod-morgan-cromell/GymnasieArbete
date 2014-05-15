@@ -67,7 +67,6 @@ def render_textrect(string, maxsize, rect, text_color, background_color=None, ju
             final_lines.append(requested_line)
 
     # Let's try to write the text out on the surface.
-
     surface = pygame.Surface(rect.size, pygame.SRCALPHA, 32)
     surface.convert_alpha()
     if background_color:
