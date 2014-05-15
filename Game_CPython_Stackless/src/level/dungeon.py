@@ -74,7 +74,6 @@ class DungeonLevel(object):
             for tile in range(0, len(self.map.tiles[row])):
                 if self.map.tiles[row][tile].id == 10:
                     self.map.tiles[row][tile].id = 1
-                    self.dungeon.grid[row][tile] = 1
                     self.map.tiles[row][tile].load_image()
                     self.items.append(Chest((tile, row), self))
                 if self.map.tiles[row][tile].id == 7:

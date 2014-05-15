@@ -171,7 +171,7 @@ class Player(Entity):
         else:
             post_event(GUI_EXPLORER_CLEAR)
         id = tile.id if hasattr(tile, 'id') else tile
-        if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7:
+        if id == 2 or id == 3 or id == 4 or id == 5 or id == 6 or id == 7 or id == 10:
             xa = 0
             ya = 0
         if id == 8 and self.KEYBOARD:
@@ -206,7 +206,7 @@ class Player(Entity):
             self.path = None
             return
         start = (self.x, self.y)
-        blocked_tiles = [0, 2, 3, 4, 5, 6, 7]
+        blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 10]
         self.path = None
         start_dir = 0
         if self.mouse_grid_x is not self.x:

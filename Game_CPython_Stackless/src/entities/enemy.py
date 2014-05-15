@@ -143,7 +143,7 @@ class Monster(Entity):
     def find_path(self, end):
 
         start = (self.x, self.y)
-        blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 8, 9]
+        blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         self.path = None
         path = self.astar.find_path(self.world.dungeon.grid, start, end, blocked_tiles, 0)
         if path:

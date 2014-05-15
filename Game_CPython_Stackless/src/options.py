@@ -3,7 +3,7 @@ import pygame
 WIDTH = int(1240 / 64) * 64
 HEIGHT = int(700 / 64) * 64
 MENU_WIDTH = int(200 / 64) * 64
-CONSOLE_HEIGHT = HEIGHT/4
+CONSOLE_HEIGHT = int((HEIGHT/4)/64) * 64
 SCALE = 1
 ALWAYS_SHOW_STATS = True
 CONSOLE_FONT_SIZE = 14
@@ -12,6 +12,7 @@ common = (255, 255, 255)
 uncommon = (30, 255, 0)
 rare = (0, 112, 255)
 epic = (163, 53, 238)
+
 
 
 

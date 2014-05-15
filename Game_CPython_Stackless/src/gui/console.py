@@ -18,6 +18,7 @@ class Console(Gui):
     def __init__(self):
         self.width = WIDTH - MENU_WIDTH
         self.height = CONSOLE_HEIGHT
+        self.max_messages = int(CONSOLE_HEIGHT/CONSOLE_FONT_SIZE) - 3
         Gui.__init__(self, 'console', (0, HEIGHT - CONSOLE_HEIGHT), pygame.Surface((self.width, self.height)), True)
         self.log = []
         self.log_processed = []
@@ -31,9 +32,7 @@ class Console(Gui):
                 color = event.color
             else:
                 color = (255, 255, 255)
-            self.log_processed.append(self.create_text(event.msg, color))
-            if len(self.log_processed) > 7:
-                self.log_processed = self.log_processed[-7:]
+            self.log_processed.insert(0, self.create_text(event.msg, color))
         elif etype == CLEAR_CONSOLE:
             self.log_processed = []
 
@@ -44,12 +43,10 @@ class Console(Gui):
                 msg_width = (len(m) * t)
                 last_msg_width = 0
                 for i2 in range(0, len(msg)):
-                    print i2
                     if i2 < i:
                         last_msg_width += (len(msg[i2].data) * CONSOLE_FONT_SIZE * 0.6 + 8)
                 rect = pygame.Rect((5 + last_msg_width, 5), (msg_width, 20))
                 if type(m) == tuple:
-                    print m[0]
                     msg[i] = Text(rect, m[0], m[1])
                 else:
                     msg[i] = Text(rect, m, color)
@@ -64,6 +61,8 @@ class Console(Gui):
 
     def draw(self, screen):
         for y, msg in enumerate(self.log_processed):
+            if y > self.max_messages - 1:
+                return
             if type(msg) == list:
                 for m in msg:
                     screen.blit(m.image, (m.rect.x + self.x, m.rect.y + self.y + y * m.rect.h))
