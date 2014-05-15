@@ -9,7 +9,7 @@ class TextRectException:
         return self.message
 
 
-def render_textrect(string, maxsize, rect, text_color, background_color=None, justification=0):
+def render_textrect(string, maxsize, rect, text_color=(255, 255, 255), background_color=(0, 0, 0, 0), justification=0):
     """Returns a surface containing the passed text string, reformatted
     to fit within the given rect, word-wrapping as necessary. The text
     will be anti-aliased.

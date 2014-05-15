@@ -79,7 +79,7 @@ class DungeonLevel(object):
                 if self.map.tiles[row][tile].id == 7:
                     self.map.tiles[row][tile].id = 1
                     self.dungeon.grid[row][tile] = 1
-                    self.monsters.append(Monster('test', 'warrior', (tile, row), self))
+                   # self.monsters.append(Monster('test', 'warrior', (tile, row), self))
                 if self.map.tiles[row][tile].id == 11:
                     self.map.tiles[row][tile].id = 1
                     self.dungeon.grid[row][tile] = 1

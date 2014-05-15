@@ -23,6 +23,8 @@ class Player(Entity):
         self.playable_area = None
         self.KEYBOARD = True
         self.stats = self.classdata.stats
+        self.starting_stats = self.classdata.starting_stats
+        self.skills = {}
         self.hp = self.stats['HP']
         self.mp = self.stats['MP']
         self.gold = 0
@@ -83,6 +85,8 @@ class Player(Entity):
             self.find_path((event.target.x, event.target.y))
             if self.x == event.target.x and self.y == event.target.y or self.path and len(self.path) <= event.range:
                 post_event(event.true, **event.args)
+                if event.target.type == 'monster':
+                    post_event(GUI_TOOLTIP_COLOR, color=(255, 165, 0))
             elif self.path:
                 post_event(GUI_TOOLTIP_POST, target=self, l_mouse=('travel', PLAYER_TRAVEL_PATH))
 

@@ -26,6 +26,7 @@ class Gui(object):
         self.x = pos[0]
         self.y = pos[1]
         self.image = image
+        self.rect = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
         self.active = active
 
     def activate(self):

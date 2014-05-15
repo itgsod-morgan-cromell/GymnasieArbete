@@ -63,9 +63,10 @@ class EventManager(object):
         self.events = pygame.event.get()
         for event in self.events:
             if event.type == pygame.USEREVENT:
-               # print self.namestr(event.event_type, globals())
+                #print self.namestr(event.event_type, globals())
                 if event.event_type in self.event_handlers:
                     for event_handler in self.event_handlers[event.event_type]:
+
                         event_handler(event)
             elif event.type == REGISTER_EVENT_HANDLER:
                 self.register_handler(event)

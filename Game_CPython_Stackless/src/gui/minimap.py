@@ -81,16 +81,17 @@ class MiniMap(Gui):
                 self.zoom_in()
             elif event.button == 5:
                 self.zoom_out()
-
-    def mouse(self, mouse, event):
-        mouse.x -= self.x
-        mouse.y -= self.y
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                if mouse.colliderect(self.zoom_in_arrow.rect):
-                    self.zoom_in()
-                elif mouse.colliderect(self.zoom_out_arrow.rect):
-                    self.zoom_out()
+            else:
+                mouse = pygame.Rect(event.pos, (1, 1)).copy()
+                mouse.x -= WIDTH - MENU_WIDTH
+                if mouse.colliderect(self.rect):
+                    mouse.x -= self.x
+                    mouse.y -= self.y
+                    if event.button == 1:
+                        if mouse.colliderect(self.zoom_in_arrow.rect):
+                            self.zoom_in()
+                        elif mouse.colliderect(self.zoom_out_arrow.rect):
+                            self.zoom_out()
 
     def zoom_in(self):
         if self.zoom_in_arrow.zoom_level < self.zoom_in_arrow.max_zoom_level:

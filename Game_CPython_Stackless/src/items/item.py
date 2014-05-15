@@ -6,6 +6,7 @@ import random
 import os
 
 
+
 class PowerUp(object):
     def __init__(self, type, amount):
         self.type = 'powerup'
@@ -36,6 +37,16 @@ class PowerUp(object):
                     (self.x * 32 - offset.x + 12, self.y * 32 - offset.y + 16))
 
 
+class Ammo(object):
+    def __init__(self, name, type, stats, extra={}):
+        self.name = name
+        self.extra = extra
+        self.type = type  #Arrow, bolt, stone
+        self.used_with = None
+        if self.type == 'arrow':
+            self.description = 'This can be used with a '
+
+
 class Equipment(object):
     def __init__(self, name, type, slot, stats, extra={}):
         self.name = name
@@ -62,22 +73,21 @@ class Equipment(object):
         self.shadow.fill((0, 0, 0, 150))
         self.stats_font = pygame.font.Font('../res/other/visitor2.ttf', 20)
 
-    def use(self):
-        pass
-
     def interact(self, orientation=None):
 
         if self.picked_up:
+            r_mouse = ('drop', PLAYER_DROP_ITEM)
             if self.equipped:
-                r_mouse = ('unequip', PLAYER_UNEQUIP_ITEM)
+                l_mouse = ('unequip', PLAYER_UNEQUIP_ITEM)
             else:
-                r_mouse = ('equip', PLAYER_EQUIP_ITEM)
+                l_mouse = ('equip', PLAYER_EQUIP_ITEM)
+            post_event(GUI_TOOLTIP_POST, l_mouse=l_mouse, r_mouse=r_mouse, target=self, orientation=orientation)
         else:
             r_mouse = ('examine', PLAYER_EXAMINE_ITEM)
             l_mouse = ('pick up', PLAYER_PICKUP_ITEM)
             post_event(PLAYER_ITEM_PROXIMITY, target=self, range=0, true=GUI_TOOLTIP_POST, args={'l_mouse': l_mouse, 'target': self})
+            post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self, orientation=orientation)
 
-        post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self, orientation=orientation)
 
     def equip(self, target):
         if target.item_slots[self.slot]:
