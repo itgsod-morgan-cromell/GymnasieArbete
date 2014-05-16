@@ -75,23 +75,17 @@ class Mouse_select(object):
             else:
                 self.color = (255, 0, 0)
 
-
-
     def update(self, offset, world):
         self.offset = offset
         self.world = world
 
-
     def draw(self, screen):
         if self.in_map:
             self.image.fill(0)
-            pygame.draw.lines(self.image, self.color, False, [(8, 0), (0, 0), (0, 8)], 2) #top left
-            pygame.draw.lines(self.image, self.color, False, [(24, 0), (30, 0), (30, 8)], 2) #top right
-            pygame.draw.lines(self.image, self.color, False, [(24, 30), (30, 30), (30, 24)], 2) #bottom right
-            pygame.draw.lines(self.image, self.color, False, [(0, 24), (0, 30), (8, 30)], 2) #bottom left
             if self.color == (255, 0, 0):
-                pygame.draw.line(self.image, self.color, (15, 3), (15, 29), 2)
-                pygame.draw.line(self.image, self.color, (3, 15), (29, 15), 2)
+                self.image.blit(cursor_red, (0, 0))
+            else:
+                self.image.blit(cursor, (0, 0))
             x = int(self.rect.x / 32) * 32
             y = int(self.rect.y / 32) * 32
             screen.blit(self.image, (x, y))

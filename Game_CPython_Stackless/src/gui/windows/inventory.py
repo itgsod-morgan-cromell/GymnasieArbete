@@ -7,6 +7,7 @@ class Slot(object):
     def __init__(self, x, y, object=None):
         self.object = object
         self.type = 'inventory'
+        self.selected = False
         self.bg = pygame.image.load('../res/gui/inventory_slot.png')
         if object:
             self.image = object
@@ -23,6 +24,9 @@ class Slot(object):
             if self.object.equipped:
                 self.image.fill((0, 255, 0, 200), pygame.Rect(2, 2, 28, 28))
             self.image.blit(self.object.image, (0, 0))
+        if self.selected:
+            self.image.blit(cursor, (0, 0))
+
         surface.blit(self.image, (self.x, self.y))
 
 
@@ -38,17 +42,19 @@ class InventoryWindow(object):
         slots_x = int(self.width/(32 + spacing))
         slots_y = int(self.height/(32 + spacing))
         self.slots = []
-        self.slots_rect = []
         for y in range(0, slots_y):
             for x in range(0, slots_x):
-                self.slots_rect.append(pygame.Rect(self.x + x*32, self.y + y*32, 32, 32))
                 self.slots.append(Slot(x*32, y * 32))
         register_handler([PLAYER_PICKUP_ITEM, PLAYER_DROP_ITEM, TIME_PASSED], self.handle_event)
 
     def get_slot(self, mouse):
-        slot = mouse.collidelist(self.slots_rect)
-        if self.slots[slot] is not None and slot != -1:
-            return self.slots[slot]
+        for slot in self.slots:
+            if mouse.colliderect(slot.rect):
+                return slot
+
+    def clear_selected(self):
+        for slot in self.slots:
+            slot.selected = False
 
     def handle_event(self, event):
         etype = get_event_type(event)
@@ -58,15 +64,20 @@ class InventoryWindow(object):
             else:
                 mouse = pygame.Rect(event.pos, (1, 1)).copy()
             mouse.x -= WIDTH - MENU_WIDTH
-            mouse.y -= 300
+            mouse.y -= INTERFACE_Y
             if mouse.colliderect(self.rect):
+                mouse.x -= self.x
+                mouse.y -= self.y
                 slot = self.get_slot(mouse)
+                if slot:
+                    slot.selected = True
                 if slot and slot.object:
-                    if etype == pygame.MOUSEMOTION:
-                        post_event(GUI_EXAMINE_ITEM, tooltip=slot.object.examine())
-                        slot.object.interact('left')
+                    post_event(GUI_EXAMINE_ITEM, tooltip=slot.object.examine())
+                    post_event(GUI_INFOBAR_POST, msg=slot.object.name)
+                    slot.object.interact('left')
                 else:
                     post_event(GUI_EXAMINE_ITEM_CLEAR)
+                    post_event(GUI_INFOBAR_CLEAR)
 
         elif etype == PLAYER_PICKUP_ITEM:
             for slot in self.slots:
@@ -79,7 +90,7 @@ class InventoryWindow(object):
                     slot.object = None
 
     def draw(self, surface):
-        self.image.fill((54, 54, 54))
+        self.image.fill(INTERFACE_COLOR)
         for slot in self.slots:
             slot.draw(self.image)
         surface.blit(self.image, (self.x, self.y))

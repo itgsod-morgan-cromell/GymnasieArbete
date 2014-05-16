@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-
+import pygame
 
 class TextRectException:
     def __init__(self, message=None):
@@ -32,7 +32,7 @@ def render_textrect(string, maxsize, rect, text_color=(255, 255, 255), backgroun
     Failure - raises a TextRectException if the text won't fit onto the surface.
     """
 
-    import pygame
+
 
     font = pygame.font.Font('../res/other/veramono.ttf', maxsize)
    # font = pygame.font.SysFont('VeraMoIt', maxsize)
@@ -93,4 +93,29 @@ def render_textrect(string, maxsize, rect, text_color=(255, 255, 255), backgroun
     return surface
 
 
+def textHollow(font, message, fontcolor):
+    notcolor = [c^0xFF for c in fontcolor]
+    base = font.render(message, 0, fontcolor, notcolor)
+    size = base.get_width() + 2, base.get_height() + 2
+    img = pygame.Surface(size, 16)
+    img.fill(notcolor)
+    base.set_colorkey(0)
+    img.blit(base, (0, 0))
+    img.blit(base, (2, 0))
+    img.blit(base, (0, 2))
+    img.blit(base, (2, 2))
+    base.set_colorkey(0)
+    base.set_palette_at(1, notcolor)
+    img.blit(base, (1, 1))
+    img.set_colorkey(notcolor)
+    return img
 
+
+def textOutline(font, message, fontcolor, outlinecolor):
+    base = font.render(message, 0, fontcolor)
+    outline = textHollow(font, message, outlinecolor)
+    img = pygame.Surface(outline.get_size(), 16)
+    img.blit(base, (1, 1))
+    img.blit(outline, (0, 0))
+    img.set_colorkey(0)
+    return img

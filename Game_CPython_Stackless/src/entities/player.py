@@ -23,7 +23,6 @@ class Player(Entity):
         self.playable_area = None
         self.KEYBOARD = True
         self.stats = self.classdata.stats
-        self.starting_stats = self.classdata.starting_stats
         self.skills = {}
         self.hp = self.stats['HP']
         self.mp = self.stats['MP']
@@ -197,7 +196,7 @@ class Player(Entity):
         if self.exp >= self.stats['EXP']:
             self.lvl += 1
             self.exp = 0
-        self.classdata.calculate_stats(self)
+        self.classdata.calculate_stats(self.lvl)
         self.stats = self.classdata.stats
 
         if self.hp > self.stats['HP']:

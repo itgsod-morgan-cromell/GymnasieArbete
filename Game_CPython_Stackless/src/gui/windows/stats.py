@@ -1,6 +1,6 @@
 import pygame
 from src.gui.textrect import *
-
+from src.options import *
 
 class StatsWindow(object):
     def __init__(self, player, rect):
@@ -10,7 +10,7 @@ class StatsWindow(object):
         self.x = rect.x + 20
         self.y = rect.y
         self.image = pygame.Surface((self.width, self.height))
-        self.starting_stats = player.starting_stats
+        self.starting_stats = player.classdata.pfs
         self.stats = player.stats
         self.stat_list = []
         self.text_size = 12
@@ -38,7 +38,7 @@ class StatsWindow(object):
         pass
 
     def draw(self, surface):
-        self.image.fill((54, 54, 54))
+        self.image.fill(INTERFACE_COLOR)
         for stat in self.stat_list:
             self.image.blit(stat[0], (stat[1].x, stat[1].y))
         surface.blit(self.image, (self.x, self.y))

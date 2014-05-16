@@ -8,9 +8,10 @@ class ClassData(object):
         self.data = xlrd.open_workbook('../res/entities/classes/{0}.xls'.format(_class))
         self.pfs = {}
         self.calculate_pf()
-        self.stats = {}
-        self.starting_stats = {}
-        self.calculate_stats(None, True)
+        self.stats = self.pfs.copy()
+        self.skills = {}
+        self.calculate_stats()
+        self.calculate_skills()
 
     def calculate_pf(self):
         self.data.sheet_names()
@@ -19,18 +20,8 @@ class ClassData(object):
             if row > 0: # Dont parse the title of each row.
                 self.pfs[str(sheet.row_values(row)[0])] = int(sheet.row_values(row)[1])
 
-    def calculate_stats(self, target=None, setup=False):
+    def calculate_stats(self, lvl=1):
         self.stats['RANGE'] = 0   # TODO: REMOVE THIS
-        if target:
-            lvl = target.lvl
-            for item in target.inventory:
-                if item.equipped:
-                    self.stats = dict(self.stats.items()+item.stats.items())
-
-        else:
-            lvl = 1
-        for key, pf in self.pfs.items():
-            self.stats[key] = (pf * lvl) + (2 * (lvl % 3)) + (10 + lvl)
 
         self.stats['HP'] = (self.stats['STR'] + self.stats['STA'])
         self.stats['MP'] = 10
@@ -38,12 +29,13 @@ class ClassData(object):
         if lvl == 1:
             self.stats['EXP'] = 30
         else:
-            self.stats['EXP'] = int(self.stats['EXP'] * 1.2 + 5)
+            self.stats['EXP'] = lvl * 1.2 + 5
 
-        if setup:
-            self.starting_stats = copy.copy(self.stats)
-            self.starting_stats['HP'] = 0
-            self.starting_stats['MP'] = 0
-            self.starting_stats['DMG'] = 0
-            self.starting_stats['RANGE'] = 0
-            self.starting_stats['EXP'] = 0
+
+    def calculate_skills(self):
+        self.skills['unarmed combat'] = self.stats['STR'] + self.stats['AGI']
+        self.skills['armed combat'] = self.stats['STR'] + self.stats['DEX']
+        self.skills['ranged combat'] = self.stats['DEX'] + self.stats['INT']
+        self.skills['magic'] = self.stats['INT'] + self.stats['STA']
+        self.skills['combat defence'] = self.stats['STR'] + self.stats['AGI']
+        self.skills['magic defence'] = self.stats['AGI'] + self.stats['INT']

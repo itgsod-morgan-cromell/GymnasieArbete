@@ -36,14 +36,14 @@ class MiniMap(Gui):
     def __init__(self, world):
         self.world = world
         self.tile_size = 6
-        self.width = 192
+        self.width = MENU_WIDTH
         self.height = 192
         self.camera = pygame.Rect((0, 0), (self.width, self.height)).copy()
         self.map = Map()
         self.map.load_dungeon(world.map.dungeon, True, self.tile_size)
-        self.zoom_in_arrow = ZoomArrow(0, (174, 10))
+        self.zoom_in_arrow = ZoomArrow(0, (self.width - 20, 10))
         self.zoom_in_arrow.create()
-        self.zoom_out_arrow = ZoomArrow(1, (174, 20))
+        self.zoom_out_arrow = ZoomArrow(1, (self.width - 20, 20))
         self.zoom_out_arrow.create()
 
         Gui.__init__(self, 'minimap', (4, 4), pygame.Surface((self.width, self.height)), True)
@@ -76,7 +76,7 @@ class MiniMap(Gui):
         etype = get_event_type(event)
         if etype == TIME_PASSED:
             self.redraw()
-        elif etype == pygame.MOUSEBUTTONDOWN and event.button in [4, 5]:
+        elif etype == pygame.MOUSEBUTTONDOWN:
             if event.button == 4:
                 self.zoom_in()
             elif event.button == 5:

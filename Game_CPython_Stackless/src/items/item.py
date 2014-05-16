@@ -103,13 +103,13 @@ class Equipment(object):
     def examine(self):
         width = 250
         info = pygame.Surface((width, 80))
-        info.fill((54, 54, 54))
+        info.fill(INTERFACE_COLOR)
         info.blit(self.image, (0, 0))
         info.blit(render_textrect(self.name, 32, pygame.Rect(0, 0, width, 40), eval(self.extra['rarity'])), (40, 1))
         info.blit(render_textrect(self.description, 15, pygame.Rect(0, 0, width, 40), (255, 255, 255)), (0, 45))
 
         stats = pygame.Surface((width, 50))
-        stats.fill((54, 54, 54))
+        stats.fill(INTERFACE_COLOR)
         y = 0
         for stat, i in self.stats.items():
             stats.blit(self.stats_font.render('{0}: '.format(stat), 0, (255, 255, 255)), (0, y * 10))
@@ -117,7 +117,7 @@ class Equipment(object):
                        (self.stats_font.size('{0}: '.format(stat))[0], y * 10))
             y += 1
         image = pygame.Surface((width + 20, info.get_rect().h + stats.get_rect().h + 20))
-        image.fill((54, 54, 54))
+        image.fill(INTERFACE_COLOR)
         image.blit(info, (10, 10))
         image.blit(stats, (10, info.get_rect().h + 20))
         pygame.draw.line(image, (0, 0, 0), (10, info.get_rect().h + 13),

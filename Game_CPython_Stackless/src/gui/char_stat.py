@@ -13,7 +13,7 @@ class Bar(object):
         self.color = color
         self.info = info
         self.hovering = ALWAYS_SHOW_STATS
-        self.image = pygame.Surface((176, 16))
+        self.image = pygame.Surface((MENU_WIDTH - 10, 16))
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
         self.rect.y = pos[1]
@@ -56,9 +56,9 @@ class CharStats(Gui):
         self.time_passed = 0.0
         self.player_image = pygame.transform.scale(self.player_image, (self.player_image.get_width() / 2,
                                                                        self.player_image.get_height() / 2))
-        self.name = render_textrect(self.world.player.name, 20, self.image.get_rect(), (255, 255, 255), (54, 54, 54))
-        self.time_passed_text = render_textrect(self.time_passed, 20, pygame.Rect(0, 0, 100, 100), (255, 255, 255),
-                                                (54, 54, 54))
+        self.name = render_textrect(self.world.player.name, 20, self.image.get_rect(), (255, 255, 255), INTERFACE_COLOR)
+        self.time_passed_text = render_textrect(self.time_passed, 20, pygame.Rect(0, 0, MENU_WIDTH - 100, 100), (255, 255, 255),
+                                                INTERFACE_COLOR)
         self.exp = Bar(self.world.player.exp, self.world.player.stats['EXP'], 'Lvl {0}'.format(self.world.player.lvl), (50, 255, 10),
                        (5, 20))
         self.hp = Bar(self.world.player.hp, self.world.player.stats['HP'], 'HP', (224, 52, 52), (5, 45))
@@ -103,12 +103,12 @@ class CharStats(Gui):
         elif etype == TIME_PASSED:
             self.time_passed += event.amount
             self.time_passed_text = render_textrect(self.time_passed, 20, pygame.Rect(0, 0, 100, 100), (255, 255, 255),
-                                                    (54, 54, 54))
+                                                    INTERFACE_COLOR)
 
     def draw(self, surface):
         self.image.blit(self.player_image, (5, 0))
         self.image.blit(self.name, (40, 0))
-        self.image.blit(self.time_passed_text, (120, 0))
+        self.image.blit(self.time_passed_text, (MENU_WIDTH - 100, 0))
         self.hp.draw(self.image)
         self.exp.draw(self.image)
         self.mp.draw(self.image)

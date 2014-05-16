@@ -21,7 +21,7 @@ class GuiHandler(object):
         self.interface_manager.update()
 
     def draw(self, screen):
-        self.bg.fill((54, 54, 54))
+        self.bg.fill(INTERFACE_COLOR)
         self.minimap.draw(self.bg)
         self.char_stat.draw(self.bg)
         self.interface_manager.draw(self.bg)

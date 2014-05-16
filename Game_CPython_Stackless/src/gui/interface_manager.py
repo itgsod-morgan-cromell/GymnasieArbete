@@ -3,6 +3,7 @@ from src.options import *
 from src.event_helper import *
 from collections import OrderedDict
 from src.gui.windows import *
+from src.gui.textrect import render_textrect
 
 
 class NavigationButton(object):
@@ -46,27 +47,50 @@ class NavigationButton(object):
         surface.blit(self.image, (self.x, self.y))
 
 
+class InfoBar(object):
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.text_size = 15
+        self.rect = pygame.Rect(0, 0, width, height)
+        self.image = pygame.Surface((width, height))
+        register_handler([GUI_INFOBAR_POST, GUI_INFOBAR_CLEAR], self.handle_event)
+
+    def handle_event(self, event):
+        etype = get_event_type(event)
+        if etype == GUI_INFOBAR_POST:
+            self.image = render_textrect(event.msg, self.text_size, self.rect, (255, 255, 255), (0, 0, 0), 1)
+        elif etype == GUI_INFOBAR_CLEAR:
+            self.image.fill((0, 0, 0))
+
+
+    def draw(self, surface):
+        surface.blit(self.image, (self.x, self.y))
+
+
 class InterfaceManager(object):
     def __init__(self, world):
         self.world = world
         self.x = 0
-        self.y = 300
+        self.y = INTERFACE_Y
         self.width = MENU_WIDTH
-        self.height = 200
+        self.height = 212
         self.rect = (self.x, self.y, self.width, self.height)
         self.image = pygame.Surface((self.width, self.height))
         windows_x = 20
-        windows_width = MENU_WIDTH - windows_x
-        windows_height = 200
-        window_rect = pygame.Rect(windows_x, 0, windows_width, windows_height)
+        windows_width = int((MENU_WIDTH - windows_x)/32) * 32
+        windows_height = int(200/32) * 32
+        window_rect = pygame.Rect(windows_x, self.height - windows_height, windows_width, windows_height)
+        self.info_bar = InfoBar(windows_x, 0, windows_width, self.height - windows_height)
         self.buttons = OrderedDict({})
         self.active_window = 'inventory'
         self.windows = OrderedDict({})
-        self.windows['inventory'] = InventoryWindow(self.world, window_rect)
+        self.windows['inventory'] = InventoryWindow(self.world.player, window_rect)
         self.windows['stats'] = StatsWindow(self.world.player, window_rect)
+        self.windows['skills'] = SkillsWindow(self.world.player, window_rect)
         i = 0
         for window in self.windows:
-            self.buttons[window] = NavigationButton(window, 0, i * 20)
+            self.buttons[window] = NavigationButton(window, 0, i * 20 + self.height - windows_height)
             i += 1
 
         register_handler([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION], self.handle_event)
@@ -78,6 +102,9 @@ class InterfaceManager(object):
 
     def handle_event(self, event):
         post_event(GUI_EXAMINE_ITEM_CLEAR)
+        post_event(GUI_INFOBAR_CLEAR)
+        if hasattr(self.windows[self.active_window], 'clear_selected'):
+            self.windows[self.active_window].clear_selected()
         post_event(GUI_INTERFACE_BUTTON, button=None)
         mouse = pygame.Rect(event.pos, (1, 1)).copy()
         mouse.x -= WIDTH - MENU_WIDTH
@@ -93,10 +120,10 @@ class InterfaceManager(object):
 
 
     def draw(self, surface):
-        self.image.fill((54, 54, 54))
+        self.image.fill(INTERFACE_COLOR)
         for button in self.buttons:
             self.buttons[button].draw(self.image)
         self.windows[self.active_window].draw(self.image)
-
+        self.info_bar.draw(self.image)
 
         surface.blit(self.image, (self.x, self.y))
