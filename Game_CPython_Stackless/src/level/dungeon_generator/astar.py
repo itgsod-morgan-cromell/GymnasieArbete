@@ -247,7 +247,7 @@ class Pathfinder:
                                         self.end_node, True)
 
 
-    def find_path(self, map, start_pos, end_pos, unwalkable_tile_ids, start_dir=0):
+    def find_path(self, map, start_pos, end_pos, unwalkable_tile_ids):
 
         self.nodes = []
         self.open_list = set()
@@ -264,7 +264,6 @@ class Pathfinder:
         self.setup(map, unwalkable_tile_ids)
         self.start_node = self.nodes[start_pos[1]][start_pos[0]]
         self.end_node = self.nodes[end_pos[1]][end_pos[0]]
-        self.start_node.dir = start_dir
         self.open_list.add(self.start_node)
         while self.open_list:
 

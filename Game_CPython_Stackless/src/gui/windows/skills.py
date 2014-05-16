@@ -61,6 +61,7 @@ class SkillsWindow(object):
         if skill:
             skill.selected = True
             post_event(GUI_INFOBAR_POST, msg=skill.name)
+            post_event(FILL_CONSOLE, msg=skill.name)
         else:
             post_event(GUI_INFOBAR_CLEAR)
 

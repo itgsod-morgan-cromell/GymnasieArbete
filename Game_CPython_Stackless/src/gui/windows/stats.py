@@ -2,6 +2,8 @@ import pygame
 from src.gui.textrect import *
 from src.options import *
 
+
+
 class StatsWindow(object):
     def __init__(self, player, rect):
         self.rect = rect

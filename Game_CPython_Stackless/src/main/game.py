@@ -38,7 +38,7 @@ class Game(object):
         self.screen.blit(pygame.image.load('../res/gui/loading_screen.png'), (WIDTH / 2 - 110, HEIGHT / 2 - 17))
         pygame.display.flip()
         self.world = World(player)
-        self.world.update(self.camera)
+        self.world.update()
         self.ui = GuiHandler(self.world)
         self.console = Console()
         self.tooltip = Tooltip(self.world)
@@ -77,7 +77,7 @@ class Game(object):
         Main update loop.
         '''
 
-        self.world.update(self.camera)
+        self.world.update()
         self.camera.centerx = int(self.world.player.x) * 32
         self.camera.centery = int(self.world.player.y) * 32
         if self.camera.x < 0:

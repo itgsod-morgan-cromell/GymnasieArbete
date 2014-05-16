@@ -13,14 +13,10 @@ class Player(Entity):
         self.classdata = ClassData(_class)
         Entity.__init__(self, name, pos, world, 'player')
         self.image = self.build_player(_class)
-        self.dir = 0
-        self.icon = self.image
-        self.move_ticker = 0
         self.inventory = []
         self.item_slots = {'back': None, 'armor': None, 'hand1': None, 'hand2': None}
         self.max_path_delay = 1
         self.astar = Pathfinder()
-        self.playable_area = None
         self.KEYBOARD = True
         self.stats = self.classdata.stats
         self.skills = {}
@@ -34,7 +30,6 @@ class Player(Entity):
         self.mouse_grid_y = 0
         self.path = None
         self.path_delay = 0
-        self.travel_dest_event = None
         self.follow_path = False
         self.move(0, 0)
         register_handler([pygame.KEYDOWN, PLAYER_FIND_PATH, PLAYER_ITEM_PROXIMITY, PLAYER_TRAVEL_PATH,
@@ -42,8 +37,7 @@ class Player(Entity):
         register_handler([PLAYER_EXAMINE_ITEM, PLAYER_USE_ITEM, PLAYER_PICKUP_ITEM,
                           PLAYER_DROP_ITEM, PLAYER_EQUIP_ITEM, PLAYER_UNEQUIP_ITEM], self.handle_items)
 
-    def update(self, offset):
-        self.playable_area = offset
+    def update(self):
         if self.path:
             if self.follow_path:
                 self.follow_path = True
@@ -55,7 +49,6 @@ class Player(Entity):
         self.follow_path = False
         self.path_delay = 0
         self.calculate_stats()
-        self.stats['DMG'] = 100
 
     def handle_event(self, event):
         etype = get_event_type(event)
@@ -144,16 +137,12 @@ class Player(Entity):
     def move(self, xa, ya):
 
         if xa > 0:
-            self.dir = 0
             xa = 1
         elif xa < 0:
-            self.dir = 2
             xa = -1
         elif ya > 0:
-            self.dir = 1
             ya = 1
         elif ya < 0:
-            self.dir = 3
             ya = -1
             # Check collision from the grid.
         tile = self.world.map.tiles[self.y + ya][self.x + xa]
@@ -211,21 +200,7 @@ class Player(Entity):
         start = (self.x, self.y)
         blocked_tiles = [0, 2, 3, 4, 5, 6, 7, 10]
         self.path = None
-        start_dir = 0
-        if self.mouse_grid_x is not self.x:
-            if end[0] > self.x:
-                start_dir = 2
-            elif end[0] < self.x:
-                start_dir = 6
-            if end[1] > self.y:
-                start_dir += 1
-            elif end[1] < self.y:
-                start_dir -= 1
-        elif end > self.y:
-            start_dir = 4
-        elif self.mouse_grid_y < self.y:
-            start_dir = 0
-        path = self.astar.find_path(self.world.dungeon.grid, start, end, blocked_tiles, start_dir)
+        path = self.astar.find_path(self.world.dungeon.grid, start, end, blocked_tiles)
         if path:
             self.path = path
             post_event(PLAYER_FOUND_PATH, path=path)

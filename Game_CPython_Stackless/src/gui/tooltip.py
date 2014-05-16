@@ -144,7 +144,6 @@ class Tooltip(Gui):
     def handle_event(self, event):
         etype = get_event_type(event)
         if etype == pygame.MOUSEBUTTONDOWN and self.options:
-
             if pygame.mouse.get_pressed()[0]:  # Left click.
                 if 'L-MOUSE' in self.options:
                     post_event(self.options['L-MOUSE'][1], target=self.options['L-MOUSE'][2])

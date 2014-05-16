@@ -4,14 +4,17 @@ import pygame
 from src.event_helper import *
 from src.gui.textrect import render_textrect
 from src.options import *
+from random import randint
 
 
 class Text(object):
     def __init__(self, rect, data, color):
         self.data = data
-        self.rect = rect
         if type(data) == str:
-            self.image = render_textrect(data, CONSOLE_FONT_SIZE, rect, color)
+            self.image = CONSOLE_FONT.render(data, 1, color)
+        self.rect = rect
+        self.rect.w = self.image.get_width()
+        self.rect.h = CONSOLE_FONT.get_linesize()
 
 
 class Console(Gui):
@@ -22,11 +25,12 @@ class Console(Gui):
         Gui.__init__(self, 'console', (0, HEIGHT - CONSOLE_HEIGHT), pygame.Surface((self.width, self.height)), True)
         self.log = []
         self.log_processed = []
-        register_handler([POST_TO_CONSOLE, CLEAR_CONSOLE], self.handle_event)
+        self.fill_message = None
+        register_handler([POST_TO_CONSOLE, CLEAR_CONSOLE, FILL_CONSOLE, CLEAR_FILL_CONSOLE], self.handle_event)
 
 
     def handle_event(self, event):
-        etype = event.type if event.type != pygame.USEREVENT else event.event_type
+        etype = get_event_type(event)
         if etype == POST_TO_CONSOLE:
             if hasattr(event, 'color'):
                 color = event.color
@@ -36,23 +40,29 @@ class Console(Gui):
         elif etype == CLEAR_CONSOLE:
             self.log_processed = []
 
+        elif etype == FILL_CONSOLE:
+            self.fill_message = Text(self.rect, event.msg, (255, 255, 255))
+        elif etype == CLEAR_FILL_CONSOLE:
+            self.fill_message = None
+
     def create_text(self, msg, color):
-        t = int(200 * (CONSOLE_FONT_SIZE/10))
         if type(msg) == list:
             for i, m in enumerate(msg):
-                msg_width = (len(m) * t)
+                if type(m) == tuple:
+                    color = m[1]
+                    m = m[0]
+
+                msg_width = (len(m) * CONSOLE_FONT_SIZE * 0.6)
+                print msg_width
                 last_msg_width = 0
                 for i2 in range(0, len(msg)):
                     if i2 < i:
-                        last_msg_width += (len(msg[i2].data) * CONSOLE_FONT_SIZE * 0.6 + 8)
-                rect = pygame.Rect((5 + last_msg_width, 5), (msg_width, 20))
-                if type(m) == tuple:
-                    msg[i] = Text(rect, m[0], m[1])
-                else:
-                    msg[i] = Text(rect, m, color)
+                        last_msg_width += msg[i2].rect.w
+                rect = pygame.Rect((last_msg_width, 5), (msg_width, 20))
+                msg[i] = Text(rect, m, color)
             return msg
         else:
-            msg_width = (len(msg) * t)
+            msg_width = (len(msg) * CONSOLE_FONT_SIZE)
             rect = pygame.Rect((5, 5), (msg_width, 20))
             text = Text(rect, msg, color)
             return text
@@ -60,6 +70,9 @@ class Console(Gui):
 
 
     def draw(self, screen):
+        if self.fill_message:
+            screen.blit(self.fill_message.image, (self.x, self.y))
+            return
         for y, msg in enumerate(self.log_processed):
             if y > self.max_messages - 1:
                 return

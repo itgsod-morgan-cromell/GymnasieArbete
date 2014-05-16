@@ -46,10 +46,8 @@ class World(object):
             self.player.move(0, 0)
 
 
-    def update(self, offset):
-        self.player.update(offset)
-        if self.player.hp <= 0:
-            self.player = None
+    def update(self):
+        self.player.update()
         for monster in self.map.monsters:
             monster.update()
 

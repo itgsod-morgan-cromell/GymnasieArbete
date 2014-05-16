@@ -103,6 +103,7 @@ class InterfaceManager(object):
     def handle_event(self, event):
         post_event(GUI_EXAMINE_ITEM_CLEAR)
         post_event(GUI_INFOBAR_CLEAR)
+        post_event(CLEAR_FILL_CONSOLE)
         if hasattr(self.windows[self.active_window], 'clear_selected'):
             self.windows[self.active_window].clear_selected()
         post_event(GUI_INTERFACE_BUTTON, button=None)

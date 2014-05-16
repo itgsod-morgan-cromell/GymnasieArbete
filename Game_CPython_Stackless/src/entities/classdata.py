@@ -21,7 +21,7 @@ class ClassData(object):
                 self.pfs[str(sheet.row_values(row)[0])] = int(sheet.row_values(row)[1])
 
     def calculate_stats(self, lvl=1):
-        self.stats['RANGE'] = 0   # TODO: REMOVE THIS
+        self.stats['RANGE'] = 1   # TODO: REMOVE THIS
 
         self.stats['HP'] = (self.stats['STR'] + self.stats['STA'])
         self.stats['MP'] = 10
