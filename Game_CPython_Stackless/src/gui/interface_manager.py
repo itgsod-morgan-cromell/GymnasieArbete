@@ -51,17 +51,17 @@ class InfoBar(object):
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
-        self.text_size = 15
+        self.text_size = 12
         self.rect = pygame.Rect(0, 0, width, height)
         self.image = pygame.Surface((width, height))
         register_handler([GUI_INFOBAR_POST, GUI_INFOBAR_CLEAR], self.handle_event)
 
     def handle_event(self, event):
+        self.image = pygame.image.load('../res/gui/info_bar.png')
         etype = get_event_type(event)
         if etype == GUI_INFOBAR_POST:
-            self.image = render_textrect(event.msg, self.text_size, self.rect, (255, 255, 255), (0, 0, 0), 1)
-        elif etype == GUI_INFOBAR_CLEAR:
-            self.image.fill((0, 0, 0))
+            self.image.blit(render_textrect(event.msg, self.text_size, self.rect, (255, 255, 255), (0, 0, 0, 0), 1), (0, 0))
+
 
 
     def draw(self, surface):
@@ -74,14 +74,14 @@ class InterfaceManager(object):
         self.x = 0
         self.y = INTERFACE_Y
         self.width = MENU_WIDTH
-        self.height = 212
+        self.height = 220
         self.rect = (self.x, self.y, self.width, self.height)
         self.image = pygame.Surface((self.width, self.height))
         windows_x = 20
         windows_width = int((MENU_WIDTH - windows_x)/32) * 32
         windows_height = int(200/32) * 32
         window_rect = pygame.Rect(windows_x, self.height - windows_height, windows_width, windows_height)
-        self.info_bar = InfoBar(windows_x, 0, windows_width, self.height - windows_height)
+        self.info_bar = InfoBar(windows_x, 8, windows_width, self.height - windows_height)
         self.buttons = OrderedDict({})
         self.active_window = 'inventory'
         self.windows = OrderedDict({})
