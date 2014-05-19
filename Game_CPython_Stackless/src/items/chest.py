@@ -43,12 +43,9 @@ class Chest(object):
         self.world.dungeon.grid[self.y][self.x] = 1
 
     def interact(self):
-        r_mouse = ('examine', PLAYER_EXAMINE_ITEM)
-
         action = 'open' if not self.used else 'loot'
         l_mouse = (action, PLAYER_USE_ITEM)
-        post_event(PLAYER_ITEM_PROXIMITY, target=self, range=1, true=GUI_TOOLTIP_POST, args={'l_mouse': l_mouse, 'target': self})
-        post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self)
+        post_event(PLAYER_OBJECT_PROXIMITY, target=self, range=1, true=GUI_TOOLTIP_POST, args={'l_mouse': l_mouse, 'target': self})
 
     def generate_loot(self):
         types = ['weapon']

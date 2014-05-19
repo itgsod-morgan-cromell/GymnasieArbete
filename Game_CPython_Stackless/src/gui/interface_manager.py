@@ -60,7 +60,7 @@ class InfoBar(object):
         self.image = pygame.image.load('../res/gui/info_bar.png')
         etype = get_event_type(event)
         if etype == GUI_INFOBAR_POST:
-            self.image.blit(render_textrect(event.msg, self.text_size, self.rect, (255, 255, 255), (0, 0, 0, 0), 1), (0, 0))
+            self.image.blit(render_textrect(event.msg, self.text_size, self.rect, (255, 255, 255), (0, 0, 0, 0), 1), (0, 2))
 
 
 
@@ -101,7 +101,6 @@ class InterfaceManager(object):
                 self.active_window = button
 
     def handle_event(self, event):
-        post_event(GUI_EXAMINE_ITEM_CLEAR)
         post_event(GUI_INFOBAR_CLEAR)
         post_event(CLEAR_FILL_CONSOLE)
         if hasattr(self.windows[self.active_window], 'clear_selected'):

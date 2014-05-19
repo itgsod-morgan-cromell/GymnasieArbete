@@ -65,6 +65,6 @@ class CombatHandler(object):
         return True
 
     def calc_damage(self, attacker, target, crit=1.0):
-        return 10
+        return 1
 
 

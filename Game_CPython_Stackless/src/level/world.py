@@ -11,6 +11,7 @@ class World(object):
         self.map.spawn_objects()
         self.player = Player(self.map.spawn, self.map, player['class'], 'Test')
         self.map.player = self.player
+        self.map.entities.append(self.player)
         self.output = None
         register_handler([WORLD_MOVE_DOWN, WORLD_MOVE_UP, PLAYER_DROP_ITEM], self.handle_event)
         register_handler([PLAYER_PICKUP_ITEM], self.map.handle_event)
@@ -45,23 +46,20 @@ class World(object):
             self.map.items.append(event.target)
             self.player.move(0, 0)
 
-
     def update(self):
-        self.player.update()
-        for monster in self.map.monsters:
-            monster.update()
+        for entity in self.map.entities:
+            entity.update()
 
     def time_passed(self, event):
-        for monster in self.map.monsters:
-            monster.time_passed(event)
+        for entity in self.map.entities:
+            entity.time_passed(event)
 
     def draw(self, screen, offset):
         self.map.map.draw(screen, offset)
         for item in self.map.items:
             explored = self.map.map.tiles[item.y][item.x].explored
             item.draw(screen, offset, explored)
-        for monster in self.map.monsters:
-            if self.map.map.tiles[monster.y][monster.x].explored > 0:
-                monster.draw(screen, offset)
-        self.player.draw(screen, offset)
+        for entity in self.map.entities:
+            if self.map.map.tiles[entity.y][entity.x].explored > 0:
+                entity.draw(screen, offset)
 

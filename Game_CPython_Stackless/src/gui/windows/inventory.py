@@ -72,11 +72,9 @@ class InventoryWindow(object):
                 if slot:
                     slot.selected = True
                 if slot and slot.object:
-                    post_event(GUI_EXAMINE_ITEM, tooltip=slot.object.examine())
                     post_event(GUI_INFOBAR_POST, msg=slot.object.name)
                     slot.object.interact('left')
                 else:
-                    post_event(GUI_EXAMINE_ITEM_CLEAR)
                     post_event(GUI_INFOBAR_CLEAR)
 
         elif etype == PLAYER_PICKUP_ITEM:

@@ -3,21 +3,7 @@ from src.event_helper import *
 from src.gui.textrect import render_textrect
 
 
-class Button(object):
-    def __init__(self, data, event_type, rect):
-        self.data = data
-        self.rect = rect
-        self.event_type = event_type
-        if type(self.data) == str:
-            self.image = render_textrect(self.data, self.rect.w, self.rect, (255, 255, 255), None, 1)
-        else:
-            self.image = self.data
 
-    def onclick(self):
-        post_event(self.event_type)
-
-    def draw(self, surface):
-        surface.blit(self.image, (self.rect.x, self.rect.y))
 
 
 class Gui(object):

@@ -1,15 +1,17 @@
 import math
 import xlrd
 import copy
+from src.options import *
+from collections import OrderedDict
 
 
 class ClassData(object):
-    def __init__(self, _class):
-        self.data = xlrd.open_workbook('../res/entities/classes/{0}.xls'.format(_class))
+    def __init__(self, type, _class):
+        self.data = xlrd.open_workbook('../res/entities/{0}_classes/{1}.xls'.format(type, _class))
         self.pfs = {}
         self.calculate_pf()
         self.stats = self.pfs.copy()
-        self.skills = {}
+        self.skills = OrderedDict({})
         self.calculate_stats()
         self.calculate_skills()
 
@@ -33,9 +35,7 @@ class ClassData(object):
 
 
     def calculate_skills(self):
-        self.skills['unarmed combat'] = self.stats['STR'] + self.stats['AGI']
-        self.skills['armed combat'] = self.stats['STR'] + self.stats['DEX']
-        self.skills['ranged combat'] = self.stats['DEX'] + self.stats['INT']
-        self.skills['magic'] = self.stats['INT'] + self.stats['STA']
-        self.skills['combat defence'] = self.stats['STR'] + self.stats['AGI']
-        self.skills['magic defence'] = self.stats['AGI'] + self.stats['INT']
+        DATA_PARSER._sections = {}
+        DATA_PARSER.read('../res/data/skills.ini')
+        for skill in DATA_PARSER.sections():
+            self.skills[skill] = 1

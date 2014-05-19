@@ -7,12 +7,13 @@ from src.event_helper import *
 from src.entities.enemy import *
 from src.level.dungeon_generator.fov import *
 
+
 class DungeonLevel(object):
     def __init__(self, floor, up=None, down=None):
-        self.monsters = []
+        self.entities = []
+        self.player = None
         self.items = []
         self.up = up
-        self.player = None
         self.floor = floor
         self.down = down
         self.dungeon = Dungeon((random.randint(33, 50), random.randint(33, 50)), "None", 100, (5, 5), (32, 32),
@@ -78,8 +79,7 @@ class DungeonLevel(object):
                     self.items.append(Chest((tile, row), self))
                 if self.map.tiles[row][tile].id == 7:
                     self.map.tiles[row][tile].id = 1
-                    self.dungeon.grid[row][tile] = 1
-                    self.monsters.append(Monster('test', 'warrior', (tile, row), self))
+                    self.entities.append(Monster((tile, row), self))
                 if self.map.tiles[row][tile].id == 11:
                     self.map.tiles[row][tile].id = 1
                     self.dungeon.grid[row][tile] = 1

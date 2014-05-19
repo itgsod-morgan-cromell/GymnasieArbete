@@ -83,10 +83,9 @@ class Equipment(object):
                 l_mouse = ('equip', PLAYER_EQUIP_ITEM)
             post_event(GUI_TOOLTIP_POST, l_mouse=l_mouse, r_mouse=r_mouse, target=self, orientation=orientation)
         else:
-            r_mouse = ('examine', PLAYER_EXAMINE_ITEM)
             l_mouse = ('pick up', PLAYER_PICKUP_ITEM)
-            post_event(PLAYER_ITEM_PROXIMITY, target=self, range=0, true=GUI_TOOLTIP_POST, args={'l_mouse': l_mouse, 'target': self})
-            post_event(GUI_TOOLTIP_POST, r_mouse=r_mouse, target=self, orientation=orientation)
+            post_event(PLAYER_OBJECT_PROXIMITY, target=self, range=0, true=GUI_TOOLTIP_POST, args={'l_mouse': l_mouse, 'target': self})
+
 
 
     def equip(self, target):
@@ -99,31 +98,6 @@ class Equipment(object):
         if target.item_slots[self.slot] == self:
             self.equipped = False
             target.item_slots[self.slot] = None
-
-    def examine(self):
-        width = 250
-        info = pygame.Surface((width, 80))
-        info.fill(INTERFACE_COLOR)
-        info.blit(self.image, (0, 0))
-        info.blit(render_textrect(self.name, 32, pygame.Rect(0, 0, width, 40), eval(self.extra['rarity'])), (40, 1))
-        info.blit(render_textrect(self.description, 15, pygame.Rect(0, 0, width, 40), (255, 255, 255)), (0, 45))
-
-        stats = pygame.Surface((width, 50))
-        stats.fill(INTERFACE_COLOR)
-        y = 0
-        for stat, i in self.stats.items():
-            stats.blit(self.stats_font.render('{0}: '.format(stat), 0, (255, 255, 255)), (0, y * 10))
-            stats.blit(self.stats_font.render(str(i), 0, (255, 255, 143)),
-                       (self.stats_font.size('{0}: '.format(stat))[0], y * 10))
-            y += 1
-        image = pygame.Surface((width + 20, info.get_rect().h + stats.get_rect().h + 20))
-        image.fill(INTERFACE_COLOR)
-        image.blit(info, (10, 10))
-        image.blit(stats, (10, info.get_rect().h + 20))
-        pygame.draw.line(image, (0, 0, 0), (10, info.get_rect().h + 13),
-                         (info.get_rect().w + 10, info.get_rect().h + 13), 2)
-        pygame.draw.rect(image, (155, 155, 155), image.get_rect(), 1)
-        return image
 
     def draw(self, screen, offset, explored=1):
         if explored:

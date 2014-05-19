@@ -30,17 +30,19 @@ class Game(object):
         self.clock = GameClock(40)
         self.camera = self.world_screen.get_rect().copy()
         self.events = None
+        self.console = Console()
         self.menu = Menu()
         register_handler(MENU_NEW_GAME, self.new_game)
 
     def new_game(self, event):
-        player = {'name': 'Test', 'class': 'warrior'}
+        self.menu.active = False
+        player = {'name': event.name, 'race': event.race, 'class': event.background}
         self.screen.blit(pygame.image.load('../res/gui/loading_screen.png'), (WIDTH / 2 - 110, HEIGHT / 2 - 17))
         pygame.display.flip()
         self.world = World(player)
         self.world.update()
         self.ui = GuiHandler(self.world)
-        self.console = Console()
+
         self.tooltip = Tooltip(self.world)
 
     def run(self):
@@ -60,14 +62,15 @@ class Game(object):
                         sys.exit()
                     elif event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
-                            if not self.menu.main:
-                                self.menu.active = not self.menu.active
+                            pygame.quit()
+                            sys.exit()
                 if not self.menu.active:
                     self.update()
 
             if self.clock.frame_ready:
                 if self.menu.active:
                     self.menu.draw(self.screen)
+                    self.console.draw(self.screen)
                 else:
                     self.draw()
                 pygame.display.flip()

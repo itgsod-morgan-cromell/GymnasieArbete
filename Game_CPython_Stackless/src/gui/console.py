@@ -10,11 +10,19 @@ from random import randint
 class Text(object):
     def __init__(self, rect, data, color):
         self.data = data
+        self.rect = rect
+        self.rect.h = CONSOLE_FONT.get_linesize()
         if type(data) == str:
             self.image = CONSOLE_FONT.render(data, 1, color)
-        self.rect = rect
+        elif type(data) == list:
+            self.rect.h *= len(data)
+            self.image = pygame.Surface((WIDTH - MENU_WIDTH, self.rect.h))
+            for i, msg in enumerate(data[:9]):
+                self.image.blit(CONSOLE_FONT.render(msg, 1, color), (0, i*CONSOLE_FONT.get_linesize()))
+            if len(data) > 9:
+                self.image.blit(CONSOLE_FONT.render('...', 1, color), (0, 9*CONSOLE_FONT.get_linesize()))
         self.rect.w = self.image.get_width()
-        self.rect.h = CONSOLE_FONT.get_linesize()
+
 
 
 class Console(Gui):
@@ -41,7 +49,10 @@ class Console(Gui):
             self.log_processed = []
 
         elif etype == FILL_CONSOLE:
-            self.fill_message = Text(self.rect, event.msg, (255, 255, 255))
+            msg = event.msg
+            if '\n' in msg:
+                msg = msg.split('\n')
+            self.fill_message = Text(self.rect, msg, (255, 255, 255))
         elif etype == CLEAR_FILL_CONSOLE:
             self.fill_message = None
 
@@ -53,7 +64,6 @@ class Console(Gui):
                     m = m[0]
 
                 msg_width = (len(m) * CONSOLE_FONT_SIZE * 0.6)
-                print msg_width
                 last_msg_width = 0
                 for i2 in range(0, len(msg)):
                     if i2 < i:
@@ -72,12 +82,12 @@ class Console(Gui):
     def draw(self, screen):
         if self.fill_message:
             screen.blit(self.fill_message.image, (self.x, self.y))
-            return
-        for y, msg in enumerate(self.log_processed):
-            if y > self.max_messages - 1:
-                return
-            if type(msg) == list:
-                for m in msg:
-                    screen.blit(m.image, (m.rect.x + self.x, m.rect.y + self.y + y * m.rect.h))
-            else:
-                screen.blit(msg.image, (msg.rect.x + self.x, msg.rect.y + self.y + y * msg.rect.h))
+        else:
+            for y, msg in enumerate(self.log_processed):
+                if y > self.max_messages - 1:
+                    return
+                if type(msg) == list:
+                    for m in msg:
+                        screen.blit(m.image, (m.rect.x + self.x, m.rect.y + self.y + y * m.rect.h))
+                else:
+                    screen.blit(msg.image, (msg.rect.x + self.x, msg.rect.y + self.y + y * msg.rect.h))
